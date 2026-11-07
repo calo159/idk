@@ -17,6 +17,7 @@ import {
   redondear3,
 } from "@/lib/carrito";
 import { formatoCOP, leerNumeroCO } from "@/lib/dinero";
+import { hashPerceptualDeArchivo } from "@/lib/hash-imagen";
 import { puedeFiar } from "@/lib/validaciones/clientes";
 import { resumirPagos, totalVenta } from "@/lib/ventas";
 import { cobrarVenta } from "./acciones";
@@ -39,7 +40,16 @@ const METODOS: { valor: Metodo; etiqueta: string }[] = [
   { valor: "credito", etiqueta: "Fiado" },
 ];
 
+interface ComprobanteSubido {
+  id: string;
+  monto: number | null;
+  entidad: string | null;
+  referencia: string | null;
+  posibleDuplicado: boolean;
+}
+
 interface Recibo {
+  verificaciones: { metodo: string; estado: string }[];
   numero: number;
   vuelto: string;
   total: number;
@@ -69,6 +79,9 @@ export function PuntoDeVenta({
   const [errorCobro, setErrorCobro] = useState<string | null>(null);
   const [excesoPendiente, setExcesoPendiente] = useState(false);
   const [recibo, setRecibo] = useState<Recibo | null>(null);
+  const [comprobantes, setComprobantes] = useState<Partial<Record<Metodo, ComprobanteSubido>>>({});
+  const [subiendo, setSubiendo] = useState<Metodo | null>(null);
+  const [errorComprobante, setErrorComprobante] = useState<string | null>(null);
   const [pendiente, iniciar] = useTransition();
   // Identificador de esta venta: no cambia en los reintentos, así nunca se cobra dos veces.
   const ventaOfflineId = useRef(crypto.randomUUID());
@@ -104,7 +117,42 @@ export function PuntoDeVenta({
     [catalogo, agregar],
   );
 
+  const subirComprobante = async (metodo: Metodo, archivo: File) => {
+    setErrorComprobante(null);
+    setSubiendo(metodo);
+    try {
+      const datos = new FormData();
+      datos.set("foto", archivo);
+      const hash = await hashPerceptualDeArchivo(archivo);
+      if (hash) datos.set("hash_perceptual", hash);
+      const resp = await fetch("/api/ia/comprobante", { method: "POST", body: datos });
+      const json = await resp.json();
+      if (!resp.ok) {
+        setErrorComprobante(json.error ?? "No pudimos leer el comprobante");
+        return;
+      }
+      setComprobantes((c) => ({
+        ...c,
+        [metodo]: {
+          id: json.comprobanteId,
+          monto: json.monto,
+          entidad: json.entidad,
+          referencia: json.referencia,
+          posibleDuplicado: json.posibleDuplicado,
+        },
+      }));
+      // Si no escribieron monto, se sugiere el que leyó la IA.
+      if (json.monto && !pagos[metodo]) setPagos((p) => ({ ...p, [metodo]: String(json.monto) }));
+    } catch {
+      setErrorComprobante("No pudimos subir el comprobante. Revisa tu conexión.");
+    } finally {
+      setSubiendo(null);
+    }
+  };
+
   const reiniciar = () => {
+    setComprobantes({});
+    setErrorComprobante(null);
     setCarrito([]);
     setPagos({ efectivo: "", nequi: "", daviplata: "", transferencia: "", tarjeta: "", credito: "" });
     setClienteId("");
@@ -132,10 +180,12 @@ export function PuntoDeVenta({
           precio_unitario: l.precio,
           descuento: l.descuento,
         })),
-        pagos: montos.filter((m) => m.monto > 0).map((m) => ({ metodo: m.metodo, monto: m.monto })),
+        pagos: montos
+          .filter((m) => m.monto > 0)
+          .map((m) => ({ metodo: m.metodo, monto: m.monto, comprobante_id: comprobantes[m.metodo]?.id ?? null })),
       });
       if (r.ok) {
-        setRecibo({ numero: r.datos.numero, vuelto: r.datos.vuelto, total: total.toNumber(), duplicada: r.datos.duplicada });
+        setRecibo({ verificaciones: r.datos.verificaciones, numero: r.datos.numero, vuelto: r.datos.vuelto, total: total.toNumber(), duplicada: r.datos.duplicada });
       } else {
         setExcesoPendiente(r.campos?.cupo === "excedido" && puedeAutorizarExceso);
         setErrorCobro(r.error);
@@ -153,6 +203,15 @@ export function PuntoDeVenta({
         {Number(recibo.vuelto) > 0 ? (
           <p className="rounded-xl bg-primary/10 p-4 text-lg font-semibold">
             Vuelto: {formatoCOP(recibo.vuelto)}
+          </p>
+        ) : null}
+        {recibo.verificaciones.some((v) => v.estado === "sospechoso") ? (
+          <p role="alert" className="rounded-xl bg-destructive/10 p-4 text-sm font-medium text-destructive">
+            Un comprobante de pago quedó marcado como sospechoso. El dueño recibió una alerta para revisarlo.
+          </p>
+        ) : recibo.verificaciones.some((v) => v.estado === "sin_verificar") ? (
+          <p className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+            Hay un pago electrónico sin comprobante: quedó pendiente de verificar.
           </p>
         ) : null}
         {recibo.duplicada ? (
@@ -356,6 +415,38 @@ export function PuntoDeVenta({
                   value={pagos[m.valor]}
                   onChange={(e) => setPagos((p) => ({ ...p, [m.valor]: e.target.value }))}
                 />
+                {m.valor === "nequi" || m.valor === "daviplata" || m.valor === "transferencia" ? (
+                  <div className="space-y-1">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      aria-label={`Foto del comprobante de ${m.etiqueta}`}
+                      disabled={subiendo === m.valor}
+                      className="block w-full text-xs"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) void subirComprobante(m.valor, f);
+                        e.target.value = "";
+                      }}
+                    />
+                    {subiendo === m.valor ? <p className="text-xs text-muted-foreground">Leyendo comprobante…</p> : null}
+                    {comprobantes[m.valor] ? (
+                      <p
+                        className={`text-xs ${
+                          comprobantes[m.valor]!.posibleDuplicado ||
+                          (comprobantes[m.valor]!.monto !== null &&
+                            comprobantes[m.valor]!.monto !== (leerNumeroCO(pagos[m.valor])?.toNumber() ?? 0))
+                            ? "text-destructive"
+                            : "text-primary"
+                        }`}
+                      >
+                        Leído: {comprobantes[m.valor]!.monto !== null ? formatoCOP(comprobantes[m.valor]!.monto) : "monto ilegible"}
+                        {comprobantes[m.valor]!.entidad ? ` · ${comprobantes[m.valor]!.entidad}` : ""}
+                        {comprobantes[m.valor]!.posibleDuplicado ? " · ¡parece repetido!" : ""}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -388,6 +479,9 @@ export function PuntoDeVenta({
               Este fiado supera el cupo de {cliente?.nombre}
               {puedeAutorizarExceso ? ". Como administrador puedes autorizarlo." : ". Pide autorización al dueño."}
             </p>
+          ) : null}
+          {errorComprobante ? (
+            <p role="alert" className="text-sm text-destructive">{errorComprobante}</p>
           ) : null}
           {errorCobro ? (
             <p role="alert" className="text-sm text-destructive">{errorCobro}</p>

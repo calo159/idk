@@ -20,7 +20,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.7 IA: factura por foto (`POST /api/ia/factura`, salida validada con Zod, `documentos_ia`, emparejado con catálogo). _(Probada con modelo simulado; falta probar con ANTHROPIC_API_KEY real y fotos reales.)_
 - [x] 1.8 Clientes con cupo de fiado y abonos (migración 0006 protege el cupo). _(Pantallas sin ejecutar contra Supabase real.)_
 - [x] 1.9 POS: búsqueda, lector USB y cámara, presentaciones, pagos mixtos, vuelto, fiado con cupo, venta idempotente por offline_id (migración 0007: auditoría de precios). _(Pantalla sin ejecutar contra Supabase real.)_
-- [ ] 1.10 IA: verificación de comprobantes Nequi/Daviplata + alerta de repetidos.
+- [x] 1.10 Verificación de comprobantes Nequi/Daviplata: lectura con IA, hash exacto y perceptual, referencia repetida, monto, fecha, uso en otra venta, alerta al dueño (migración 0008). _(IA probada con modelo simulado; UI sin ejecutar contra Supabase real.)_
 - [x] 1.11 Caja: apertura con base, cierre ciego con conteo por denominaciones y diferencia calculada en SQL. _(Pantallas sin ejecutar contra Supabase real; `cerrar_turno` probada en SQL.)_
 - [ ] 1.12 Anulación de ventas y compras con auditoría.
 - [ ] 1.13 POS offline (PWA + Dexie + cola con `offline_id`).

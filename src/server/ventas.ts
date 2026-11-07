@@ -18,7 +18,11 @@ export interface VentaRegistrada {
   /** true si esta venta ya se había registrado (reintento o sincronización repetida). */
   duplicada: boolean;
   vuelto: string;
+  /** Estado de verificación de los pagos con comprobante (Nequi, Daviplata, transferencia). */
+  verificaciones: { metodo: string; estado: string }[];
 }
+
+const METODOS_CON_COMPROBANTE = ["nequi", "daviplata", "transferencia"];
 
 /**
  * Registra y confirma una venta del POS de forma transaccional e idempotente.
@@ -37,7 +41,7 @@ export async function registrarVenta(
 
   // Idempotencia: si ya existe una venta con este offline_id, no se vuelve a crear.
   const existente = await buscarPorOffline(supabase, ctx.organizacionId, d.offline_id);
-  if (existente) return ok({ ...existente, duplicada: true, vuelto: "0.00" });
+  if (existente) return ok({ ...existente, duplicada: true, vuelto: "0.00", verificaciones: [] });
 
   // La venta debe pertenecer a un turno de caja abierto del vendedor.
   const { data: turno } = await supabase
@@ -110,7 +114,7 @@ export async function registrarVenta(
   if (errVenta || !venta) {
     if (errVenta?.code === "23505") {
       const dup = await buscarPorOffline(supabase, ctx.organizacionId, d.offline_id);
-      if (dup) return ok({ ...dup, duplicada: true, vuelto: "0.00" });
+      if (dup) return ok({ ...dup, duplicada: true, vuelto: "0.00", verificaciones: [] });
     }
     return fallo("No pudimos crear la venta");
   }
@@ -134,7 +138,7 @@ export async function registrarVenta(
   }
 
   const comprobantePorMetodo = new Map(d.pagos.map((p) => [p.metodo, p.comprobante_id]));
-  const { error: errPagos } = await supabase.from("pagos_venta").insert(
+  const { data: pagosGuardados, error: errPagos } = await supabase.from("pagos_venta").insert(
     pagos.pagosParaBd.map((p) => ({
       organizacion_id: ctx.organizacionId,
       venta_id: venta.id,
@@ -142,7 +146,7 @@ export async function registrarVenta(
       monto: numericoBd(paraBd(p.monto)),
       comprobante_id: comprobantePorMetodo.get(p.metodo as never) ?? null,
     })),
-  );
+  ).select("id, metodo, monto, comprobante_id");
   if (errPagos) {
     await descartar();
     return fallo("No pudimos guardar los pagos");
@@ -156,9 +160,11 @@ export async function registrarVenta(
     return fallo(mensajeConfirmacion(errConf.message));
   }
 
+  const verificaciones = await verificarPagos(supabase, pagosGuardados ?? []);
+
   await auditarPrecios(supabase, venta.id, d.lineas, productos ?? [], presentaciones ?? []);
 
-  return ok({ ventaId: venta.id, numero: Number(numero), duplicada: false, vuelto: paraBd(pagos.vuelto) });
+  return ok({ ventaId: venta.id, numero: Number(numero), duplicada: false, vuelto: paraBd(pagos.vuelto), verificaciones });
 }
 
 async function buscarPorOffline(supabase: Supabase, org: string, offlineId: string) {
@@ -201,4 +207,31 @@ async function auditarPrecios(
   }
   if (!cambios.length) return;
   await supabase.rpc("registrar_cambio_precio", { p_venta: ventaId, p_cambios: cambios });
+}
+
+/**
+ * Verifica cada pago con comprobante en SQL (repetido, monto, fecha) y lo marca.
+ * Un pago electrónico sin comprobante queda "sin_verificar" para que el dueño lo revise.
+ * Nunca falla la venta: la verificación es control, no bloqueo en el mostrador.
+ */
+async function verificarPagos(
+  supabase: Supabase,
+  pagos: { id: string; metodo: string; monto: number; comprobante_id: string | null }[],
+): Promise<{ metodo: string; estado: string }[]> {
+  const resultado: { metodo: string; estado: string }[] = [];
+  for (const p of pagos) {
+    if (!METODOS_CON_COMPROBANTE.includes(p.metodo)) continue;
+    let estado: Database["public"]["Enums"]["estado_verificacion"] = "sin_verificar";
+    if (p.comprobante_id) {
+      const { data, error } = await supabase.rpc("verificar_comprobante", {
+        p_comprobante: p.comprobante_id,
+        p_monto_esperado: numericoBd(paraBd(p.monto)),
+        p_pago: p.id,
+      });
+      if (!error && data) estado = data;
+    }
+    await supabase.rpc("marcar_verificacion_pago", { p_pago: p.id, p_estado: estado });
+    resultado.push({ metodo: p.metodo, estado });
+  }
+  return resultado;
 }

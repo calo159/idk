@@ -429,6 +429,7 @@ export type Database = {
           nombre_leido: string | null;
           confianza: number | null;
           creado_en: string;
+          hash_perceptual: unknown | null;
         };
         Insert: {
           id?: string;
@@ -442,6 +443,7 @@ export type Database = {
           nombre_leido?: string | null;
           confianza?: number | null;
           creado_en?: string;
+          hash_perceptual?: unknown | null;
         };
         Update: {
           id?: string;
@@ -455,6 +457,7 @@ export type Database = {
           nombre_leido?: string | null;
           confianza?: number | null;
           creado_en?: string;
+          hash_perceptual?: unknown | null;
         };
         Relationships: [
           {
@@ -1512,6 +1515,7 @@ export type Database = {
         Args: {
           p_comprobante: string;
           p_monto_esperado: number;
+          p_pago?: string;
         };
         Returns: Database["public"]["Enums"]["estado_verificacion"];
       };

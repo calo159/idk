@@ -160,3 +160,62 @@ export function emparejarLineas(lineas: LineaFacturaIA[], catalogo: ProductoCata
     return { ...l, productoId: null, similitud: 0 };
   });
 }
+
+// ---------------------------------------------------------------------------
+// Comprobantes de pago (Nequi, Daviplata, transferencias)
+// ---------------------------------------------------------------------------
+
+export const esquemaComprobanteIA = z.object({
+  /** ¿La imagen es de verdad un comprobante de pago? */
+  es_comprobante: z.boolean(),
+  entidad: z
+    .string()
+    .trim()
+    .max(40)
+    .nullish()
+    .transform((v) => (v ? v.toLowerCase() : null)),
+  monto: numeroIA.nullish().transform((v) => v ?? null),
+  /** ISO 8601 con zona, o null. */
+  fecha: z
+    .string()
+    .max(40)
+    .nullish()
+    .transform((v) => {
+      if (!v) return null;
+      const t = Date.parse(v);
+      return Number.isNaN(t) ? null : new Date(t).toISOString();
+    }),
+  referencia: z
+    .string()
+    .trim()
+    .max(60)
+    .nullish()
+    .transform((v) => (v ? v : null)),
+  nombre: z
+    .string()
+    .trim()
+    .max(120)
+    .nullish()
+    .transform((v) => (v ? v : null)),
+  confianza: numeroIA.pipe(z.number().min(0).max(1)).catch(0.5),
+});
+export type ComprobanteIA = z.infer<typeof esquemaComprobanteIA>;
+
+export const HERRAMIENTA_COMPROBANTE = {
+  name: "registrar_comprobante",
+  description:
+    "Registra los datos de un comprobante de pago colombiano (Nequi, Daviplata, Bancolombia, transferencia). Usa null si un dato no se ve; nunca inventes.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      es_comprobante: { type: "boolean", description: "false si la imagen no es un comprobante de pago" },
+      entidad: { type: ["string", "null"], description: "nequi, daviplata, bancolombia, davivienda, etc." },
+      monto: { type: ["number", "null"], description: "Valor pagado en COP, sin separadores" },
+      fecha: { type: ["string", "null"], description: "Fecha y hora ISO 8601 (zona America/Bogota -05:00)" },
+      referencia: { type: ["string", "null"], description: "Número de referencia / comprobante / aprobación" },
+      nombre: { type: ["string", "null"], description: "Nombre de quien envía o recibe" },
+      confianza: { type: "number", description: "0 a 1: legibilidad" },
+    },
+    required: ["es_comprobante", "confianza"],
+  },
+};
