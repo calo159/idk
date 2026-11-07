@@ -77,6 +77,10 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select registrar_abono($1, $2, 'efectivo', $3)", [clienteId, 1000, turno]);
   });
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
+    await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
+  });
   // Baja el stock hasta el mínimo para que se dispare el evento stock.bajo (llena eventos_outbox).
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select ajustar_inventario($1, $2, $3, -7, 'conteo de prueba')", [

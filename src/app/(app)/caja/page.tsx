@@ -5,9 +5,10 @@ import { requerirContexto } from "@/lib/auth/contexto";
 import { estadoCierre } from "@/lib/caja";
 import { formatoCOP, sumar } from "@/lib/dinero";
 import { formatoFechaHora } from "@/lib/fechas";
-import { puedeEscribir } from "@/lib/permisos";
+import { puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { FormAbrirCaja, FormCerrarCaja } from "./formularios";
+import { FormMovimientoCaja } from "./gastos/formularios";
 
 export const metadata: Metadata = { title: "Caja" };
 
@@ -55,9 +56,23 @@ export default async function Pagina() {
     .eq("organizacion_id", ctx.organizacionId);
   const nombres = new Map((miembros ?? []).map((m) => [m.usuario_id, m.nombre]));
 
+  // Señales de riesgo por turno (dueño, admin y contador). Son señales para revisar, no acusaciones.
+  const riesgos = new Map<string, { puntaje: number; nivel: string; senales: { texto: string }[] }>();
+  if (puede(ctx.rol, "riesgo.ver")) {
+    const resultados = await Promise.all(
+      historial.map((t) => supabase.rpc("riesgo_turno", { p_turno: t.id }).then((r) => [t.id, r.data] as const)),
+    );
+    for (const [id, data] of resultados)
+      if (data && typeof data === "object" && !Array.isArray(data))
+        riesgos.set(id, data as unknown as { puntaje: number; nivel: string; senales: { texto: string }[] });
+  }
+
   return (
     <section className="mx-auto max-w-xl space-y-5 px-4 py-6">
-      <h1 className="text-xl font-semibold">Caja</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Caja</h1>
+        <Link href="/caja/gastos" className="text-sm text-primary underline">Gastos</Link>
+      </div>
 
       {!maneja ? (
         <p className="text-sm text-muted-foreground">Tu rol no abre caja; aquí ves el historial de cierres.</p>
@@ -80,6 +95,7 @@ export default async function Pagina() {
               Ir a vender
             </Link>
           </div>
+          <FormMovimientoCaja turnoId={turno.id} />
           <FormCerrarCaja turnoId={turno.id} />
         </>
       ) : (
@@ -94,18 +110,35 @@ export default async function Pagina() {
           <ul className="divide-y rounded-xl border text-sm">
             {historial.map((t) => {
               const estado = estadoCierre(t.diferencia ?? 0);
+              const riesgo = riesgos.get(t.id);
               return (
-                <li key={t.id} className="flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{nombres.get(t.usuario_id) ?? "Cajero"}</p>
-                    <p className="text-xs text-muted-foreground">{t.cerrado_en ? formatoFechaHora(t.cerrado_en) : ""}</p>
+                <li key={t.id} className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{nombres.get(t.usuario_id) ?? "Cajero"}</p>
+                      <p className="text-xs text-muted-foreground">{t.cerrado_en ? formatoFechaHora(t.cerrado_en) : ""}</p>
+                    </div>
+                    {riesgo && riesgo.puntaje >= 25 ? (
+                      <Badge variant={riesgo.nivel === "alto" ? "destructive" : "secondary"}>Riesgo {riesgo.nivel}</Badge>
+                    ) : null}
+                    <Badge variant={estado === "cuadra" ? "secondary" : "destructive"}>
+                      {estado === "cuadra" ? "Cuadra" : estado === "faltante" ? "Faltante" : "Sobrante"}
+                    </Badge>
+                    <span className="tabular-nums">
+                      {estado === "cuadra" ? formatoCOP(t.efectivo_contado ?? 0) : formatoCOP(t.diferencia ?? 0)}
+                    </span>
                   </div>
-                  <Badge variant={estado === "cuadra" ? "secondary" : "destructive"}>
-                    {estado === "cuadra" ? "Cuadra" : estado === "faltante" ? "Faltante" : "Sobrante"}
-                  </Badge>
-                  <span className="tabular-nums">
-                    {estado === "cuadra" ? formatoCOP(t.efectivo_contado ?? 0) : formatoCOP(t.diferencia ?? 0)}
-                  </span>
+                  {riesgo && riesgo.senales.length > 0 ? (
+                    <details className="mt-2 text-xs text-muted-foreground">
+                      <summary className="cursor-pointer">Señales a revisar ({riesgo.puntaje}/100)</summary>
+                      <ul className="mt-1 list-disc space-y-0.5 pl-5">
+                        {riesgo.senales.map((sn) => (
+                          <li key={sn.texto}>{sn.texto}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-1 italic">Son señales, no una acusación: confirma con la persona.</p>
+                    </details>
+                  ) : null}
                 </li>
               );
             })}

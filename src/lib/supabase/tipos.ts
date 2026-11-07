@@ -633,6 +633,76 @@ export type Database = {
           },
         ];
       };
+      gastos: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          turno_id: string | null;
+          categoria: string;
+          descripcion: string;
+          monto: number;
+          metodo: Database["public"]["Enums"]["metodo_pago"];
+          soporte_url: string | null;
+          fecha: string;
+          estado: string;
+          motivo_anulacion: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          turno_id?: string | null;
+          categoria: string;
+          descripcion: string;
+          monto: number;
+          metodo?: Database["public"]["Enums"]["metodo_pago"];
+          soporte_url?: string | null;
+          fecha?: string;
+          estado?: string;
+          motivo_anulacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          turno_id?: string | null;
+          categoria?: string;
+          descripcion?: string;
+          monto?: number;
+          metodo?: Database["public"]["Enums"]["metodo_pago"];
+          soporte_url?: string | null;
+          fecha?: string;
+          estado?: string;
+          motivo_anulacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gastos_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "gastos_turno_id_fkey";
+            columns: ["turno_id"];
+            isOneToOne: false;
+            referencedRelation: "turnos_caja";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "gastos_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invitaciones: {
         Row: {
           id: string;
@@ -725,6 +795,61 @@ export type Database = {
           },
           {
             foreignKeyName: "miembros_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      movimientos_caja: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          turno_id: string;
+          tipo: string;
+          monto: number;
+          motivo: string;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          turno_id: string;
+          tipo: string;
+          monto: number;
+          motivo: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          turno_id?: string;
+          tipo?: string;
+          monto?: number;
+          motivo?: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "movimientos_caja_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "movimientos_caja_turno_id_fkey";
+            columns: ["turno_id"];
+            isOneToOne: false;
+            referencedRelation: "turnos_caja";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "movimientos_caja_usuario_id_fkey";
             columns: ["usuario_id"];
             isOneToOne: false;
             referencedRelation: "users";
@@ -1412,6 +1537,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      anular_gasto: {
+        Args: {
+          p_gasto: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
       anular_venta: {
         Args: {
           p_venta_id: string;
@@ -1425,6 +1557,12 @@ export type Database = {
           p_nicho: string;
         };
         Returns: undefined;
+      };
+      calcular_riesgo_turno: {
+        Args: {
+          p_turno: string;
+        };
+        Returns: Json;
       };
       cargar_inventario_inicial: {
         Args: {
@@ -1454,6 +1592,17 @@ export type Database = {
         };
         Returns: number;
       };
+      crear_alerta_unica: {
+        Args: {
+          p_org: string;
+          p_tipo: string;
+          p_clave: string;
+          p_severidad: string;
+          p_mensaje: string;
+          p_datos?: Json;
+        };
+        Returns: undefined;
+      };
       crear_organizacion: {
         Args: {
           p_nombre: string;
@@ -1465,6 +1614,12 @@ export type Database = {
       desde_funcion: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
+      };
+      efectivo_esperado_turno: {
+        Args: {
+          p_turno: string;
+        };
+        Returns: number;
       };
       marcar_verificacion_pago: {
         Args: {
@@ -1492,6 +1647,28 @@ export type Database = {
           p_cambios: Json;
         };
         Returns: undefined;
+      };
+      registrar_gasto: {
+        Args: {
+          p_org: string;
+          p_categoria: string;
+          p_descripcion: string;
+          p_monto: number;
+          p_metodo?: Database["public"]["Enums"]["metodo_pago"];
+          p_soporte?: string;
+          p_fecha?: string;
+          p_turno?: string;
+        };
+        Returns: string;
+      };
+      registrar_movimiento_caja: {
+        Args: {
+          p_turno: string;
+          p_tipo: string;
+          p_monto: number;
+          p_motivo: string;
+        };
+        Returns: string;
       };
       reporte_ventas_diarias: {
         Args: {
@@ -1533,6 +1710,12 @@ export type Database = {
           p_hasta: string;
         };
         Returns: undefined;
+      };
+      riesgo_turno: {
+        Args: {
+          p_turno: string;
+        };
+        Returns: Json;
       };
       roles_escritura: {
         Args: {

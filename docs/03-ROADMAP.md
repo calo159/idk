@@ -35,8 +35,9 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [ ] 2.4 Comparador de proveedores y alerta de alzas.
 - [ ] 2.5 Listas de precios, variantes, lotes/vencimientos, seriales.
 - [ ] 2.6 Cotizaciones, separados con abonos, devoluciones de clientes.
-- [ ] 2.7 Gastos con foto de soporte, retiros de caja.
-- [ ] 2.8 Alertas antirrobo y puntaje de riesgo por turno.
+- [x] 2.7 Gastos con foto de soporte, retiros e ingresos de efectivo (migración 0011; el efectivo esperado del cierre los descuenta). _(Pantallas sin ejecutar contra Supabase real.)_
+- [x] 2.8 Alertas antirrobo (anulación rápida, ajustes negativos repetidos, faltantes, comprobantes sospechosos) y puntaje de riesgo por turno como señales, no acusaciones (migración 0011).
+
 - [ ] 2.9 Reportes: utilidad por producto, ABC, rotación, inventario valorizado, plata dormida.
 - [ ] 2.10 Metas y comisiones de vendedores.
 - [ ] 2.11 Usuario contador y exportaciones.
