@@ -22,6 +22,7 @@ export default defineConfig({
         resolve: { alias },
         test: {
           name: "db",
+          fileParallelism: false,
           environment: "node",
           include: ["src/**/*.db.test.ts"],
           testTimeout: 60_000,
