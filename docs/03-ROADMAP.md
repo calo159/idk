@@ -13,7 +13,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 ## Fase 1 — MVP vendible
 - [x] 1.1 Registro de negocio: crea organización, bodega principal, usuario dueño y plantilla de nicho. _(SQL probado con PGlite; pantallas login/registro/recuperar/bienvenida verificadas sin sesión. El flujo completo contra GoTrue queda por probar con Supabase local.)_
 - [x] 1.2 Usuarios e invitaciones con roles. _(Migración 0003 + 22 tests de roles; pantalla /configuracion/usuarios pendiente de prueba con sesión real.)_
-- [ ] 1.3 Productos: CRUD, categorías, presentaciones, código de barras, foto.
+- [x] 1.3 Productos: CRUD, categorías, presentaciones, código de barras, foto. _(Migración 0004: bucket privado `productos`. Pantallas sin ejecutar contra Supabase real: validaciones y SQL sí probados.)_
 - [ ] 1.4 Escáner de código de barras con cámara.
 - [ ] 1.5 Inventario: existencias, kardex por producto, ajustes con motivo.
 - [ ] 1.6 Proveedores y compras: registrar compra, confirmar (entradas + costo promedio).
