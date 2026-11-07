@@ -26,7 +26,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.13 POS offline: PWA (manifest + service worker), cola Dexie con offline_id, sincronización automática, ventas rechazadas visibles. Ver D-005. _(Cola probada con fake-indexeddb; falta probar el service worker en un celular real.)_
 - [x] 1.14 Importar productos desde Excel/CSV con mapeo de columnas por IA (con respaldo por títulos), vista previa con errores por fila y carga de inventario inicial (migración 0009). _(Probado con datos simulados; falta probar con Excel reales y la IA real.)_
 - [x] 1.15 Dashboard del dueño (ventas, utilidad, fiado, por reponer, 7 días, alertas) y reportes por día, producto, vendedor y método de pago con CSV (migración 0010). _(SQL probado con datos reales de prueba; pantallas sin ejecutar contra Supabase real.)_
-- [ ] 1.16 Datos de demo realistas (ferretería de Riohacha) para mostrar a clientes.
+- [x] 1.16 Datos de demo: ferretería de Riohacha con 60 días de operación (`npm run demo:sql`). Invariantes probados en PGlite (stock = kardex, cartera, caja, reportes). _(La variante con usuarios reales de Supabase Auth no se pudo ejecutar sin Docker.)_
 
 ## Fase 2 — Control y dinero
 - [ ] 2.1 Multi-bodega y traslados.

@@ -50,3 +50,17 @@ npm run db:tipos                # regenera src/lib/supabase/tipos.ts (sin Docker
 
 Los tests de base de datos ejecutan las migraciones reales de `supabase/migrations/` sobre Postgres en WASM
 (PGlite) con un esquema `auth` simulado. Ver `docs/06-DECISIONES.md`.
+
+## Datos de demo (ferretería de Riohacha, 60 días)
+
+```bash
+npm run demo:sql        # genera supabase/seed-demo.sql (≈2 MB, no se sube al repositorio)
+```
+
+Carga el archivo en un Supabase **vacío** (SQL Editor, o `psql` con Supabase local tras `npm run db:reset`).
+Crea 78 productos, 6 proveedores, 25 clientes, ~1.360 ventas, 40 compras, abonos, cierres de caja con
+faltantes plantados, una venta anulada y comprobantes de pago sospechosos, todo con las funciones reales del
+sistema (stock, costo promedio, cartera y caja quedan consistentes). La caja de hoy queda abierta para vender.
+
+Usuarios: `demo@surtix.co` (dueño) · `maria@surtix.co` y `luis@surtix.co` (vendedores) · contraseña `Demo-Surtix-2026`.
+La versión sin contraseñas reales (esquema `auth` simulado) se prueba automáticamente en `npm run db:test`.
