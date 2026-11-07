@@ -544,6 +544,48 @@ export type Database = {
           },
         ];
       };
+      config_comisiones: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          usuario_id: string | null;
+          base: string;
+          porcentaje: number;
+          bono_meta: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          usuario_id?: string | null;
+          base?: string;
+          porcentaje: number;
+          bono_meta?: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          usuario_id?: string | null;
+          base?: string;
+          porcentaje?: number;
+          bono_meta?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "config_comisiones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: true;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "config_comisiones_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       consecutivos: {
         Row: {
           organizacion_id: string;
@@ -1403,6 +1445,45 @@ export type Database = {
             columns: ["organizacion_id"];
             isOneToOne: false;
             referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      metas_vendedor: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          usuario_id: string;
+          mes: string;
+          meta_ventas: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          usuario_id: string;
+          mes: string;
+          meta_ventas: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          usuario_id?: string;
+          mes?: string;
+          meta_ventas?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "metas_vendedor_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "metas_vendedor_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -2683,6 +2764,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      calcular_avance_mes: {
+        Args: {
+          p_org: string;
+          p_mes: string;
+        };
+        Returns: { usuario_id: string; nombre: string; ventas: number; ventas_netas: number; utilidad_neta: number; meta: number; cumplimiento: number; base: string; porcentaje: number; comision: number }[];
+      };
       calcular_riesgo_turno: {
         Args: {
           p_turno: string;
@@ -2832,6 +2920,25 @@ export type Database = {
         };
         Returns: string;
       };
+      fijar_comision: {
+        Args: {
+          p_org: string;
+          p_usuario: string;
+          p_base: string;
+          p_porcentaje: number;
+          p_bono?: number;
+        };
+        Returns: undefined;
+      };
+      fijar_meta: {
+        Args: {
+          p_org: string;
+          p_usuario: string;
+          p_mes: string;
+          p_meta: number;
+        };
+        Returns: undefined;
+      };
       iniciar_conteo: {
         Args: {
           p_org: string;
@@ -2847,6 +2954,13 @@ export type Database = {
           p_estado: Database["public"]["Enums"]["estado_verificacion"];
         };
         Returns: undefined;
+      };
+      mi_avance_mes: {
+        Args: {
+          p_org: string;
+          p_mes: string;
+        };
+        Returns: { usuario_id: string; nombre: string; ventas: number; ventas_netas: number; utilidad_neta: number; meta: number; cumplimiento: number; base: string; porcentaje: number; comision: number }[];
       };
       mis_organizaciones: {
         Args: Record<PropertyKey, never>;
@@ -2952,6 +3066,13 @@ export type Database = {
           p_hasta: string;
         };
         Returns: { producto_id: string; nombre: string; ingreso: number; participacion: number; acumulado: number; clase: string }[];
+      };
+      reporte_comisiones: {
+        Args: {
+          p_org: string;
+          p_mes: string;
+        };
+        Returns: { usuario_id: string; nombre: string; ventas: number; ventas_netas: number; utilidad_neta: number; meta: number; cumplimiento: number; base: string; porcentaje: number; comision: number }[];
       };
       reporte_inventario_valorizado: {
         Args: {

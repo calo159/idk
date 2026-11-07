@@ -81,6 +81,11 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  // Metas y comisiones (migración 0017)
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select fijar_meta($1,$2,current_date,1000000)", [base.orgId, vendedorId]);
+    await db.query("select fijar_comision($1,null,'ventas',2,1)", [base.orgId]);
+  });
   // Cotización, separado con abono y devolución de cliente (migración 0016)
   await comoUsuario(db, base.duenoId, async () => {
     const lineas = JSON.stringify([{ producto_id: productoId, cantidad: 1, precio: 25000 }]);

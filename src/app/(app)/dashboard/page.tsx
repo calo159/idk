@@ -45,6 +45,7 @@ export default async function Pagina() {
         <div className="grid grid-cols-2 gap-3">
           <Tarjeta titulo="Vender" valor="Abrir POS" href="/ventas/pos" />
           <Tarjeta titulo="Mi caja" valor="Abrir / cerrar" href="/caja" />
+          <Tarjeta titulo="Mi avance del mes" valor="Meta y comisión" href="/reportes/comisiones" />
         </div>
       </section>
     );
