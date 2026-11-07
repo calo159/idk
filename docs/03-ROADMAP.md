@@ -40,7 +40,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 
 - [x] 2.9 Reportes de inventario: valorizado, ABC, rotación y plata dormida (migración 0012). _(SQL probado; pantalla sin ejecutar contra Supabase real. La utilidad por producto ya está en Reportes.)_
 - [ ] 2.10 Metas y comisiones de vendedores.
-- [ ] 2.11 Usuario contador y exportaciones.
+- [x] 2.11 Usuario contador (solo lectura) y exportaciones CSV para Excel: ventas, compras, gastos, cartera, cuentas por pagar e inventario. _(Pantalla sin ejecutar contra Supabase real.)_
 - [ ] 2.12 Foto del cuaderno → productos y deudas.
 
 ## Fase 3 — Automatización e inteligencia

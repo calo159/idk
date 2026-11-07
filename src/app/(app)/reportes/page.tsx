@@ -63,7 +63,7 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
     <section className="mx-auto max-w-3xl space-y-6 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Reportes</h1>
-        <Link href="/reportes/inventario" className="text-sm text-primary underline">Inventario y plata dormida</Link>
+        <span className="flex gap-3 text-sm"><Link href="/reportes/inventario" className="text-primary underline">Inventario</Link><Link href="/reportes/contador" className="text-primary underline">Contador</Link></span>
       </div>
       <nav aria-label="Periodo" className="flex flex-wrap gap-2">
         {PERIODOS.map((p) => (
