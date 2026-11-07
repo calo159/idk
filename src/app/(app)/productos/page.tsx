@@ -9,6 +9,7 @@ import { puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { cn } from "@/lib/utils";
 import { FormCategoria } from "./formularios";
+import { EscanerBusqueda } from "./escaner-busqueda";
 
 export const metadata: Metadata = { title: "Productos" };
 
@@ -80,6 +81,7 @@ export default async function Pagina({
         <button type="submit" className={cn(buttonVariants({ variant: "outline" }), "h-11")}>
           Buscar
         </button>
+        <EscanerBusqueda />
       </form>
 
       {(productos ?? []).length === 0 ? (

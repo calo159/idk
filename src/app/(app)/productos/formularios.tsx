@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useTransition } from "react";
+import { useActionState, useState, useTransition } from "react";
+import { EscanerCodigo } from "@/components/escaner-codigo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,7 @@ export function FormProducto({
 }) {
   const [estado, accion, pendiente] = useActionState(guardarProducto, null);
   const e = estado && !estado.ok ? (estado.campos ?? {}) : {};
+  const [codigo, setCodigo] = useState(producto?.codigo_barras ?? "");
   const num = (v: number | null | undefined) => (v === null || v === undefined ? "" : String(v));
 
   return (
@@ -112,9 +114,11 @@ export function FormProducto({
             id="codigo_barras"
             name="codigo_barras"
             inputMode="numeric"
-            defaultValue={producto?.codigo_barras ?? ""}
+            value={codigo}
+            onChange={(ev) => setCodigo(ev.target.value)}
             className="h-11"
           />
+          <EscanerCodigo alLeer={setCodigo} etiqueta="Escanear código" />
         </Campo>
         <Campo id="sku" etiqueta="SKU (opcional)" error={e.sku}>
           <Input id="sku" name="sku" defaultValue={producto?.sku ?? ""} className="h-11" />
