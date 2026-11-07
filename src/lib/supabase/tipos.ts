@@ -1670,6 +1670,35 @@ export type Database = {
         };
         Returns: string;
       };
+      reporte_abc: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: { producto_id: string; nombre: string; ingreso: number; participacion: number; acumulado: number; clase: string }[];
+      };
+      reporte_inventario_valorizado: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { producto_id: string; nombre: string; categoria: string; cantidad: number; costo_promedio: number; valor: number }[];
+      };
+      reporte_plata_dormida: {
+        Args: {
+          p_org: string;
+          p_dias?: number;
+        };
+        Returns: { producto_id: string; nombre: string; cantidad: number; valor: number; ultima_venta: string; dias_sin_vender: number }[];
+      };
+      reporte_rotacion: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: { producto_id: string; nombre: string; vendido: number; stock: number; venta_diaria: number; dias_de_inventario: number }[];
+      };
       reporte_ventas_diarias: {
         Args: {
           p_org: string;

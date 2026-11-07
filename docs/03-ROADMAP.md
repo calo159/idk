@@ -38,7 +38,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 2.7 Gastos con foto de soporte, retiros e ingresos de efectivo (migración 0011; el efectivo esperado del cierre los descuenta). _(Pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.8 Alertas antirrobo (anulación rápida, ajustes negativos repetidos, faltantes, comprobantes sospechosos) y puntaje de riesgo por turno como señales, no acusaciones (migración 0011).
 
-- [ ] 2.9 Reportes: utilidad por producto, ABC, rotación, inventario valorizado, plata dormida.
+- [x] 2.9 Reportes de inventario: valorizado, ABC, rotación y plata dormida (migración 0012). _(SQL probado; pantalla sin ejecutar contra Supabase real. La utilidad por producto ya está en Reportes.)_
 - [ ] 2.10 Metas y comisiones de vendedores.
 - [ ] 2.11 Usuario contador y exportaciones.
 - [ ] 2.12 Foto del cuaderno → productos y deudas.
