@@ -1,0 +1,5 @@
+-- Datos de demo: se completan en la tarea 1.16 del roadmap
+-- (ferretería de Riohacha con productos, proveedores, clientes, compras y ventas de 60 días).
+--
+-- Nota: en Supabase local los usuarios se crean con el panel (Studio) o con supabase.auth.admin
+-- desde un script de Node (scripts/seed-demo.ts). Después ese usuario llama crear_organizacion().
