@@ -377,9 +377,9 @@ describe("documentos confirmados son inmutables (regla #4)", () => {
           db.query("update ventas_detalle set cantidad = 99 where venta_id = $1", [v]),
         ),
       ).toMatch(/No se puede modificar el detalle/);
-      // no hay política de DELETE: la fila simplemente no es visible para borrar
-      const borrado = await db.query("delete from ventas_detalle where venta_id = $1", [v]);
-      expect(borrado.affectedRows).toBe(0);
+      expect(
+        await mensajeDeError(() => db.query("delete from ventas_detalle where venta_id = $1", [v])),
+      ).toMatch(/No se puede modificar el detalle/);
       expect(
         await mensajeDeError(() =>
           db.query("update pagos_venta set monto = 1 where venta_id = $1", [v]),

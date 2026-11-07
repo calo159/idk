@@ -630,6 +630,60 @@ export type Database = {
           },
         ];
       };
+      invitaciones: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          correo: string;
+          rol: Database["public"]["Enums"]["rol_miembro"];
+          nombre: string | null;
+          token: string;
+          creado_por: string | null;
+          expira_en: string;
+          aceptada_en: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          correo: string;
+          rol: Database["public"]["Enums"]["rol_miembro"];
+          nombre?: string | null;
+          token?: string;
+          creado_por?: string | null;
+          expira_en?: string;
+          aceptada_en?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          correo?: string;
+          rol?: Database["public"]["Enums"]["rol_miembro"];
+          nombre?: string | null;
+          token?: string;
+          creado_por?: string | null;
+          expira_en?: string;
+          aceptada_en?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invitaciones_creado_por_fkey";
+            columns: ["creado_por"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invitaciones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       miembros: {
         Row: {
           organizacion_id: string;
@@ -1330,6 +1384,13 @@ export type Database = {
       };
     };
     Functions: {
+      aceptar_invitacion: {
+        Args: {
+          p_token: string;
+          p_nombre?: string;
+        };
+        Returns: string;
+      };
       ajustar_inventario: {
         Args: {
           p_org: string;
@@ -1341,10 +1402,24 @@ export type Database = {
         };
         Returns: undefined;
       };
+      anular_compra: {
+        Args: {
+          p_compra_id: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
       anular_venta: {
         Args: {
           p_venta_id: string;
           p_motivo: string;
+        };
+        Returns: undefined;
+      };
+      aplicar_plantilla_nicho: {
+        Args: {
+          p_org: string;
+          p_nicho: string;
         };
         Returns: undefined;
       };
@@ -1399,6 +1474,12 @@ export type Database = {
           p_turno?: string;
         };
         Returns: string;
+      };
+      roles_escritura: {
+        Args: {
+          tabla: string;
+        };
+        Returns: Database["public"]["Enums"]["rol_miembro"][];
       };
       signo_movimiento: {
         Args: {

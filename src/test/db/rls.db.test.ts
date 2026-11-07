@@ -69,7 +69,10 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
   const ventaId = await venta(db, ctx, [{ producto: productoId, cantidad: 1, precio: 25000 }], {
     turno,
     cliente: clienteId,
-    pagos: [{ metodo: "nequi", monto: 25000, comprobante: comp }],
+    pagos: [
+      { metodo: "nequi", monto: 24000, comprobante: comp },
+      { metodo: "credito", monto: 1000 },
+    ],
   });
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select registrar_abono($1, $2, 'efectivo', $3)", [clienteId, 1000, turno]);
@@ -85,6 +88,10 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
   await db.query(
     "insert into documentos_ia (organizacion_id, tipo, resultado) values ($1, 'factura', '{}')",
     [base.orgId],
+  );
+  await db.query(
+    "insert into invitaciones (organizacion_id, correo, rol) values ($1, 'nuevo@' || $2, 'vendedor')",
+    [base.orgId, correo],
   );
   await db.query(
     "insert into alertas (organizacion_id, tipo, mensaje) values ($1, 'prueba', 'hola')",
@@ -282,7 +289,7 @@ describe("escritura: B no puede tocar datos de A", () => {
           [A.orgId, B.duenoId],
         ),
       );
-      expect(msg).toMatch(/row-level security/i);
+      expect(msg).toMatch(/row-level security|Solo un dueño/i);
       const u = await db.query("update miembros set rol = 'contador' where organizacion_id = $1", [
         A.orgId,
       ]);
