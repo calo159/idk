@@ -433,3 +433,15 @@ describe("protección de dueños", () => {
     );
   });
 });
+
+describe("la tabla de permisos de la interfaz coincide con la base de datos", () => {
+  it("ESCRITURA (src/lib/permisos.ts) == roles_escritura(tabla)", async () => {
+    const { ESCRITURA } = await import("@/lib/permisos");
+    for (const [tabla, roles] of Object.entries(ESCRITURA)) {
+      const r = await db.query<{ roles: string[] }>("select roles_escritura($1)::text[] as roles", [
+        tabla,
+      ]);
+      expect([...r.rows[0]!.roles].sort(), tabla).toEqual([...roles].sort());
+    }
+  });
+});

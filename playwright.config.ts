@@ -34,10 +34,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npx next dev -p ${puerto}`,
+    command: `npx next build && npx next start -p ${puerto}`,
     url: `http://localhost:${puerto}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 240_000,
     env: {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321",
       NEXT_PUBLIC_SUPABASE_ANON_KEY:
