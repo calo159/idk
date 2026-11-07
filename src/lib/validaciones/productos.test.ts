@@ -98,3 +98,27 @@ describe("foto y errores", () => {
     expect(mensajeErrorProducto("otra cosa")).toMatch(/Intenta de nuevo/);
   });
 });
+
+import { esquemaAjuste } from "./inventario";
+
+describe("esquemaAjuste", () => {
+  const a = {
+    producto_id: "3f2b8c1e-5d4a-4e6f-9a1b-2c3d4e5f6a7b",
+    bodega_id: "4f2b8c1e-5d4a-4e6f-9a1b-2c3d4e5f6a7b",
+    modo: "salida",
+    cantidad: "2,5",
+    motivo: "Producto dañado",
+    costo: "",
+  };
+  it("acepta salida con decimales y costo vacío", () => {
+    const r = esquemaAjuste.parse(a);
+    expect(r.cantidad).toBe(2.5);
+    expect(r.costo).toBe(0);
+  });
+  it("exige motivo y cantidad positiva, pero el conteo acepta cero", () => {
+    expect(esquemaAjuste.safeParse({ ...a, motivo: "  " }).success).toBe(false);
+    expect(esquemaAjuste.safeParse({ ...a, cantidad: "0" }).success).toBe(false);
+    expect(esquemaAjuste.safeParse({ ...a, modo: "conteo", cantidad: "0" }).success).toBe(true);
+    expect(esquemaAjuste.safeParse({ ...a, cantidad: "1,2345" }).success).toBe(false);
+  });
+});

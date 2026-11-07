@@ -15,7 +15,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.2 Usuarios e invitaciones con roles. _(Migración 0003 + 22 tests de roles; pantalla /configuracion/usuarios pendiente de prueba con sesión real.)_
 - [x] 1.3 Productos: CRUD, categorías, presentaciones, código de barras, foto. _(Migración 0004: bucket privado `productos`. Pantallas sin ejecutar contra Supabase real: validaciones y SQL sí probados.)_
 - [x] 1.4 Escáner de código de barras con cámara. _(BarcodeDetector + ZXing como respaldo para iPhone; no probado con cámara real.)_
-- [ ] 1.5 Inventario: existencias, kardex por producto, ajustes con motivo.
+- [x] 1.5 Inventario: existencias, kardex y ajustes con motivo (entrada, salida y conteo físico). _(Lógica SQL ya cubierta por tests; pantallas sin ejecutar contra Supabase real.)_
 - [ ] 1.6 Proveedores y compras: registrar compra, confirmar (entradas + costo promedio).
 - [ ] 1.7 IA: foto de factura → borrador de compra con coincidencia de productos.
 - [ ] 1.8 Clientes: cupo, saldo, abonos.
