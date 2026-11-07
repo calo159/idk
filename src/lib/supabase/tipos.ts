@@ -2163,6 +2163,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      alzas_de_precio: {
+        Args: {
+          p_org: string;
+          p_dias?: number;
+          p_umbral?: number;
+        };
+        Returns: { producto_id: string; producto: string; proveedor_id: string; proveedor: string; costo_anterior: number; costo_nuevo: number; pct: number; fecha: string }[];
+      };
       anular_compra: {
         Args: {
           p_compra_id: string;
@@ -2239,6 +2247,13 @@ export type Database = {
           p_denominaciones: Json;
         };
         Returns: number;
+      };
+      comparar_proveedores: {
+        Args: {
+          p_org: string;
+          p_producto: string;
+        };
+        Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
       };
       confirmar_compra: {
         Args: {
