@@ -22,7 +22,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.9 POS: búsqueda, lector USB y cámara, presentaciones, pagos mixtos, vuelto, fiado con cupo, venta idempotente por offline_id (migración 0007: auditoría de precios). _(Pantalla sin ejecutar contra Supabase real.)_
 - [x] 1.10 Verificación de comprobantes Nequi/Daviplata: lectura con IA, hash exacto y perceptual, referencia repetida, monto, fecha, uso en otra venta, alerta al dueño (migración 0008). _(IA probada con modelo simulado; UI sin ejecutar contra Supabase real.)_
 - [x] 1.11 Caja: apertura con base, cierre ciego con conteo por denominaciones y diferencia calculada en SQL. _(Pantallas sin ejecutar contra Supabase real; `cerrar_turno` probada en SQL.)_
-- [ ] 1.12 Anulación de ventas y compras con auditoría.
+- [x] 1.12 Anulaciones desde la interfaz: historial de ventas con detalle, anular venta (dueño/admin, con motivo) y anular compra. _(Pantallas sin ejecutar contra Supabase real; SQL probado.)_
 - [ ] 1.13 POS offline (PWA + Dexie + cola con `offline_id`).
 - [ ] 1.14 Importar productos desde Excel con mapeo por IA.
 - [ ] 1.15 Dashboard del dueño + reportes básicos (ventas por día, producto, vendedor, método de pago).
