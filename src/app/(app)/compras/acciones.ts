@@ -31,6 +31,7 @@ export async function crearCompra(
       numero_factura: d.numero_factura ?? null,
       fecha: d.fecha,
       documento_ia_id: d.documento_ia_id,
+      condicion_pago: d.condicion_pago,
       usuario_id: ctx.usuarioId,
     })
     .select("id")
@@ -61,11 +62,20 @@ export async function crearCompra(
       .eq("organizacion_id", ctx.organizacionId);
   }
 
+  if (d.condicion_pago === "credito" && !d.proveedor_id) {
+    await supabase.from("compras").delete().eq("id", compra.id);
+    return fallo("Para comprar a crédito elige un proveedor");
+  }
+
   if (confirmar) {
     const { error: errConf } = await supabase.rpc("confirmar_compra", { p_compra_id: compra.id });
     if (errConf) {
       revalidatePath("/compras");
       return fallo("La compra quedó en borrador, pero no se pudo confirmar. Revísala e inténtalo de nuevo.");
+    }
+    if (d.condicion_pago === "credito") {
+      const { error: errCxp } = await supabase.rpc("registrar_cuenta_por_pagar", { p_compra: compra.id, p_dias: d.dias_credito });
+      if (errCxp) return fallo("La compra se confirmó, pero no se pudo crear la cuenta por pagar. Créala desde la compra.");
     }
   }
   revalidatePath("/compras");

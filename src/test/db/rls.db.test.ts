@@ -81,6 +81,23 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  // Orden de compra recibida a crédito, pago al proveedor y devolución (migración 0014)
+  await comoUsuario(db, base.duenoId, async () => {
+    const oc = (
+      await db.query<{ id: string }>("select crear_orden_compra($1,$2,$3,$4::jsonb) id", [
+        base.orgId, proveedorId, base.bodegaId, JSON.stringify([{ producto_id: productoId, cantidad: 10, costo: 1000 }]),
+      ])
+    ).rows[0]!.id;
+    const det = (await db.query<{ id: string }>("select id from ordenes_compra_detalle where orden_id=$1", [oc])).rows[0]!.id;
+    const compraCredito = (
+      await db.query<{ c: string }>("select recibir_orden_compra($1,$2::jsonb,null,'credito') c", [oc, JSON.stringify([{ detalle_id: det, cantidad: 10 }])])
+    ).rows[0]!.c;
+    const cxp = (await db.query<{ id: string }>("select id from cuentas_por_pagar where compra_id=$1", [compraCredito])).rows[0]!.id;
+    await db.query("select registrar_pago_proveedor($1, 1000, 'efectivo')", [cxp]);
+    await db.query("select registrar_devolucion_proveedor($1,$2,$3,$4::jsonb,'Dañado')", [
+      base.orgId, proveedorId, base.bodegaId, JSON.stringify([{ producto_id: productoId, cantidad: 1 }]),
+    ]);
+  });
   // Traslado entre bodegas y conteo físico (migración 0013)
   const bodega2 = (
     await db.query<{ id: string }>("insert into bodegas (organizacion_id, nombre) values ($1, 'Depósito') returning id", [base.orgId])
@@ -107,6 +124,7 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     "insert into invitaciones (organizacion_id, correo, rol) values ($1, 'nuevo@' || $2, 'vendedor')",
     [base.orgId, correo],
   );
+  await db.query("insert into eventos_outbox (organizacion_id, tipo) values ($1, 'prueba.sembrado')", [base.orgId]);
   await db.query(
     "insert into alertas (organizacion_id, tipo, mensaje) values ($1, 'prueba', 'hola')",
     [base.orgId],

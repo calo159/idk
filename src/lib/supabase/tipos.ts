@@ -294,6 +294,8 @@ export type Database = {
           usuario_id: string | null;
           motivo_anulacion: string | null;
           creado_en: string;
+          orden_compra_id: string | null;
+          condicion_pago: string;
         };
         Insert: {
           id?: string;
@@ -308,6 +310,8 @@ export type Database = {
           usuario_id?: string | null;
           motivo_anulacion?: string | null;
           creado_en?: string;
+          orden_compra_id?: string | null;
+          condicion_pago?: string;
         };
         Update: {
           id?: string;
@@ -322,6 +326,8 @@ export type Database = {
           usuario_id?: string | null;
           motivo_anulacion?: string | null;
           creado_en?: string;
+          orden_compra_id?: string | null;
+          condicion_pago?: string;
         };
         Relationships: [
           {
@@ -329,6 +335,13 @@ export type Database = {
             columns: ["bodega_id"];
             isOneToOne: false;
             referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "compras_orden_fk";
+            columns: ["orden_compra_id"];
+            isOneToOne: false;
+            referencedRelation: "ordenes_compra";
             referencedColumns: ["id"];
           },
           {
@@ -621,6 +634,188 @@ export type Database = {
           },
           {
             foreignKeyName: "conteos_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      cuentas_por_pagar: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          compra_id: string;
+          monto: number;
+          saldo: number;
+          vence: string;
+          estado: string;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          compra_id: string;
+          monto: number;
+          saldo: number;
+          vence: string;
+          estado?: string;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          proveedor_id?: string;
+          compra_id?: string;
+          monto?: number;
+          saldo?: number;
+          vence?: string;
+          estado?: string;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cuentas_por_pagar_compra_id_fkey";
+            columns: ["compra_id"];
+            isOneToOne: true;
+            referencedRelation: "compras";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cuentas_por_pagar_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cuentas_por_pagar_proveedor_id_fkey";
+            columns: ["proveedor_id"];
+            isOneToOne: false;
+            referencedRelation: "proveedores";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      devoluciones_proveedor: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          bodega_id: string;
+          compra_id: string | null;
+          numero: number | null;
+          motivo: string;
+          total: number;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          bodega_id: string;
+          compra_id?: string | null;
+          numero?: number | null;
+          motivo: string;
+          total?: number;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          proveedor_id?: string;
+          bodega_id?: string;
+          compra_id?: string | null;
+          numero?: number | null;
+          motivo?: string;
+          total?: number;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "devoluciones_proveedor_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_compra_id_fkey";
+            columns: ["compra_id"];
+            isOneToOne: false;
+            referencedRelation: "compras";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_proveedor_id_fkey";
+            columns: ["proveedor_id"];
+            isOneToOne: false;
+            referencedRelation: "proveedores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      devoluciones_proveedor_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          devolucion_id: string;
+          producto_id: string;
+          cantidad: number;
+          costo_unitario: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          devolucion_id: string;
+          producto_id: string;
+          cantidad: number;
+          costo_unitario: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          devolucion_id?: string;
+          producto_id?: string;
+          cantidad?: number;
+          costo_unitario?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "devoluciones_proveedor_detalle_devolucion_id_fkey";
+            columns: ["devolucion_id"];
+            isOneToOne: false;
+            referencedRelation: "devoluciones_proveedor";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_proveedor_detalle_producto_id_fkey";
             columns: ["producto_id"];
             isOneToOne: false;
             referencedRelation: "productos";
@@ -1073,6 +1268,136 @@ export type Database = {
           },
         ];
       };
+      ordenes_compra: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          bodega_id: string;
+          numero: number | null;
+          estado: string;
+          fecha_esperada: string | null;
+          nota: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          proveedor_id: string;
+          bodega_id: string;
+          numero?: number | null;
+          estado?: string;
+          fecha_esperada?: string | null;
+          nota?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          proveedor_id?: string;
+          bodega_id?: string;
+          numero?: number | null;
+          estado?: string;
+          fecha_esperada?: string | null;
+          nota?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ordenes_compra_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_proveedor_id_fkey";
+            columns: ["proveedor_id"];
+            isOneToOne: false;
+            referencedRelation: "proveedores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ordenes_compra_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          orden_id: string;
+          producto_id: string;
+          presentacion_id: string | null;
+          cantidad_pedida: number;
+          cantidad_recibida: number;
+          costo_unitario: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          orden_id: string;
+          producto_id: string;
+          presentacion_id?: string | null;
+          cantidad_pedida: number;
+          cantidad_recibida?: number;
+          costo_unitario: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          orden_id?: string;
+          producto_id?: string;
+          presentacion_id?: string | null;
+          cantidad_pedida?: number;
+          cantidad_recibida?: number;
+          costo_unitario?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ordenes_compra_detalle_orden_id_fkey";
+            columns: ["orden_id"];
+            isOneToOne: false;
+            referencedRelation: "ordenes_compra";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_detalle_presentacion_id_fkey";
+            columns: ["presentacion_id"];
+            isOneToOne: false;
+            referencedRelation: "presentaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ordenes_compra_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       organizaciones: {
         Row: {
           id: string;
@@ -1111,6 +1436,64 @@ export type Database = {
           creado_en?: string;
         };
         Relationships: [];
+      };
+      pagos_proveedor: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cxp_id: string;
+          monto: number;
+          metodo: Database["public"]["Enums"]["metodo_pago"];
+          referencia: string | null;
+          tipo: string;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cxp_id: string;
+          monto: number;
+          metodo: Database["public"]["Enums"]["metodo_pago"];
+          referencia?: string | null;
+          tipo?: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cxp_id?: string;
+          monto?: number;
+          metodo?: Database["public"]["Enums"]["metodo_pago"];
+          referencia?: string | null;
+          tipo?: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pagos_proveedor_cxp_id_fkey";
+            columns: ["cxp_id"];
+            isOneToOne: false;
+            referencedRelation: "cuentas_por_pagar";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pagos_proveedor_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pagos_proveedor_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       pagos_venta: {
         Row: {
@@ -1821,6 +2204,13 @@ export type Database = {
         };
         Returns: Json;
       };
+      cambiar_estado_orden: {
+        Args: {
+          p_orden: string;
+          p_estado: string;
+        };
+        Returns: undefined;
+      };
       cancelar_conteo: {
         Args: {
           p_conteo: string;
@@ -1873,6 +2263,17 @@ export type Database = {
         };
         Returns: undefined;
       };
+      crear_orden_compra: {
+        Args: {
+          p_org: string;
+          p_proveedor: string;
+          p_bodega: string;
+          p_lineas: Json;
+          p_fecha_esperada?: string;
+          p_nota?: string;
+        };
+        Returns: string;
+      };
       crear_organizacion: {
         Args: {
           p_nombre: string;
@@ -1911,6 +2312,16 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string[];
       };
+      recibir_orden_compra: {
+        Args: {
+          p_orden: string;
+          p_lineas: Json;
+          p_factura?: string;
+          p_condicion?: string;
+          p_dias_credito?: number;
+        };
+        Returns: string;
+      };
       registrar_abono: {
         Args: {
           p_cliente: string;
@@ -1935,6 +2346,24 @@ export type Database = {
         };
         Returns: number;
       };
+      registrar_cuenta_por_pagar: {
+        Args: {
+          p_compra: string;
+          p_dias?: number;
+        };
+        Returns: string;
+      };
+      registrar_devolucion_proveedor: {
+        Args: {
+          p_org: string;
+          p_proveedor: string;
+          p_bodega: string;
+          p_lineas: Json;
+          p_motivo: string;
+          p_compra?: string;
+        };
+        Returns: string;
+      };
       registrar_gasto: {
         Args: {
           p_org: string;
@@ -1954,6 +2383,15 @@ export type Database = {
           p_tipo: string;
           p_monto: number;
           p_motivo: string;
+        };
+        Returns: string;
+      };
+      registrar_pago_proveedor: {
+        Args: {
+          p_cxp: string;
+          p_monto: number;
+          p_metodo: Database["public"]["Enums"]["metodo_pago"];
+          p_referencia?: string;
         };
         Returns: string;
       };

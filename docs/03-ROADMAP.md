@@ -31,7 +31,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 ## Fase 2 — Control y dinero
 - [x] 2.1 Multi-bodega y traslados atómicos con costo conservado, anulables (migración 0013). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.2 Conteo físico guiado (ciego), diferencias valoradas, corrección opcional del inventario y alerta por faltantes grandes (migración 0013). Nota: el “ciego” es de interfaz; un usuario técnico podría leer `cantidad_sistema` por la API.
-- [ ] 2.3 Órdenes de compra, cuentas por pagar, devoluciones.
+- [x] 2.3 Órdenes de compra (recepción parcial), cuentas por pagar con vencimientos y pagos, compras a crédito y devoluciones a proveedor (migración 0014). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [ ] 2.4 Comparador de proveedores y alerta de alzas.
 - [ ] 2.5 Listas de precios, variantes, lotes/vencimientos, seriales.
 - [ ] 2.6 Cotizaciones, separados con abonos, devoluciones de clientes.

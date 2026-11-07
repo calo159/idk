@@ -35,6 +35,11 @@ export default async function Pagina() {
           </Link>
         ) : null}
       </header>
+      <div className="flex flex-wrap gap-2 text-sm">
+        <Link href="/compras/ordenes" className="rounded-full border px-3 py-1.5 hover:bg-muted">Órdenes de compra</Link>
+        <Link href="/compras/pagos" className="rounded-full border px-3 py-1.5 hover:bg-muted">Cuentas por pagar</Link>
+        <Link href="/proveedores" className="rounded-full border px-3 py-1.5 hover:bg-muted">Proveedores</Link>
+      </div>
       {(compras ?? []).length === 0 ? (
         <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
           Aún no has registrado compras.

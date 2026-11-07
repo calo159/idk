@@ -11,6 +11,7 @@ import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { zUuid } from "@/lib/validaciones/comunes";
 import { totalCompra } from "@/lib/validaciones/compras";
 import { BotonConfirmarCompra, FormAnularCompra } from "./acciones-compra";
+import { DevolverAProveedor } from "./devolver";
 
 export const metadata: Metadata = { title: "Compra" };
 
@@ -22,13 +23,13 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
   const [{ data: compra }, { data: lineas }] = await Promise.all([
     supabase
       .from("compras")
-      .select("id, numero_factura, fecha, estado, total, motivo_anulacion, proveedores(nombre), bodegas(nombre)")
+      .select("id, numero_factura, fecha, estado, total, motivo_anulacion, proveedor_id, bodega_id, proveedores(nombre), bodegas(nombre)")
       .eq("id", id)
       .eq("organizacion_id", ctx.organizacionId)
       .maybeSingle(),
     supabase
       .from("compras_detalle")
-      .select("id, cantidad, costo_unitario, subtotal, productos(nombre, unidad_base), presentaciones(nombre)")
+      .select("id, producto_id, cantidad, costo_unitario, subtotal, productos(nombre, unidad_base), presentaciones(nombre)")
       .eq("compra_id", id),
   ]);
   if (!compra) notFound();
@@ -76,6 +77,18 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
 
       {compra.estado === "borrador" && puede(ctx.rol, "compras.confirmar") ? (
         <BotonConfirmarCompra id={compra.id} />
+      ) : null}
+      {compra.estado === "confirmado" && compra.proveedor_id && puede(ctx.rol, "compras.confirmar") ? (
+        <DevolverAProveedor
+          compraId={compra.id}
+          proveedorId={compra.proveedor_id}
+          bodegaId={compra.bodega_id}
+          lineas={(lineas ?? []).map((l) => ({
+            productoId: l.producto_id,
+            nombre: l.productos?.nombre ?? "",
+            cantidad: Number(l.cantidad),
+          }))}
+        />
       ) : null}
       {compra.estado === "confirmado" && puede(ctx.rol, "compras.anular") ? (
         <FormAnularCompra id={compra.id} />

@@ -67,6 +67,8 @@ export function FormularioCompra({
   const [bodega, setBodega] = useState(bodegas[0]?.id ?? "");
   const [factura, setFactura] = useState("");
   const [fecha, setFecha] = useState(hoy);
+  const [condicion, setCondicion] = useState<"contado" | "credito">("contado");
+  const [diasCredito, setDiasCredito] = useState("30");
   const [documentoIa, setDocumentoIa] = useState<string | null>(null);
   const [pendientesIa, setPendientesIa] = useState<PendienteIA[]>([]);
   const [avisosIa, setAvisosIa] = useState<string[]>([]);
@@ -161,6 +163,8 @@ export function FormularioCompra({
           numero_factura: factura,
           fecha,
           documento_ia_id: documentoIa,
+          condicion_pago: condicion,
+          dias_credito: Number(diasCredito) || 0,
           lineas: lineas.map((l, i) => ({
             producto_id: l.producto.id,
             presentacion_id: l.presentacionId || null,
@@ -258,6 +262,19 @@ export function FormularioCompra({
           <Label htmlFor="factura">N.º de factura</Label>
           <Input id="factura" value={factura} onChange={(e) => setFactura(e.target.value)} className="h-11" />
         </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="condicion">Pago</Label>
+          <select id="condicion" value={condicion} onChange={(e) => setCondicion(e.target.value as "contado" | "credito")} className={clase}>
+            <option value="contado">De contado</option>
+            <option value="credito">A crédito (se queda debiendo)</option>
+          </select>
+        </div>
+        {condicion === "credito" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="dias-credito">Días de crédito</Label>
+            <Input id="dias-credito" inputMode="numeric" value={diasCredito} onChange={(e) => setDiasCredito(e.target.value)} className="h-11" />
+          </div>
+        ) : null}
         <div className="space-y-1.5">
           <Label htmlFor="fecha">Fecha</Label>
           <Input id="fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="h-11" />

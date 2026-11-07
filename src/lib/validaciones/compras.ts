@@ -36,6 +36,8 @@ export const esquemaCompra = z.object({
   numero_factura: zTextoOpcional(40),
   fecha: zDia,
   documento_ia_id: zUuid.nullish().transform((v) => v ?? null),
+  condicion_pago: z.enum(["contado", "credito"]).default("contado"),
+  dias_credito: z.number().int().min(0).max(365).default(30),
   lineas: z.array(esquemaLineaCompra).min(1, "Agrega al menos un producto").max(300),
 });
 export type DatosCompra = z.infer<typeof esquemaCompra>;
