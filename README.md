@@ -30,3 +30,23 @@ Sistema de inventario, compras y ventas para negocios de Colombia, con WhatsApp,
 - Verificación de comprobantes repetidos o con monto diferente.
 - Alertas (stock bajo, ventas anuladas, ajustes grandes, caja) listas para n8n.
 - Aislamiento entre negocios (RLS) y bloqueos para que nadie edite stock, saldos o ventas confirmadas a mano.
+
+## Desarrollo
+
+```bash
+cp .env.example .env.local      # completa las llaves (Supabase local: `npm run db:start` las imprime)
+npm install
+npm run dev                     # http://localhost:3000
+
+npm run lint && npm run typecheck
+npm test                        # unitarios (dinero, fechas, Zod) + base de datos (PGlite, sin Docker)
+npm run db:test                 # solo los tests de base de datos: RLS, inventario, costos, ventas, caja
+npm run test:e2e                # Playwright (usa Edge del sistema; en CI: npx playwright install chromium)
+
+npm run db:start                # Supabase local (requiere Docker Desktop)
+npm run db:reset                # aplica migraciones + seed
+npm run db:tipos                # regenera src/lib/supabase/tipos.ts (sin Docker, desde las migraciones)
+```
+
+Los tests de base de datos ejecutan las migraciones reales de `supabase/migrations/` sobre Postgres en WASM
+(PGlite) con un esquema `auth` simulado. Ver `docs/06-DECISIONES.md`.

@@ -7,8 +7,8 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 0.2 Configurar Supabase local, aplicar `supabase/migrations/0001_esquema_inicial.sql` y `seed.sql`. _(`config.toml` listo; migraciones verificadas con PGlite en `src/test/db/`. `supabase start` requiere instalar Docker Desktop.)_
 - [x] 0.3 Generar tipos de Supabase y clientes server/browser en `src/lib/supabase/`.
 - [x] 0.4 Utilidades: `dinero.ts` (formato COP, sumas seguras), fechas en America/Bogota, esquemas Zod base.
-- [ ] 0.5 Vitest y Playwright configurados. Test de RLS entre dos organizaciones.
-- [ ] 0.6 Layout mobile-first: menú inferior en celular, lateral en escritorio.
+- [x] 0.5 Vitest y Playwright configurados. Test de RLS entre dos organizaciones. _(+ tests de inventario, costo promedio, ventas, caja y comprobantes; migración 0002 cierra el hueco de referencias entre negocios.)_
+- [x] 0.6 Layout mobile-first: menú inferior en celular, lateral en escritorio.
 
 ## Fase 1 — MVP vendible
 - [ ] 1.1 Registro de negocio: crea organización, bodega principal, usuario dueño y plantilla de nicho.
