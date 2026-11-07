@@ -23,3 +23,13 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 
 ## D-004 · Cambios de BD solo con migraciones nuevas
 - `0001_esquema_inicial.sql` está probada y congelada. Correcciones y ampliaciones van en `0002_…`, `0003_…`.
+
+## D-005 — POS offline: cola en IndexedDB + Server Action idempotente
+- Las ventas sin internet se guardan en Dexie (clave = `offline_id`) y se envían con la misma Server Action `cobrarVenta`
+  al volver la conexión (evento `online`, al abrir y cada 30 s). El servidor es idempotente por `offline_id`.
+- Una respuesta negativa del servidor (sin stock, cupo, caja cerrada) deja la venta **rechazada y visible** para que
+  una persona decida (reintentar o descartar); nunca se pierde en silencio ni se reintenta sola.
+- La venta conserva su hora real (`creado_en`, máx. 7 días atrás). Los movimientos de inventario llevan la hora de sincronización.
+- Limitaciones conocidas: sin conexión no se pueden leer comprobantes con IA (el pago queda "sin verificar");
+  el cupo del cliente y el stock se validan localmente con datos de la última carga y definitivamente al sincronizar.
+- El service worker solo guarda `/ventas/pos` y `/caja` (y estáticos). Al abrir `/login` se borra esa caché.

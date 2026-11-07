@@ -106,6 +106,7 @@ export async function registrarVenta(
       turno_id: turno.id,
       usuario_id: ctx.usuarioId,
       offline_id: d.offline_id,
+      ...(d.creado_en ? { creado_en: d.creado_en } : {}),
       descuento: numericoBd(paraBd(d.descuento)),
       origen: "pos",
     })

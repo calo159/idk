@@ -20,6 +20,8 @@ import { formatoCOP, leerNumeroCO } from "@/lib/dinero";
 import { hashPerceptualDeArchivo } from "@/lib/hash-imagen";
 import { puedeFiar } from "@/lib/validaciones/clientes";
 import { resumirPagos, totalVenta } from "@/lib/ventas";
+import { EstadoSync } from "@/components/pwa/estado-sync";
+import { encolarVenta } from "@/lib/offline/cola";
 import { cobrarVenta } from "./acciones";
 
 export interface ClientePOS {
@@ -49,8 +51,10 @@ interface ComprobanteSubido {
 }
 
 interface Recibo {
+  /** true si la venta quedó guardada en el dispositivo esperando internet. */
+  sinConexion?: boolean;
   verificaciones: { metodo: string; estado: string }[];
-  numero: number;
+  numero: number | null;
   vuelto: string;
   total: number;
   duplicada: boolean;
@@ -166,26 +170,54 @@ export function PuntoDeVenta({
 
   const cobrar = (autorizar = false) => {
     setErrorCobro(null);
-    iniciar(async () => {
-      const r = await cobrarVenta({
-        offline_id: ventaOfflineId.current,
-        bodega_id: bodegaId,
-        cliente_id: clienteId || null,
-        descuento: dto,
-        autorizar_exceso_cupo: autorizar,
-        lineas: carrito.map((l) => ({
-          producto_id: l.productoId,
-          presentacion_id: l.presentacionId,
-          cantidad: l.cantidad,
-          precio_unitario: l.precio,
-          descuento: l.descuento,
-        })),
-        pagos: montos
-          .filter((m) => m.monto > 0)
-          .map((m) => ({ metodo: m.metodo, monto: m.monto, comprobante_id: comprobantes[m.metodo]?.id ?? null })),
+    const payload = {
+      offline_id: ventaOfflineId.current,
+      bodega_id: bodegaId,
+      cliente_id: clienteId || null,
+      descuento: dto,
+      autorizar_exceso_cupo: autorizar,
+      lineas: carrito.map((l) => ({
+        producto_id: l.productoId,
+        presentacion_id: l.presentacionId,
+        cantidad: l.cantidad,
+        precio_unitario: l.precio,
+        descuento: l.descuento,
+      })),
+      pagos: montos
+        .filter((m) => m.monto > 0)
+        .map((m) => ({ metodo: m.metodo, monto: m.monto, comprobante_id: comprobantes[m.metodo]?.id ?? null })),
+    };
+    const guardarSinConexion = async () => {
+      // Se valida lo esencial aquí porque el servidor no puede responder ahora.
+      if (!resumen.faltante.isZero()) return setErrorCobro("Revisa el pago: no coincide con el total");
+      if (aCredito > 0 && !clienteId) return setErrorCobro("Para fiar elige un cliente");
+      await encolarVenta({ ...payload, creado_en: new Date().toISOString() }, total.toNumber());
+      setRecibo({
+        sinConexion: true,
+        numero: null,
+        vuelto: resumen.vuelto.toFixed(2),
+        total: total.toNumber(),
+        duplicada: false,
+        verificaciones: [],
       });
+    };
+    iniciar(async () => {
+      if (!navigator.onLine) return guardarSinConexion();
+      let r;
+      try {
+        r = await cobrarVenta(payload);
+      } catch {
+        // La conexión se cayó a mitad del cobro: queda en cola; el offline_id evita duplicados.
+        return guardarSinConexion();
+      }
       if (r.ok) {
-        setRecibo({ verificaciones: r.datos.verificaciones, numero: r.datos.numero, vuelto: r.datos.vuelto, total: total.toNumber(), duplicada: r.datos.duplicada });
+        setRecibo({
+          verificaciones: r.datos.verificaciones,
+          numero: r.datos.numero,
+          vuelto: r.datos.vuelto,
+          total: total.toNumber(),
+          duplicada: r.datos.duplicada,
+        });
       } else {
         setExcesoPendiente(r.campos?.cupo === "excedido" && puedeAutorizarExceso);
         setErrorCobro(r.error);
@@ -198,7 +230,14 @@ export function PuntoDeVenta({
     return (
       <section className="mx-auto max-w-md space-y-4 px-4 py-12 text-center">
         <p className="text-4xl" aria-hidden>✅</p>
-        <h1 className="text-xl font-semibold">Venta #{recibo.numero} registrada</h1>
+        <h1 className="text-xl font-semibold">
+          {recibo.sinConexion ? "Venta guardada sin internet" : `Venta #${recibo.numero} registrada`}
+        </h1>
+        {recibo.sinConexion ? (
+          <p className="text-sm text-muted-foreground">
+            Se enviará sola cuando vuelva la conexión. Puedes seguir vendiendo.
+          </p>
+        ) : null}
         <p className="text-2xl font-bold tabular-nums">{formatoCOP(recibo.total)}</p>
         {Number(recibo.vuelto) > 0 ? (
           <p className="rounded-xl bg-primary/10 p-4 text-lg font-semibold">
@@ -227,6 +266,7 @@ export function PuntoDeVenta({
   return (
     <section className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-4 pb-32">
       <h1 className="sr-only">Punto de venta</h1>
+      <EstadoSync />
 
       {/* Búsqueda ---------------------------------------------------------------- */}
       <div className="space-y-2">

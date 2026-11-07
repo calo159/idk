@@ -36,6 +36,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Todo menos archivos estáticos, el service worker y los webhooks (que se autentican con HMAC).
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|icons/|api/webhooks).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw.js|offline.html|manifest.webmanifest|icons/|api/webhooks).*)",
   ],
 };

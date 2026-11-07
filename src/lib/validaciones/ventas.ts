@@ -26,6 +26,19 @@ export const esquemaVenta = z.object({
   descuento: zMonto.default(0),
   lineas: z.array(esquemaLineaVenta).min(1, "Agrega al menos un producto").max(200),
   pagos: z.array(esquemaPagoVenta).min(1, "Registra el pago").max(10),
+  /**
+   * Momento real de la venta cuando se hizo sin internet. Solo se acepta si es de los últimos 7 días
+   * y no es del futuro (tolerancia de 5 minutos por relojes desajustados).
+   */
+  creado_en: z.iso
+    .datetime({ offset: true, message: "Fecha inválida" })
+    .optional()
+    .refine((v) => {
+      if (!v) return true;
+      const t = Date.parse(v);
+      const ahora = Date.now();
+      return t <= ahora + 5 * 60_000 && t >= ahora - 7 * 86_400_000;
+    }, "La fecha de la venta no es válida"),
   /** Un administrador autoriza vender por encima del cupo. */
   autorizar_exceso_cupo: z.boolean().default(false),
 });
