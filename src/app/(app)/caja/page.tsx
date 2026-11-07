@@ -42,6 +42,13 @@ export default async function Pagina() {
     ventasTurno = [...porMetodo].map(([metodo, montos]) => ({ metodo, monto: sumar(...montos).toNumber() }));
   }
 
+  const { data: bodegasActivas } = await supabase
+    .from("bodegas")
+    .select("id, nombre")
+    .eq("organizacion_id", ctx.organizacionId)
+    .eq("activa", true)
+    .order("es_principal", { ascending: false });
+
   const { data: cerrados } = await supabase
     .from("turnos_caja")
     .select("id, usuario_id, abierto_en, cerrado_en, efectivo_esperado, efectivo_contado, diferencia")
@@ -99,7 +106,7 @@ export default async function Pagina() {
           <FormCerrarCaja turnoId={turno.id} />
         </>
       ) : (
-        <FormAbrirCaja />
+        <FormAbrirCaja bodegas={bodegasActivas ?? []} />
       )}
 
       <div className="space-y-2">

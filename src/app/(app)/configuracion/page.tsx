@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
-import { etiquetaRol, puede } from "@/lib/permisos";
+import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 
 export const metadata: Metadata = { title: "Configuración" };
 
@@ -28,6 +28,15 @@ export default async function Pagina() {
             <span className="text-sm text-muted-foreground">
               Invita a tu equipo y define qué puede hacer cada uno
             </span>
+          </span>
+        </Link>
+      ) : null}
+      {puedeEscribir(ctx.rol, "bodegas") ? (
+        <Link href="/configuracion/bodegas" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <Warehouse className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Bodegas y sedes</span>
+            <span className="text-sm text-muted-foreground">Varias bodegas, cada una con su stock, y traslados entre ellas</span>
           </span>
         </Link>
       ) : null}

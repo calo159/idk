@@ -44,6 +44,11 @@ export default async function Pagina({
   return (
     <section className="mx-auto max-w-3xl space-y-4 px-4 py-6">
       <h1 className="text-xl font-semibold">Inventario</h1>
+      <div className="flex flex-wrap gap-2 text-sm">
+        <Link href="/inventario/traslados" className="rounded-full border px-3 py-1.5 hover:bg-muted">Traslados</Link>
+        <Link href="/inventario/conteos" className="rounded-full border px-3 py-1.5 hover:bg-muted">Conteos físicos</Link>
+        <Link href="/reportes/inventario" className="rounded-full border px-3 py-1.5 hover:bg-muted">Reportes</Link>
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border p-4">
           <p className="text-xs text-muted-foreground">Valor del inventario (a costo)</p>

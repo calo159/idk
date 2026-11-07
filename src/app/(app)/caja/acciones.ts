@@ -15,8 +15,22 @@ export async function abrirTurno(_prev: ResultadoAccion | null, f: FormData): Pr
   if (!puedeEscribir(ctx.rol, "turnos_caja")) return fallo("Tu rol no maneja caja");
   const r = esquemaApertura.safeParse({ base_inicial: String(f.get("base_inicial") ?? "") });
   if (!r.success) return fallo("Revisa los datos", erroresPorCampo(r.error));
-  if (!ctx.bodegaId) return fallo("Tu negocio no tiene una bodega principal");
   const supabase = await crearClienteServidor();
+  // Bodega donde se vende: la elegida (si es del negocio y está activa) o la principal.
+  const pedida = String(f.get("bodega_id") ?? "");
+  let bodegaId = ctx.bodegaId;
+  if (pedida) {
+    const { data: b } = await supabase
+      .from("bodegas")
+      .select("id")
+      .eq("id", pedida)
+      .eq("organizacion_id", ctx.organizacionId)
+      .eq("activa", true)
+      .maybeSingle();
+    if (!b) return fallo("Esa bodega no está disponible");
+    bodegaId = b.id;
+  }
+  if (!bodegaId) return fallo("Tu negocio no tiene una bodega principal");
 
   const { data: abierto } = await supabase
     .from("turnos_caja")
@@ -29,7 +43,7 @@ export async function abrirTurno(_prev: ResultadoAccion | null, f: FormData): Pr
 
   const { error } = await supabase.from("turnos_caja").insert({
     organizacion_id: ctx.organizacionId,
-    bodega_id: ctx.bodegaId,
+    bodega_id: bodegaId,
     usuario_id: ctx.usuarioId,
     base_inicial: numericoBd(paraBd(r.data.base_inicial)),
   });

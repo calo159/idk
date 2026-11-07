@@ -495,6 +495,139 @@ export type Database = {
           },
         ];
       };
+      conteos: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          bodega_id: string;
+          nombre: string;
+          categoria_id: string | null;
+          estado: string;
+          ajustes_aplicados: boolean;
+          usuario_id: string | null;
+          creado_en: string;
+          cerrado_en: string | null;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          bodega_id: string;
+          nombre: string;
+          categoria_id?: string | null;
+          estado?: string;
+          ajustes_aplicados?: boolean;
+          usuario_id?: string | null;
+          creado_en?: string;
+          cerrado_en?: string | null;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          bodega_id?: string;
+          nombre?: string;
+          categoria_id?: string | null;
+          estado?: string;
+          ajustes_aplicados?: boolean;
+          usuario_id?: string | null;
+          creado_en?: string;
+          cerrado_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conteos_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_categoria_id_fkey";
+            columns: ["categoria_id"];
+            isOneToOne: false;
+            referencedRelation: "categorias";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      conteos_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          conteo_id: string;
+          producto_id: string;
+          cantidad_contada: number | null;
+          cantidad_sistema: number | null;
+          costo_unitario: number | null;
+          contado_por: string | null;
+          contado_en: string | null;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          conteo_id: string;
+          producto_id: string;
+          cantidad_contada?: number | null;
+          cantidad_sistema?: number | null;
+          costo_unitario?: number | null;
+          contado_por?: string | null;
+          contado_en?: string | null;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          conteo_id?: string;
+          producto_id?: string;
+          cantidad_contada?: number | null;
+          cantidad_sistema?: number | null;
+          costo_unitario?: number | null;
+          contado_por?: string | null;
+          contado_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conteos_detalle_contado_por_fkey";
+            columns: ["contado_por"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_detalle_conteo_id_fkey";
+            columns: ["conteo_id"];
+            isOneToOne: false;
+            referencedRelation: "conteos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conteos_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       documentos_ia: {
         Row: {
           id: string;
@@ -1245,6 +1378,123 @@ export type Database = {
           },
         ];
       };
+      traslados: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          bodega_origen_id: string;
+          bodega_destino_id: string;
+          numero: number | null;
+          nota: string | null;
+          estado: string;
+          motivo_anulacion: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          bodega_origen_id: string;
+          bodega_destino_id: string;
+          numero?: number | null;
+          nota?: string | null;
+          estado?: string;
+          motivo_anulacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          bodega_origen_id?: string;
+          bodega_destino_id?: string;
+          numero?: number | null;
+          nota?: string | null;
+          estado?: string;
+          motivo_anulacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "traslados_bodega_destino_id_fkey";
+            columns: ["bodega_destino_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "traslados_bodega_origen_id_fkey";
+            columns: ["bodega_origen_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "traslados_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "traslados_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      traslados_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          traslado_id: string;
+          producto_id: string;
+          cantidad: number;
+          costo_unitario: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          traslado_id: string;
+          producto_id: string;
+          cantidad: number;
+          costo_unitario?: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          traslado_id?: string;
+          producto_id?: string;
+          cantidad?: number;
+          costo_unitario?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "traslados_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "traslados_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "traslados_detalle_traslado_id_fkey";
+            columns: ["traslado_id"];
+            isOneToOne: false;
+            referencedRelation: "traslados";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       turnos_caja: {
         Row: {
           id: string;
@@ -1544,6 +1794,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      anular_traslado: {
+        Args: {
+          p_traslado: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
       anular_venta: {
         Args: {
           p_venta_id: string;
@@ -1564,11 +1821,24 @@ export type Database = {
         };
         Returns: Json;
       };
+      cancelar_conteo: {
+        Args: {
+          p_conteo: string;
+        };
+        Returns: undefined;
+      };
       cargar_inventario_inicial: {
         Args: {
           p_org: string;
           p_bodega: string;
           p_lineas: Json;
+        };
+        Returns: number;
+      };
+      cerrar_conteo: {
+        Args: {
+          p_conteo: string;
+          p_aplicar?: boolean;
         };
         Returns: number;
       };
@@ -1621,6 +1891,15 @@ export type Database = {
         };
         Returns: number;
       };
+      iniciar_conteo: {
+        Args: {
+          p_org: string;
+          p_bodega: string;
+          p_nombre: string;
+          p_categoria?: string;
+        };
+        Returns: string;
+      };
       marcar_verificacion_pago: {
         Args: {
           p_pago: string;
@@ -1647,6 +1926,14 @@ export type Database = {
           p_cambios: Json;
         };
         Returns: undefined;
+      };
+      registrar_conteo_producto: {
+        Args: {
+          p_conteo: string;
+          p_producto: string;
+          p_cantidad: number;
+        };
+        Returns: number;
       };
       registrar_gasto: {
         Args: {
@@ -1771,6 +2058,16 @@ export type Database = {
           roles: Database["public"]["Enums"]["rol_miembro"][];
         };
         Returns: boolean;
+      };
+      trasladar_inventario: {
+        Args: {
+          p_org: string;
+          p_origen: string;
+          p_destino: string;
+          p_lineas: Json;
+          p_nota?: string;
+        };
+        Returns: string;
       };
       verificar_comprobante: {
         Args: {

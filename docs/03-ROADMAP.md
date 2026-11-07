@@ -29,8 +29,8 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.16 Datos de demo: ferretería de Riohacha con 60 días de operación (`npm run demo:sql`). Invariantes probados en PGlite (stock = kardex, cartera, caja, reportes). _(La variante con usuarios reales de Supabase Auth no se pudo ejecutar sin Docker.)_
 
 ## Fase 2 — Control y dinero
-- [ ] 2.1 Multi-bodega y traslados.
-- [ ] 2.2 Conteo físico guiado y reporte de diferencias.
+- [x] 2.1 Multi-bodega y traslados atómicos con costo conservado, anulables (migración 0013). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
+- [x] 2.2 Conteo físico guiado (ciego), diferencias valoradas, corrección opcional del inventario y alerta por faltantes grandes (migración 0013). Nota: el “ciego” es de interfaz; un usuario técnico podría leer `cantidad_sistema` por la API.
 - [ ] 2.3 Órdenes de compra, cuentas por pagar, devoluciones.
 - [ ] 2.4 Comparador de proveedores y alerta de alzas.
 - [ ] 2.5 Listas de precios, variantes, lotes/vencimientos, seriales.

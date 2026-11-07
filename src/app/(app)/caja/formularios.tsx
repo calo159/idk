@@ -8,7 +8,7 @@ import { DENOMINACIONES, type Conteo, estadoCierre, totalConteo } from "@/lib/ca
 import { formatoCOP } from "@/lib/dinero";
 import { type ResultadoCierre, abrirTurno, cerrarTurno } from "./acciones";
 
-export function FormAbrirCaja() {
+export function FormAbrirCaja({ bodegas = [] }: { bodegas?: { id: string; nombre: string }[] }) {
   const [estado, accion, pendiente] = useActionState(abrirTurno, null);
   const e = estado && !estado.ok ? (estado.campos ?? {}) : {};
   return (
@@ -17,6 +17,16 @@ export function FormAbrirCaja() {
       <p className="text-sm text-muted-foreground">
         Cuenta el efectivo con el que empiezas (la base) y escríbelo.
       </p>
+      {bodegas.length > 1 ? (
+        <div className="space-y-1.5">
+          <Label htmlFor="bodega_id">¿Desde qué bodega vendes?</Label>
+          <select id="bodega_id" name="bodega_id" className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm">
+            {bodegas.map((b) => (
+              <option key={b.id} value={b.id}>{b.nombre}</option>
+            ))}
+          </select>
+        </div>
+      ) : null}
       <div className="space-y-1.5">
         <Label htmlFor="base_inicial">Base en efectivo ($)</Label>
         <Input id="base_inicial" name="base_inicial" inputMode="decimal" defaultValue="0" className="h-12 text-lg" />
