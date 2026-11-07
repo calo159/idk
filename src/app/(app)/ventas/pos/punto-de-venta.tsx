@@ -65,20 +65,34 @@ export function PuntoDeVenta({
   catalogo,
   clientes,
   puedeAutorizarExceso,
+  cotizacionInicial = null,
 }: {
+  cotizacionInicial?: {
+    id: string;
+    clienteId: string | null;
+    lineas: { productoId: string; presentacionId: string | null; cantidad: number; precio: number; descuento: number }[];
+  } | null;
   bodegaId: string;
   catalogo: ProductoPOS[];
   clientes: ClientePOS[];
   puedeAutorizarExceso: boolean;
 }) {
-  const [carrito, setCarrito] = useState<LineaCarrito[]>([]);
+  const [carrito, setCarrito] = useState<LineaCarrito[]>(() =>
+    (cotizacionInicial?.lineas ?? []).flatMap((l) => {
+      const p = catalogo.find((x) => x.id === l.productoId);
+      if (!p) return [];
+      const pres = p.presentaciones.find((x) => x.id === l.presentacionId) ?? null;
+      const base = agregarAlCarrito([], p, pres, l.cantidad);
+      return base.map((b) => ({ ...b, precio: l.precio, descuento: l.descuento }));
+    }),
+  );
   const [busqueda, setBusqueda] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [cobrando, setCobrando] = useState(false);
   const [pagos, setPagos] = useState<Record<Metodo, string>>({
     efectivo: "", nequi: "", daviplata: "", transferencia: "", tarjeta: "", credito: "",
   });
-  const [clienteId, setClienteId] = useState("");
+  const [clienteId, setClienteId] = useState(cotizacionInicial?.clienteId ?? "");
   const [descuento, setDescuento] = useState("");
   const [errorCobro, setErrorCobro] = useState<string | null>(null);
   const [excesoPendiente, setExcesoPendiente] = useState(false);
@@ -176,6 +190,7 @@ export function PuntoDeVenta({
       cliente_id: clienteId || null,
       descuento: dto,
       autorizar_exceso_cupo: autorizar,
+      cotizacion_id: cotizacionInicial?.id ?? null,
       lineas: carrito.map((l) => ({
         producto_id: l.productoId,
         presentacion_id: l.presentacionId,

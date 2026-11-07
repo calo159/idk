@@ -31,6 +31,10 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <h1 className="text-xl font-semibold">Historial de ventas</h1>
+      <div className="flex flex-wrap gap-2 text-sm">
+        <Link href="/ventas/cotizaciones" className="rounded-full border px-3 py-1.5 hover:bg-muted">Cotizaciones</Link>
+        <Link href="/ventas/separados" className="rounded-full border px-3 py-1.5 hover:bg-muted">Separados</Link>
+      </div>
       <form className="flex gap-2">
         <input
           type="date"

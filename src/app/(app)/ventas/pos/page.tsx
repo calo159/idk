@@ -9,7 +9,8 @@ import { PuntoDeVenta } from "./punto-de-venta";
 
 export const metadata: Metadata = { title: "Vender" };
 
-export default async function Pagina() {
+export default async function Pagina({ searchParams }: { searchParams: Promise<{ cotizacion?: string }> }) {
+  const { cotizacion } = await searchParams;
   const ctx = await requerirContexto();
   if (!puede(ctx.rol, "ventas.confirmar")) {
     return (
@@ -78,8 +79,32 @@ export default async function Pagina() {
     })),
   }));
 
+  // Cotización que se quiere vender: sus líneas llenan el carrito.
+  let cotizacionInicial: { id: string; clienteId: string | null; lineas: { productoId: string; presentacionId: string | null; cantidad: number; precio: number; descuento: number }[] } | null = null;
+  if (cotizacion) {
+    const { data: cot } = await supabase
+      .from("cotizaciones")
+      .select("id, cliente_id, estado, vigencia_hasta, cotizaciones_detalle(producto_id, presentacion_id, cantidad, precio_unitario, descuento)")
+      .eq("id", cotizacion)
+      .eq("organizacion_id", ctx.organizacionId)
+      .maybeSingle();
+    if (cot && cot.estado === "vigente")
+      cotizacionInicial = {
+        id: cot.id,
+        clienteId: cot.cliente_id,
+        lineas: cot.cotizaciones_detalle.map((d) => ({
+          productoId: d.producto_id,
+          presentacionId: d.presentacion_id,
+          cantidad: Number(d.cantidad),
+          precio: Number(d.precio_unitario),
+          descuento: Number(d.descuento),
+        })),
+      };
+  }
+
   return (
     <PuntoDeVenta
+      cotizacionInicial={cotizacionInicial}
       bodegaId={turno.bodega_id}
       catalogo={catalogo}
       clientes={(clientes ?? []).map((c) => ({

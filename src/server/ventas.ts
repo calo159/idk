@@ -162,6 +162,10 @@ export async function registrarVenta(
   }
 
   const verificaciones = await verificarPagos(supabase, pagosGuardados ?? []);
+  if (d.cotizacion_id) {
+    // La cotización queda vendida; si ya no estaba vigente no se bloquea la venta.
+    await supabase.rpc("cambiar_estado_cotizacion", { p_cot: d.cotizacion_id, p_estado: "aceptada", p_venta: venta.id });
+  }
 
   await auditarPrecios(supabase, venta.id, d.lineas, productos ?? [], presentaciones ?? []);
 

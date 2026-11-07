@@ -9,6 +9,7 @@ import { formatoFechaHora } from "@/lib/fechas";
 import { puede } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { zUuid } from "@/lib/validaciones/comunes";
+import { DevolverVenta } from "./devolver";
 import { FormAnularVenta } from "./anular";
 
 export const metadata: Metadata = { title: "Venta" };
@@ -28,13 +29,13 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
   const [{ data: venta }, { data: lineas }, { data: pagos }] = await Promise.all([
     supabase
       .from("ventas")
-      .select("id, numero, estado, total, descuento, costo_total, creado_en, motivo_anulacion, anulada_en, clientes(nombre)")
+      .select("id, numero, estado, total, descuento, costo_total, creado_en, motivo_anulacion, anulada_en, cliente_id, clientes(nombre)")
       .eq("id", id)
       .eq("organizacion_id", ctx.organizacionId)
       .maybeSingle(),
     supabase
       .from("ventas_detalle")
-      .select("id, cantidad, precio_unitario, subtotal, productos(nombre), presentaciones(nombre)")
+      .select("id, cantidad, precio_unitario, subtotal, productos(nombre), presentaciones(nombre), devoluciones_cliente_detalle(cantidad)")
       .eq("venta_id", id),
     supabase.from("pagos_venta").select("id, metodo, monto, verificacion").eq("venta_id", id),
   ]);
@@ -107,6 +108,18 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
         </ul>
       </div>
 
+      {venta.estado === "confirmado" && puede(ctx.rol, "ventas.confirmar") ? (
+        <DevolverVenta
+          ventaId={venta.id}
+          tieneCliente={!!venta.cliente_id}
+          lineas={(lineas ?? []).map((l) => ({
+            detalleId: l.id,
+            nombre: l.productos?.nombre ?? "",
+            vendida: Number(l.cantidad),
+            devuelta: l.devoluciones_cliente_detalle.reduce((s, d) => s + Number(d.cantidad), 0),
+          }))}
+        />
+      ) : null}
       {venta.estado === "confirmado" && puede(ctx.rol, "ventas.anular") ? <FormAnularVenta id={venta.id} /> : null}
     </section>
   );

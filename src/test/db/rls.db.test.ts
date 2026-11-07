@@ -81,6 +81,14 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  // Cotización, separado con abono y devolución de cliente (migración 0016)
+  await comoUsuario(db, base.duenoId, async () => {
+    const lineas = JSON.stringify([{ producto_id: productoId, cantidad: 1, precio: 25000 }]);
+    await db.query("select crear_cotizacion($1,$2,$3::jsonb)", [base.orgId, clienteId, lineas]);
+    await db.query("select crear_separado($1,$2,$3,$4::jsonb,null,null,5000,'nequi')", [base.orgId, clienteId, base.bodegaId, lineas]);
+    const det = (await db.query<{ id: string }>("select id from ventas_detalle where venta_id=$1 limit 1", [ventaId])).rows[0]!.id;
+    await db.query("select registrar_devolucion_cliente($1,$2::jsonb,'Prueba','nequi')", [ventaId, JSON.stringify([{ venta_detalle_id: det, cantidad: 1 }])]);
+  });
   // Orden de compra recibida a crédito, pago al proveedor y devolución (migración 0014)
   await comoUsuario(db, base.duenoId, async () => {
     const oc = (

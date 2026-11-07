@@ -77,6 +77,68 @@ export type Database = {
           },
         ];
       };
+      abonos_separado: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          separado_id: string;
+          turno_id: string | null;
+          metodo: Database["public"]["Enums"]["metodo_pago"];
+          monto: number;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          separado_id: string;
+          turno_id?: string | null;
+          metodo: Database["public"]["Enums"]["metodo_pago"];
+          monto: number;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          separado_id?: string;
+          turno_id?: string | null;
+          metodo?: Database["public"]["Enums"]["metodo_pago"];
+          monto?: number;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "abonos_separado_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "abonos_separado_separado_id_fkey";
+            columns: ["separado_id"];
+            isOneToOne: false;
+            referencedRelation: "separados";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "abonos_separado_turno_id_fkey";
+            columns: ["turno_id"];
+            isOneToOne: false;
+            referencedRelation: "turnos_caja";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "abonos_separado_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       alertas: {
         Row: {
           id: string;
@@ -641,6 +703,136 @@ export type Database = {
           },
         ];
       };
+      cotizaciones: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string | null;
+          numero: number | null;
+          estado: string;
+          vigencia_hasta: string;
+          nota: string | null;
+          venta_id: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id?: string | null;
+          numero?: number | null;
+          estado?: string;
+          vigencia_hasta: string;
+          nota?: string | null;
+          venta_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string | null;
+          numero?: number | null;
+          estado?: string;
+          vigencia_hasta?: string;
+          nota?: string | null;
+          venta_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      cotizaciones_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cotizacion_id: string;
+          producto_id: string;
+          presentacion_id: string | null;
+          cantidad: number;
+          precio_unitario: number;
+          descuento: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cotizacion_id: string;
+          producto_id: string;
+          presentacion_id?: string | null;
+          cantidad: number;
+          precio_unitario: number;
+          descuento?: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cotizacion_id?: string;
+          producto_id?: string;
+          presentacion_id?: string | null;
+          cantidad?: number;
+          precio_unitario?: number;
+          descuento?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_detalle_cotizacion_id_fkey";
+            columns: ["cotizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "cotizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_detalle_presentacion_id_fkey";
+            columns: ["presentacion_id"];
+            isOneToOne: false;
+            referencedRelation: "presentaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cotizaciones_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       cuentas_por_pagar: {
         Row: {
           id: string;
@@ -695,6 +887,136 @@ export type Database = {
             columns: ["proveedor_id"];
             isOneToOne: false;
             referencedRelation: "proveedores";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      devoluciones_cliente: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          venta_id: string;
+          turno_id: string | null;
+          numero: number | null;
+          motivo: string;
+          total: number;
+          costo_total: number;
+          reembolso: string;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          venta_id: string;
+          turno_id?: string | null;
+          numero?: number | null;
+          motivo: string;
+          total?: number;
+          costo_total?: number;
+          reembolso: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          venta_id?: string;
+          turno_id?: string | null;
+          numero?: number | null;
+          motivo?: string;
+          total?: number;
+          costo_total?: number;
+          reembolso?: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "devoluciones_cliente_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_turno_id_fkey";
+            columns: ["turno_id"];
+            isOneToOne: false;
+            referencedRelation: "turnos_caja";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      devoluciones_cliente_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          devolucion_id: string;
+          venta_detalle_id: string;
+          producto_id: string;
+          cantidad: number;
+          valor: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          devolucion_id: string;
+          venta_detalle_id: string;
+          producto_id: string;
+          cantidad: number;
+          valor: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          devolucion_id?: string;
+          venta_detalle_id?: string;
+          producto_id?: string;
+          cantidad?: number;
+          valor?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "devoluciones_cliente_detalle_devolucion_id_fkey";
+            columns: ["devolucion_id"];
+            isOneToOne: false;
+            referencedRelation: "devoluciones_cliente";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "devoluciones_cliente_detalle_venta_detalle_id_fkey";
+            columns: ["venta_detalle_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas_detalle";
             referencedColumns: ["id"];
           },
         ];
@@ -1761,6 +2083,152 @@ export type Database = {
           },
         ];
       };
+      separados: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string;
+          bodega_id: string;
+          numero: number | null;
+          estado: string;
+          total: number;
+          abonado: number;
+          fecha_limite: string | null;
+          nota: string | null;
+          venta_id: string | null;
+          motivo_cancelacion: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id: string;
+          bodega_id: string;
+          numero?: number | null;
+          estado?: string;
+          total?: number;
+          abonado?: number;
+          fecha_limite?: string | null;
+          nota?: string | null;
+          venta_id?: string | null;
+          motivo_cancelacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string;
+          bodega_id?: string;
+          numero?: number | null;
+          estado?: string;
+          total?: number;
+          abonado?: number;
+          fecha_limite?: string | null;
+          nota?: string | null;
+          venta_id?: string | null;
+          motivo_cancelacion?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "separados_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      separados_detalle: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          separado_id: string;
+          producto_id: string;
+          presentacion_id: string | null;
+          cantidad: number;
+          precio_unitario: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          separado_id: string;
+          producto_id: string;
+          presentacion_id?: string | null;
+          cantidad: number;
+          precio_unitario: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          separado_id?: string;
+          producto_id?: string;
+          presentacion_id?: string | null;
+          cantidad?: number;
+          precio_unitario?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "separados_detalle_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_detalle_presentacion_id_fkey";
+            columns: ["presentacion_id"];
+            isOneToOne: false;
+            referencedRelation: "presentaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_detalle_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "separados_detalle_separado_id_fkey";
+            columns: ["separado_id"];
+            isOneToOne: false;
+            referencedRelation: "separados";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       traslados: {
         Row: {
           id: string;
@@ -2145,6 +2613,15 @@ export type Database = {
       };
     };
     Functions: {
+      abonar_separado: {
+        Args: {
+          p_separado: string;
+          p_monto: number;
+          p_metodo: Database["public"]["Enums"]["metodo_pago"];
+          p_turno?: string;
+        };
+        Returns: string;
+      };
       aceptar_invitacion: {
         Args: {
           p_token: string;
@@ -2212,6 +2689,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      cambiar_estado_cotizacion: {
+        Args: {
+          p_cot: string;
+          p_estado: string;
+          p_venta?: string;
+        };
+        Returns: undefined;
+      };
       cambiar_estado_orden: {
         Args: {
           p_orden: string;
@@ -2222,6 +2707,14 @@ export type Database = {
       cancelar_conteo: {
         Args: {
           p_conteo: string;
+        };
+        Returns: undefined;
+      };
+      cancelar_separado: {
+        Args: {
+          p_separado: string;
+          p_motivo: string;
+          p_turno?: string;
         };
         Returns: undefined;
       };
@@ -2278,6 +2771,16 @@ export type Database = {
         };
         Returns: undefined;
       };
+      crear_cotizacion: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_lineas: Json;
+          p_vigencia?: string;
+          p_nota?: string;
+        };
+        Returns: string;
+      };
       crear_orden_compra: {
         Args: {
           p_org: string;
@@ -2297,6 +2800,20 @@ export type Database = {
         };
         Returns: string;
       };
+      crear_separado: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_bodega: string;
+          p_lineas: Json;
+          p_fecha_limite?: string;
+          p_nota?: string;
+          p_abono?: number;
+          p_metodo?: Database["public"]["Enums"]["metodo_pago"];
+          p_turno?: string;
+        };
+        Returns: string;
+      };
       desde_funcion: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
@@ -2306,6 +2823,14 @@ export type Database = {
           p_turno: string;
         };
         Returns: number;
+      };
+      entregar_separado: {
+        Args: {
+          p_separado: string;
+          p_pagos: Json;
+          p_turno: string;
+        };
+        Returns: string;
       };
       iniciar_conteo: {
         Args: {
@@ -2365,6 +2890,16 @@ export type Database = {
         Args: {
           p_compra: string;
           p_dias?: number;
+        };
+        Returns: string;
+      };
+      registrar_devolucion_cliente: {
+        Args: {
+          p_venta: string;
+          p_lineas: Json;
+          p_motivo: string;
+          p_reembolso: string;
+          p_turno?: string;
         };
         Returns: string;
       };
@@ -2504,6 +3039,12 @@ export type Database = {
           doc: string;
         };
         Returns: number;
+      };
+      stock_reservado: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { producto_id: string; bodega_id: string; reservado: number }[];
       };
       tiene_rol: {
         Args: {
