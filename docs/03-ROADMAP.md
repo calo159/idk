@@ -3,7 +3,7 @@
 Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica.
 
 ## Fase 0 — Base del proyecto
-- [ ] 0.1 Crear proyecto Next.js + TypeScript estricto + Tailwind + shadcn/ui + ESLint/Prettier.
+- [x] 0.1 Crear proyecto Next.js + TypeScript estricto + Tailwind + shadcn/ui + ESLint/Prettier.
 - [ ] 0.2 Configurar Supabase local, aplicar `supabase/migrations/0001_esquema_inicial.sql` y `seed.sql`.
 - [ ] 0.3 Generar tipos de Supabase y clientes server/browser en `src/lib/supabase/`.
 - [ ] 0.4 Utilidades: `dinero.ts` (formato COP, sumas seguras), fechas en America/Bogota, esquemas Zod base.
