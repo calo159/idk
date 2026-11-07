@@ -107,10 +107,14 @@ async function main() {
     con_default: number;
     retorno: string;
     es_set: boolean;
+    salidas: { nombre: string; tipo: string }[] | null;
   }>(`
     select p.proname as nombre, p.proargnames as nombres_args,
            (select array_agg(format_type(t, null) order by o) from unnest(p.proargtypes::oid[]) with ordinality u(t, o)) as tipos_args,
-           p.pronargdefaults as con_default, format_type(p.prorettype, null) as retorno, p.proretset as es_set
+           p.pronargdefaults as con_default, format_type(p.prorettype, null) as retorno, p.proretset as es_set,
+           (select json_agg(json_build_object('nombre', n, 'tipo', format_type(t, null)) order by o)
+              from unnest(p.proallargtypes, p.proargnames, p.proargmodes) with ordinality u(t, n, m, o)
+             where m in ('t', 'o')) as salidas
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public' and p.prokind = 'f'
       and p.prorettype <> 'trigger'::regtype
@@ -213,8 +217,14 @@ async function main() {
       });
       L.push("        };");
     }
-    const r = ts(f.retorno);
-    L.push(`        Returns: ${f.es_set ? `${r}[]` : r};`);
+    if (f.salidas && f.salidas.length > 0) {
+      // `returns table (...)`: cada columna de salida con su tipo.
+      const cols = f.salidas.map((c) => `${c.nombre}: ${ts(c.tipo)}`).join("; ");
+      L.push(`        Returns: { ${cols} }[];`);
+    } else {
+      const r = ts(f.retorno);
+      L.push(`        Returns: ${f.es_set ? `${r}[]` : r};`);
+    }
     L.push("      };");
   }
   L.push("    };");

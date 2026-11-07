@@ -1493,6 +1493,47 @@ export type Database = {
         };
         Returns: undefined;
       };
+      reporte_ventas_diarias: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: { dia: string; ventas: number; total: number; costo: number; utilidad: number }[];
+      };
+      reporte_ventas_por_metodo: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: { metodo: string; pagos: number; total: number }[];
+      };
+      reporte_ventas_por_producto: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+          p_limite?: number;
+        };
+        Returns: { producto_id: string; nombre: string; cantidad: number; ingreso: number; costo: number; utilidad: number }[];
+      };
+      reporte_ventas_por_vendedor: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: { usuario_id: string; nombre: string; ventas: number; total: number; utilidad: number }[];
+      };
+      reportes_validar: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: undefined;
+      };
       roles_escritura: {
         Args: {
           tabla: string;
