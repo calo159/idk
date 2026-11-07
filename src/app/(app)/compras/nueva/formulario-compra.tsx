@@ -19,6 +19,23 @@ export interface ProductoCompra {
   presentaciones: { id: string; nombre: string; factor: number; codigo_barras: string | null }[];
 }
 
+interface PendienteIA {
+  clave: string;
+  descripcion: string;
+  cantidad: string;
+  costo: string;
+}
+
+interface RespuestaFactura {
+  documentoId: string;
+  proveedor_id: string | null;
+  numero_factura: string | null;
+  fecha: string | null;
+  confianza: number;
+  advertencias: string[];
+  lineas: { productoId: string | null; descripcion: string; cantidad: number; costo_unitario: number }[];
+}
+
 interface Linea {
   clave: string;
   producto: ProductoCompra;
@@ -50,6 +67,59 @@ export function FormularioCompra({
   const [bodega, setBodega] = useState(bodegas[0]?.id ?? "");
   const [factura, setFactura] = useState("");
   const [fecha, setFecha] = useState(hoy);
+  const [documentoIa, setDocumentoIa] = useState<string | null>(null);
+  const [pendientesIa, setPendientesIa] = useState<PendienteIA[]>([]);
+  const [avisosIa, setAvisosIa] = useState<string[]>([]);
+  const [leyendo, setLeyendo] = useState(false);
+
+  const leerFoto = async (archivo: File) => {
+    setError(null);
+    setLeyendo(true);
+    try {
+      const datos = new FormData();
+      datos.set("foto", archivo);
+      const resp = await fetch("/api/ia/factura", { method: "POST", body: datos });
+      const json = (await resp.json()) as RespuestaFactura | { error: string };
+      if (!resp.ok || "error" in json) {
+        setError("error" in json ? json.error : "No pudimos leer la factura");
+        return;
+      }
+      setDocumentoIa(json.documentoId);
+      if (json.proveedor_id) setProveedor(json.proveedor_id);
+      if (json.numero_factura) setFactura(json.numero_factura);
+      if (json.fecha) setFecha(json.fecha);
+      const nuevas: Linea[] = [];
+      const sinPar: PendienteIA[] = [];
+      for (const l of json.lineas) {
+        const prod = l.productoId ? productos.find((p) => p.id === l.productoId) : undefined;
+        if (prod)
+          nuevas.push({
+            clave: crypto.randomUUID(),
+            producto: prod,
+            presentacionId: "",
+            cantidad: String(l.cantidad),
+            costo: String(l.costo_unitario),
+          });
+        else
+          sinPar.push({
+            clave: crypto.randomUUID(),
+            descripcion: l.descripcion,
+            cantidad: String(l.cantidad),
+            costo: String(l.costo_unitario),
+          });
+      }
+      setLineas((ls) => [...ls, ...nuevas]);
+      setPendientesIa(sinPar);
+      setAvisosIa([
+        ...(json.confianza < 0.6 ? ["La foto se leyó con poca seguridad: revisa todo con cuidado."] : []),
+        ...json.advertencias,
+      ]);
+    } catch {
+      setError("No pudimos leer la factura. Revisa tu conexión.");
+    } finally {
+      setLeyendo(false);
+    }
+  };
 
   const sugeridos = useMemo(() => {
     const t = busqueda.trim().toLowerCase();
@@ -57,11 +127,9 @@ export function FormularioCompra({
     return productos.filter((p) => p.nombre.toLowerCase().includes(t)).slice(0, 6);
   }, [busqueda, productos]);
 
-  const agregar = (p: ProductoCompra, presentacionId = "") =>
-    setLineas((ls) => [
-      ...ls,
-      { clave: crypto.randomUUID(), producto: p, presentacionId, cantidad: "1", costo: "" },
-    ]);
+  const agregarLinea = (p: ProductoCompra, cantidad = "1", costo = "", presentacionId = "") =>
+    setLineas((ls) => [...ls, { clave: crypto.randomUUID(), producto: p, presentacionId, cantidad, costo }]);
+  const agregar = (p: ProductoCompra, presentacionId = "") => agregarLinea(p, "1", "", presentacionId);
 
   const alEscanear = (codigo: string) => {
     const vs = variantesCodigo(codigo);
@@ -92,6 +160,7 @@ export function FormularioCompra({
           bodega_id: bodega,
           numero_factura: factura,
           fecha,
+          documento_ia_id: documentoIa,
           lineas: lineas.map((l, i) => ({
             producto_id: l.producto.id,
             presentacion_id: l.presentacionId || null,
@@ -111,6 +180,58 @@ export function FormularioCompra({
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2 rounded-xl border border-dashed p-4">
+        <Label htmlFor="foto-factura">Foto de la factura (la IA llena los productos)</Label>
+        <Input
+          id="foto-factura"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
+          disabled={leyendo}
+          className="h-11"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void leerFoto(f);
+            e.target.value = "";
+          }}
+        />
+        {leyendo ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            Leyendo la factura… puede tardar unos segundos.
+          </p>
+        ) : null}
+        {documentoIa ? (
+          <p className="text-xs text-muted-foreground">
+            La IA propone, tú confirmas: revisa cantidades y costos antes de guardar.
+          </p>
+        ) : null}
+        {avisosIa.map((a) => (
+          <p key={a} role="alert" className="text-sm text-amber-700 dark:text-amber-400">
+            {a}
+          </p>
+        ))}
+      </div>
+
+      {pendientesIa.length > 0 ? (
+        <div className="space-y-2 rounded-xl border border-amber-500/50 p-3">
+          <p className="text-sm font-medium">
+            {pendientesIa.length} producto(s) de la factura no se encontraron en tu catálogo. Elige cuál es:
+          </p>
+          {pendientesIa.map((pi) => (
+            <PendientePorElegir
+              key={pi.clave}
+              pendiente={pi}
+              productos={productos}
+              alElegir={(p) => {
+                agregarLinea(p, pi.cantidad, pi.costo);
+                setPendientesIa((x) => x.filter((y) => y.clave !== pi.clave));
+              }}
+              alDescartar={() => setPendientesIa((x) => x.filter((y) => y.clave !== pi.clave))}
+            />
+          ))}
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="proveedor">Proveedor</Label>
@@ -254,6 +375,53 @@ export function FormularioCompra({
           {pendiente ? "Guardando…" : "Confirmar compra"}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function PendientePorElegir({
+  pendiente,
+  productos,
+  alElegir,
+  alDescartar,
+}: {
+  pendiente: PendienteIA;
+  productos: ProductoCompra[];
+  alElegir: (p: ProductoCompra) => void;
+  alDescartar: () => void;
+}) {
+  const [texto, setTexto] = useState("");
+  const sugeridos = useMemo(() => {
+    const t = texto.trim().toLowerCase();
+    return t.length < 2 ? [] : productos.filter((p) => p.nombre.toLowerCase().includes(t)).slice(0, 5);
+  }, [texto, productos]);
+  return (
+    <div className="space-y-1.5 rounded-lg bg-muted/50 p-2">
+      <p className="text-sm">
+        <span className="font-medium">«{pendiente.descripcion}»</span> · {pendiente.cantidad} × ${pendiente.costo}
+      </p>
+      <div className="flex gap-2">
+        <Input
+          aria-label={`Buscar producto para ${pendiente.descripcion}`}
+          placeholder="Buscar en tu catálogo…"
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          className="h-10"
+        />
+        <Button type="button" variant="ghost" size="sm" onClick={alDescartar}>
+          Descartar
+        </Button>
+      </div>
+      {sugeridos.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          className="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
+          onClick={() => alElegir(p)}
+        >
+          {p.nombre}
+        </button>
+      ))}
     </div>
   );
 }

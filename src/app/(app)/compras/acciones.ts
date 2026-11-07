@@ -30,6 +30,7 @@ export async function crearCompra(
       bodega_id: d.bodega_id,
       numero_factura: d.numero_factura ?? null,
       fecha: d.fecha,
+      documento_ia_id: d.documento_ia_id,
       usuario_id: ctx.usuarioId,
     })
     .select("id")
@@ -49,6 +50,15 @@ export async function crearCompra(
   if (errDetalle) {
     await supabase.from("compras").delete().eq("id", compra.id); // borrador sin líneas: se descarta
     return fallo("No pudimos guardar los productos de la compra");
+  }
+
+  if (d.documento_ia_id) {
+    // La persona revisó y aceptó lo que propuso la IA.
+    await supabase
+      .from("documentos_ia")
+      .update({ estado: "confirmado" })
+      .eq("id", d.documento_ia_id)
+      .eq("organizacion_id", ctx.organizacionId);
   }
 
   if (confirmar) {
