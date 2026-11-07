@@ -45,6 +45,7 @@ export const ACCIONES: Record<string, Rol[]> = {
   "compras.anular": ["dueno", "admin"],
   "inventario.ajustar": ["dueno", "admin", "bodeguero"],
   "abonos.registrar": ["dueno", "admin", "vendedor", "ruta"],
+  "clientes.cupo": ["dueno", "admin"],
   "usuarios.gestionar": ["dueno", "admin"],
   "configuracion.editar": ["dueno", "admin"],
   "pagos.verificar_manual": ["dueno", "admin"],

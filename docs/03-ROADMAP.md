@@ -18,7 +18,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.5 Inventario: existencias, kardex y ajustes con motivo (entrada, salida y conteo físico). _(Lógica SQL ya cubierta por tests; pantallas sin ejecutar contra Supabase real.)_
 - [x] 1.6 Proveedores y compras (borrador, confirmar, anular). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 1.7 IA: factura por foto (`POST /api/ia/factura`, salida validada con Zod, `documentos_ia`, emparejado con catálogo). _(Probada con modelo simulado; falta probar con ANTHROPIC_API_KEY real y fotos reales.)_
-- [ ] 1.8 Clientes: cupo, saldo, abonos.
+- [x] 1.8 Clientes con cupo de fiado y abonos (migración 0006 protege el cupo). _(Pantallas sin ejecutar contra Supabase real.)_
 - [ ] 1.9 POS: búsqueda/escaneo, descuentos, pagos mixtos, crédito, recibo.
 - [ ] 1.10 IA: verificación de comprobantes Nequi/Daviplata + alerta de repetidos.
 - [ ] 1.11 Caja: apertura, cierre, arqueo por denominación, diferencia.
