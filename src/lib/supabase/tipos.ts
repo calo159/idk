@@ -139,6 +139,61 @@ export type Database = {
           },
         ];
       };
+      ajustes_cartera: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string;
+          monto: number;
+          motivo: string;
+          documento_ia_id: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id: string;
+          monto: number;
+          motivo: string;
+          documento_ia_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string;
+          monto?: number;
+          motivo?: string;
+          documento_ia_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ajustes_cartera_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ajustes_cartera_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ajustes_cartera_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       alertas: {
         Row: {
           id: string;
@@ -3004,6 +3059,15 @@ export type Database = {
         Args: {
           p_compra: string;
           p_dias?: number;
+        };
+        Returns: string;
+      };
+      registrar_deuda_inicial: {
+        Args: {
+          p_cliente: string;
+          p_monto: number;
+          p_motivo?: string;
+          p_documento_ia?: string;
         };
         Returns: string;
       };

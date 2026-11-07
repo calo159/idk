@@ -49,6 +49,9 @@ export default async function Pagina({
         <h1 className="text-xl font-semibold">Productos</h1>
         {puedeEditar ? (
           <div className="flex gap-2">
+            <Link href="/productos/cuaderno" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
+              Cuaderno
+            </Link>
             <Link href="/productos/importar" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
               Importar
             </Link>

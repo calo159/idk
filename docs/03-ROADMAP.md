@@ -41,7 +41,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 2.9 Reportes de inventario: valorizado, ABC, rotación y plata dormida (migración 0012). _(SQL probado; pantalla sin ejecutar contra Supabase real. La utilidad por producto ya está en Reportes.)_
 - [x] 2.10 Metas mensuales y comisiones de vendedores (porcentaje sobre ventas o utilidad, bono por meta, neto de devoluciones; cada vendedor ve solo lo suyo) (migración 0017). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.11 Usuario contador (solo lectura) y exportaciones CSV para Excel: ventas, compras, gastos, cartera, cuentas por pagar e inventario. _(Pantalla sin ejecutar contra Supabase real.)_
-- [ ] 2.12 Foto del cuaderno → productos y deudas.
+- [x] 2.12 Foto del cuaderno → productos con existencias y deudas de clientes (migración 0018; la IA propone, la persona revisa; probado con modelo simulado). _(Falta probar con ANTHROPIC_API_KEY real y cuadernos reales.)_
 
 ## Fase 3 — Automatización e inteligencia
 - [ ] 3.1 n8n: outbox, webhooks firmados, flujo de alertas al dueño por WhatsApp.

@@ -81,6 +81,10 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  // Deuda anterior del cuaderno (migración 0018)
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select registrar_deuda_inicial($1, 1000, 'Cuaderno')", [clienteId]);
+  });
   // Metas y comisiones (migración 0017)
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select fijar_meta($1,$2,current_date,1000000)", [base.orgId, vendedorId]);
