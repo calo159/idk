@@ -9,6 +9,7 @@ import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { cupoDisponible } from "@/lib/validaciones/clientes";
 import { zUuid } from "@/lib/validaciones/comunes";
 import { FormAbono, FormCliente } from "../formularios";
+import { SelectorLista } from "../selector-lista";
 
 export const metadata: Metadata = { title: "Cliente" };
 
@@ -17,6 +18,7 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
   const { id } = await params;
   if (!zUuid.safeParse(id).success) notFound();
   const supabase = await crearClienteServidor();
+  const { data: listas } = await supabase.from("listas_precios").select("id, nombre").eq("organizacion_id", ctx.organizacionId).eq("activa", true).order("nombre");
   const [{ data: cliente }, { data: abonos }, { data: fiados }] = await Promise.all([
     supabase.from("clientes").select("*").eq("id", id).eq("organizacion_id", ctx.organizacionId).maybeSingle(),
     supabase
@@ -53,6 +55,10 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
           </p>
         </div>
       </div>
+
+      {(ctx.rol === "dueno" || ctx.rol === "admin") && (listas ?? []).length > 0 ? (
+        <SelectorLista clienteId={cliente.id} actual={cliente.lista_precios_id} listas={listas ?? []} />
+      ) : null}
 
       {puede(ctx.rol, "abonos.registrar") ? (
         <FormAbono clienteId={cliente.id} saldo={Number(cliente.saldo)} />

@@ -30,6 +30,7 @@ export interface ClientePOS {
   telefono: string | null;
   cupo: number;
   saldo: number;
+  listaId?: string | null;
 }
 
 type Metodo = "efectivo" | "nequi" | "daviplata" | "transferencia" | "tarjeta" | "credito";
@@ -66,7 +67,9 @@ export function PuntoDeVenta({
   clientes,
   puedeAutorizarExceso,
   cotizacionInicial = null,
+  listasPrecios = {},
 }: {
+  listasPrecios?: Record<string, Record<string, number>>;
   cotizacionInicial?: {
     id: string;
     clienteId: string | null;
@@ -166,6 +169,21 @@ export function PuntoDeVenta({
     } finally {
       setSubiendo(null);
     }
+  };
+
+  /** Al elegir cliente se aplican los precios de su lista a las líneas que no tengan un precio cambiado a mano. */
+  const cambiarCliente = (id: string) => {
+    setClienteId(id);
+    const lista = listasPrecios[clientes.find((c) => c.id === id)?.listaId ?? ""] ?? {};
+    setCarrito((c) =>
+      c.map((l) => {
+        if (l.precio !== l.precioCatalogo) return l; // precio tocado a mano: se respeta
+        const p = catalogo.find((x) => x.id === l.productoId);
+        const base = l.presentacionId ? (p?.presentaciones.find((x) => x.id === l.presentacionId)?.precio ?? l.precio) : (p?.precio ?? l.precio);
+        const nuevo = lista[l.presentacionId ? `p:${l.presentacionId}` : `b:${l.productoId}`] ?? base;
+        return { ...l, precio: nuevo, precioCatalogo: nuevo };
+      }),
+    );
   };
 
   const reiniciar = () => {
@@ -446,7 +464,7 @@ export function PuntoDeVenta({
             <select
               id="cliente"
               value={clienteId}
-              onChange={(e) => setClienteId(e.target.value)}
+              onChange={(e) => cambiarCliente(e.target.value)}
               className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
             >
               <option value="">Mostrador</option>

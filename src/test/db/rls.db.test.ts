@@ -81,6 +81,13 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  // Lista de precios, lote y serial (migración 0019)
+  await comoUsuario(db, base.duenoId, async () => {
+    const lista = (await db.query<{ id: string }>("select crear_lista_precios($1,'Mayorista') id", [base.orgId])).rows[0]!.id;
+    await db.query("select fijar_precio_lista($1,$2,20000)", [lista, productoId]);
+    await db.query("select registrar_lote($1,$2,$3,'L-1',current_date + 30,5)", [base.orgId, productoId, base.bodegaId]);
+    await db.query("select registrar_seriales($1,$2,$3,$4::text[])", [base.orgId, productoId, base.bodegaId, ["SERIAL-RLS-" + correo]]);
+  });
   // Deuda anterior del cuaderno (migración 0018)
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select registrar_deuda_inicial($1, 1000, 'Cuaderno')", [clienteId]);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Users, Warehouse } from "lucide-react";
+import { Tags, Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
 import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 
@@ -28,6 +28,15 @@ export default async function Pagina() {
             <span className="text-sm text-muted-foreground">
               Invita a tu equipo y define qué puede hacer cada uno
             </span>
+          </span>
+        </Link>
+      ) : null}
+      {puedeEscribir(ctx.rol, "bodegas") ? (
+        <Link href="/configuracion/listas" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <Tags className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Listas de precios</span>
+            <span className="text-sm text-muted-foreground">Mayorista, constructores… cada cliente con su precio</span>
           </span>
         </Link>
       ) : null}

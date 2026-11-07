@@ -33,7 +33,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 2.2 Conteo físico guiado (ciego), diferencias valoradas, corrección opcional del inventario y alerta por faltantes grandes (migración 0013). Nota: el “ciego” es de interfaz; un usuario técnico podría leer `cantidad_sistema` por la API.
 - [x] 2.3 Órdenes de compra (recepción parcial), cuentas por pagar con vencimientos y pagos, compras a crédito y devoluciones a proveedor (migración 0014). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.4 Comparador de proveedores (último precio, rango, diferencia contra el mejor) y alerta de alzas de precio al confirmar compras (migración 0015). _(SQL probado; pantalla sin ejecutar contra Supabase real.)_
-- [ ] 2.5 Listas de precios, variantes, lotes/vencimientos, seriales.
+- [x] 2.5 Listas de precios por cliente (el POS las aplica), variantes (talla/color), lotes con vencimiento (saldo derivado del stock, FEFO) y seriales con garantía (migración 0019). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.6 Cotizaciones (envío por WhatsApp y venta desde el POS), separados con abonos y entrega, y devoluciones de clientes con reembolso y reporte neto (migración 0016). _(SQL probado; pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.7 Gastos con foto de soporte, retiros e ingresos de efectivo (migración 0011; el efectivo esperado del cierre los descuenta). _(Pantallas sin ejecutar contra Supabase real.)_
 - [x] 2.8 Alertas antirrobo (anulación rápida, ajustes negativos repetidos, faltantes, comprobantes sospechosos) y puntaje de riesgo por turno como señales, no acusaciones (migración 0011).

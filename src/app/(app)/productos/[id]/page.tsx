@@ -7,6 +7,7 @@ import { formatoCantidad, formatoCOP } from "@/lib/dinero";
 import { puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { zUuid } from "@/lib/validaciones/comunes";
+import { FormVariantes } from "../../inventario/avanzado/formularios";
 import {
   BotonActivarProducto,
   BotonEliminarPresentacion,
@@ -91,6 +92,9 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
         )}
         {editar ? <FormPresentacion productoId={producto.id} /> : null}
       </div>
+
+      {editar && !producto.variante_de ? <FormVariantes productoId={producto.id} /> : null}
+      {producto.atributos ? <p className="text-xs text-muted-foreground">Variante: {Object.values(producto.atributos as Record<string, string>).join(" / ")}</p> : null}
 
       {editar ? (
         <div className="space-y-3">

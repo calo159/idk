@@ -54,12 +54,22 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
       .limit(3000),
     supabase
       .from("clientes")
-      .select("id, nombre, telefono, cupo_credito, saldo")
+      .select("id, nombre, telefono, cupo_credito, saldo, lista_precios_id")
       .eq("organizacion_id", ctx.organizacionId)
       .eq("activo", true)
       .order("nombre")
       .limit(1000),
   ]);
+
+  const { data: preciosListas } = await supabase
+    .from("precios_lista")
+    .select("lista_id, producto_id, presentacion_id, precio")
+    .eq("organizacion_id", ctx.organizacionId)
+    .limit(50000);
+  const listas: Record<string, Record<string, number>> = {};
+  for (const x of preciosListas ?? []) {
+    (listas[x.lista_id] ??= {})[x.presentacion_id ? `p:${x.presentacion_id}` : `b:${x.producto_id}`] = Number(x.precio);
+  }
 
   const catalogo: ProductoPOS[] = (productos ?? []).map((p) => ({
     id: p.id,
@@ -113,7 +123,9 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
         telefono: c.telefono,
         cupo: Number(c.cupo_credito),
         saldo: Number(c.saldo),
+        listaId: c.lista_precios_id,
       }))}
+      listasPrecios={listas}
       puedeAutorizarExceso={ctx.rol === "dueno" || ctx.rol === "admin"}
     />
   );

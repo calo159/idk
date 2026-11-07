@@ -360,6 +360,7 @@ export type Database = {
           acepta_mensajes: boolean;
           activo: boolean;
           creado_en: string;
+          lista_precios_id: string | null;
         };
         Insert: {
           id?: string;
@@ -373,6 +374,7 @@ export type Database = {
           acepta_mensajes?: boolean;
           activo?: boolean;
           creado_en?: string;
+          lista_precios_id?: string | null;
         };
         Update: {
           id?: string;
@@ -386,8 +388,16 @@ export type Database = {
           acepta_mensajes?: boolean;
           activo?: boolean;
           creado_en?: string;
+          lista_precios_id?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "clientes_lista_precios_id_fkey";
+            columns: ["lista_precios_id"];
+            isOneToOne: false;
+            referencedRelation: "listas_precios";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "clientes_organizacion_id_fkey";
             columns: ["organizacion_id"];
@@ -1504,6 +1514,113 @@ export type Database = {
           },
         ];
       };
+      listas_precios: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          nombre: string;
+          descripcion: string | null;
+          activa: boolean;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          nombre: string;
+          descripcion?: string | null;
+          activa?: boolean;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          nombre?: string;
+          descripcion?: string | null;
+          activa?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "listas_precios_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lotes: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          producto_id: string;
+          bodega_id: string;
+          codigo: string;
+          vence: string | null;
+          cantidad: number;
+          compra_id: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          producto_id: string;
+          bodega_id: string;
+          codigo: string;
+          vence?: string | null;
+          cantidad: number;
+          compra_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          producto_id?: string;
+          bodega_id?: string;
+          codigo?: string;
+          vence?: string | null;
+          cantidad?: number;
+          compra_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lotes_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_compra_id_fkey";
+            columns: ["compra_id"];
+            isOneToOne: false;
+            referencedRelation: "compras";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       metas_vendedor: {
         Row: {
           id: string;
@@ -2008,6 +2125,62 @@ export type Database = {
           },
         ];
       };
+      precios_lista: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          lista_id: string;
+          producto_id: string;
+          presentacion_id: string | null;
+          precio: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          lista_id: string;
+          producto_id: string;
+          presentacion_id?: string | null;
+          precio: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          lista_id?: string;
+          producto_id?: string;
+          presentacion_id?: string | null;
+          precio?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "precios_lista_lista_id_fkey";
+            columns: ["lista_id"];
+            isOneToOne: false;
+            referencedRelation: "listas_precios";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "precios_lista_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "precios_lista_presentacion_id_fkey";
+            columns: ["presentacion_id"];
+            isOneToOne: false;
+            referencedRelation: "presentaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "precios_lista_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       precios_proveedor: {
         Row: {
           id: number;
@@ -2129,6 +2302,11 @@ export type Database = {
           foto_url: string | null;
           activo: boolean;
           creado_en: string;
+          variante_de: string | null;
+          atributos: Json | null;
+          maneja_lotes: boolean;
+          maneja_seriales: boolean;
+          garantia_dias: number | null;
         };
         Insert: {
           id?: string;
@@ -2146,6 +2324,11 @@ export type Database = {
           foto_url?: string | null;
           activo?: boolean;
           creado_en?: string;
+          variante_de?: string | null;
+          atributos?: Json | null;
+          maneja_lotes?: boolean;
+          maneja_seriales?: boolean;
+          garantia_dias?: number | null;
         };
         Update: {
           id?: string;
@@ -2163,6 +2346,11 @@ export type Database = {
           foto_url?: string | null;
           activo?: boolean;
           creado_en?: string;
+          variante_de?: string | null;
+          atributos?: Json | null;
+          maneja_lotes?: boolean;
+          maneja_seriales?: boolean;
+          garantia_dias?: number | null;
         };
         Relationships: [
           {
@@ -2177,6 +2365,13 @@ export type Database = {
             columns: ["organizacion_id"];
             isOneToOne: false;
             referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "productos_variante_de_fkey";
+            columns: ["variante_de"];
+            isOneToOne: false;
+            referencedRelation: "productos";
             referencedColumns: ["id"];
           },
         ];
@@ -2361,6 +2556,84 @@ export type Database = {
             columns: ["separado_id"];
             isOneToOne: false;
             referencedRelation: "separados";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      seriales: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          producto_id: string;
+          bodega_id: string;
+          serial: string;
+          estado: string;
+          compra_id: string | null;
+          venta_id: string | null;
+          vendido_en: string | null;
+          garantia_hasta: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          producto_id: string;
+          bodega_id: string;
+          serial: string;
+          estado?: string;
+          compra_id?: string | null;
+          venta_id?: string | null;
+          vendido_en?: string | null;
+          garantia_hasta?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          producto_id?: string;
+          bodega_id?: string;
+          serial?: string;
+          estado?: string;
+          compra_id?: string | null;
+          venta_id?: string | null;
+          vendido_en?: string | null;
+          garantia_hasta?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "seriales_bodega_id_fkey";
+            columns: ["bodega_id"];
+            isOneToOne: false;
+            referencedRelation: "bodegas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seriales_compra_id_fkey";
+            columns: ["compra_id"];
+            isOneToOne: false;
+            referencedRelation: "compras";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seriales_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seriales_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seriales_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
             referencedColumns: ["id"];
           },
         ];
@@ -2819,6 +3092,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      asignar_lista_cliente: {
+        Args: {
+          p_cliente: string;
+          p_lista: string;
+        };
+        Returns: undefined;
+      };
       calcular_avance_mes: {
         Args: {
           p_org: string;
@@ -2903,6 +3183,13 @@ export type Database = {
         };
         Returns: number;
       };
+      consultar_serial: {
+        Args: {
+          p_org: string;
+          p_serial: string;
+        };
+        Returns: { producto: string; estado: string; bodega: string; comprado: string; proveedor: string; vendido: string; cliente: string; venta_numero: number; garantia_hasta: string; en_garantia: boolean }[];
+      };
       crear_alerta_unica: {
         Args: {
           p_org: string;
@@ -2921,6 +3208,14 @@ export type Database = {
           p_lineas: Json;
           p_vigencia?: string;
           p_nota?: string;
+        };
+        Returns: string;
+      };
+      crear_lista_precios: {
+        Args: {
+          p_org: string;
+          p_nombre: string;
+          p_descripcion?: string;
         };
         Returns: string;
       };
@@ -2956,6 +3251,13 @@ export type Database = {
           p_turno?: string;
         };
         Returns: string;
+      };
+      crear_variantes: {
+        Args: {
+          p_base: string;
+          p_combinaciones: Json;
+        };
+        Returns: number;
       };
       desde_funcion: {
         Args: Record<PropertyKey, never>;
@@ -2994,6 +3296,15 @@ export type Database = {
         };
         Returns: undefined;
       };
+      fijar_precio_lista: {
+        Args: {
+          p_lista: string;
+          p_producto: string;
+          p_precio: number;
+          p_presentacion?: string;
+        };
+        Returns: undefined;
+      };
       iniciar_conteo: {
         Args: {
           p_org: string;
@@ -3002,6 +3313,14 @@ export type Database = {
           p_categoria?: string;
         };
         Returns: string;
+      };
+      lotes_con_saldo: {
+        Args: {
+          p_org: string;
+          p_producto?: string;
+          p_bodega?: string;
+        };
+        Returns: { lote_id: string; producto_id: string; producto: string; bodega_id: string; codigo: string; vence: string; cantidad_recibida: number; saldo: number; dias_para_vencer: number }[];
       };
       marcar_verificacion_pago: {
         Args: {
@@ -3105,6 +3424,18 @@ export type Database = {
         };
         Returns: string;
       };
+      registrar_lote: {
+        Args: {
+          p_org: string;
+          p_producto: string;
+          p_bodega: string;
+          p_codigo: string;
+          p_vence: string;
+          p_cantidad: number;
+          p_compra?: string;
+        };
+        Returns: string;
+      };
       registrar_movimiento_caja: {
         Args: {
           p_turno: string;
@@ -3122,6 +3453,16 @@ export type Database = {
           p_referencia?: string;
         };
         Returns: string;
+      };
+      registrar_seriales: {
+        Args: {
+          p_org: string;
+          p_producto: string;
+          p_bodega: string;
+          p_seriales: string[];
+          p_compra?: string;
+        };
+        Returns: number;
       };
       reporte_abc: {
         Args: {
@@ -3245,6 +3586,20 @@ export type Database = {
           p_destino: string;
           p_lineas: Json;
           p_nota?: string;
+        };
+        Returns: string;
+      };
+      vencimientos_proximos: {
+        Args: {
+          p_org: string;
+          p_dias?: number;
+        };
+        Returns: { lote_id: string; producto: string; bodega_id: string; codigo: string; vence: string; saldo: number; dias_para_vencer: number; valor_en_riesgo: number }[];
+      };
+      vender_serial: {
+        Args: {
+          p_venta: string;
+          p_serial: string;
         };
         Returns: string;
       };

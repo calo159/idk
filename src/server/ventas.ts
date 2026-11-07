@@ -167,7 +167,25 @@ export async function registrarVenta(
     await supabase.rpc("cambiar_estado_cotizacion", { p_cot: d.cotizacion_id, p_estado: "aceptada", p_venta: venta.id });
   }
 
-  await auditarPrecios(supabase, venta.id, d.lineas, productos ?? [], presentaciones ?? []);
+  // Los precios de la lista del cliente cuentan como "precio de catálogo" para esta venta.
+  const productosRef = (productos ?? []).map((p) => ({ ...p }));
+  const presentacionesRef = (presentaciones ?? []).map((p) => ({ ...p }));
+  if (d.cliente_id) {
+    const { data: cli } = await supabase.from("clientes").select("lista_precios_id").eq("id", d.cliente_id).maybeSingle();
+    if (cli?.lista_precios_id) {
+      const { data: deLista } = await supabase.from("precios_lista").select("producto_id, presentacion_id, precio").eq("lista_id", cli.lista_precios_id).in("producto_id", ids);
+      for (const x of deLista ?? []) {
+        if (x.presentacion_id) {
+          const r = presentacionesRef.find((p) => p.id === x.presentacion_id);
+          if (r) r.precio_venta = x.precio;
+        } else {
+          const r = productosRef.find((p) => p.id === x.producto_id);
+          if (r) r.precio_venta = x.precio;
+        }
+      }
+    }
+  }
+  await auditarPrecios(supabase, venta.id, d.lineas, productosRef, presentacionesRef);
 
   return ok({ ventaId: venta.id, numero: Number(numero), duplicada: false, vuelto: paraBd(pagos.vuelto), verificaciones });
 }
