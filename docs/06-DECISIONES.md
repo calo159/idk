@@ -17,8 +17,9 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - **Límite:** no cubre GoTrue ni Storage. Esos se prueban con Supabase local (`npm run db:start`) y Playwright.
 
 ## D-003 · Dinero con `decimal.js`
-- `numeric(14,2)` en BD llega como `string` al cliente. `src/lib/dinero.ts` opera con `Decimal` y redondea a 2
-  decimales en cada operación visible; nunca se suman `number` sueltos.
+- PostgREST entrega `numeric` como número JSON (los tipos generados dicen `number`). Es seguro para numeric(14,2) (≤ 15 dígitos
+  significativos), pero NUNCA se opera con ese `number`: `src/lib/dinero.ts` lo convierte a `Decimal` (redondeo igual al
+  de Postgres) y hacia la BD se envía `paraBd()` (string). Prohibido sumar/multiplicar dinero con `+` o `*` sueltos.
 
 ## D-004 · Cambios de BD solo con migraciones nuevas
 - `0001_esquema_inicial.sql` está probada y congelada. Correcciones y ampliaciones van en `0002_…`, `0003_…`.
