@@ -5,7 +5,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 ## Fase 0 — Base del proyecto
 - [x] 0.1 Crear proyecto Next.js + TypeScript estricto + Tailwind + shadcn/ui + ESLint/Prettier.
 - [x] 0.2 Configurar Supabase local, aplicar `supabase/migrations/0001_esquema_inicial.sql` y `seed.sql`. _(`config.toml` listo; migraciones verificadas con PGlite en `src/test/db/`. `supabase start` requiere instalar Docker Desktop.)_
-- [ ] 0.3 Generar tipos de Supabase y clientes server/browser en `src/lib/supabase/`.
+- [x] 0.3 Generar tipos de Supabase y clientes server/browser en `src/lib/supabase/`.
 - [ ] 0.4 Utilidades: `dinero.ts` (formato COP, sumas seguras), fechas en America/Bogota, esquemas Zod base.
 - [ ] 0.5 Vitest y Playwright configurados. Test de RLS entre dos organizaciones.
 - [ ] 0.6 Layout mobile-first: menú inferior en celular, lateral en escritorio.
