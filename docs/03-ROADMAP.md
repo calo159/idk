@@ -24,7 +24,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 1.11 Caja: apertura con base, cierre ciego con conteo por denominaciones y diferencia calculada en SQL. _(Pantallas sin ejecutar contra Supabase real; `cerrar_turno` probada en SQL.)_
 - [x] 1.12 Anulaciones desde la interfaz: historial de ventas con detalle, anular venta (dueño/admin, con motivo) y anular compra. _(Pantallas sin ejecutar contra Supabase real; SQL probado.)_
 - [x] 1.13 POS offline: PWA (manifest + service worker), cola Dexie con offline_id, sincronización automática, ventas rechazadas visibles. Ver D-005. _(Cola probada con fake-indexeddb; falta probar el service worker en un celular real.)_
-- [ ] 1.14 Importar productos desde Excel con mapeo por IA.
+- [x] 1.14 Importar productos desde Excel/CSV con mapeo de columnas por IA (con respaldo por títulos), vista previa con errores por fila y carga de inventario inicial (migración 0009). _(Probado con datos simulados; falta probar con Excel reales y la IA real.)_
 - [ ] 1.15 Dashboard del dueño + reportes básicos (ventas por día, producto, vendedor, método de pago).
 - [ ] 1.16 Datos de demo realistas (ferretería de Riohacha) para mostrar a clientes.
 

@@ -48,9 +48,14 @@ export default async function Pagina({
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Productos</h1>
         {puedeEditar ? (
-          <Link href="/productos/nuevo" className={cn(buttonVariants(), "h-10")}>
-            <Plus className="size-4" aria-hidden /> Nuevo
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/productos/importar" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
+              Importar
+            </Link>
+            <Link href="/productos/nuevo" className={cn(buttonVariants(), "h-10")}>
+              <Plus className="size-4" aria-hidden /> Nuevo
+            </Link>
+          </div>
         ) : null}
       </header>
 

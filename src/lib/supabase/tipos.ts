@@ -1426,6 +1426,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      cargar_inventario_inicial: {
+        Args: {
+          p_org: string;
+          p_bodega: string;
+          p_lineas: Json;
+        };
+        Returns: number;
+      };
       cerrar_turno: {
         Args: {
           p_turno: string;
