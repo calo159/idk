@@ -1475,6 +1475,13 @@ export type Database = {
         };
         Returns: string;
       };
+      registrar_cambio_precio: {
+        Args: {
+          p_venta: string;
+          p_cambios: Json;
+        };
+        Returns: undefined;
+      };
       roles_escritura: {
         Args: {
           tabla: string;
