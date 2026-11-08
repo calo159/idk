@@ -2824,6 +2824,63 @@ export type Database = {
           },
         ];
       };
+      temporadas: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          nombre: string;
+          mes_inicio: number;
+          dia_inicio: number;
+          mes_fin: number;
+          dia_fin: number;
+          factor: number;
+          categoria_id: string | null;
+          activa: boolean;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          nombre: string;
+          mes_inicio: number;
+          dia_inicio: number;
+          mes_fin: number;
+          dia_fin: number;
+          factor: number;
+          categoria_id?: string | null;
+          activa?: boolean;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          nombre?: string;
+          mes_inicio?: number;
+          dia_inicio?: number;
+          mes_fin?: number;
+          dia_fin?: number;
+          factor?: number;
+          categoria_id?: string | null;
+          activa?: boolean;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "temporadas_categoria_id_fkey";
+            columns: ["categoria_id"];
+            isOneToOne: false;
+            referencedRelation: "categorias";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "temporadas_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       traslados: {
         Row: {
           id: string;
@@ -3224,6 +3281,13 @@ export type Database = {
         };
         Returns: string;
       };
+      activar_temporada: {
+        Args: {
+          p_id: string;
+          p_activa: boolean;
+        };
+        Returns: undefined;
+      };
       ajustar_inventario: {
         Args: {
           p_org: string;
@@ -3339,7 +3403,7 @@ export type Database = {
           p_cobertura?: number;
           p_entrega?: number;
         };
-        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number }[];
+        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number; factor: number }[];
       };
       cambiar_estado_cotizacion: {
         Args: {
@@ -3375,6 +3439,12 @@ export type Database = {
           p_org: string;
           p_bodega: string;
           p_lineas: Json;
+        };
+        Returns: number;
+      };
+      cargar_temporadas_base: {
+        Args: {
+          p_org: string;
         };
         Returns: number;
       };
@@ -3498,6 +3568,16 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
       };
+      dia_en_temporada: {
+        Args: {
+          d: string;
+          mi: number;
+          di: number;
+          mf: number;
+          df: number;
+        };
+        Returns: boolean;
+      };
       efectivo_esperado_turno: {
         Args: {
           p_turno: string;
@@ -3511,6 +3591,15 @@ export type Database = {
           p_turno: string;
         };
         Returns: string;
+      };
+      factor_temporada: {
+        Args: {
+          p_org: string;
+          p_categoria: string;
+          p_desde: string;
+          p_dias: number;
+        };
+        Returns: number;
       };
       fijar_comision: {
         Args: {
@@ -3547,6 +3636,20 @@ export type Database = {
           p_error?: string;
         };
         Returns: undefined;
+      };
+      guardar_temporada: {
+        Args: {
+          p_org: string;
+          p_nombre: string;
+          p_mes_ini: number;
+          p_dia_ini: number;
+          p_mes_fin: number;
+          p_dia_fin: number;
+          p_factor: number;
+          p_categoria?: string;
+          p_id?: string;
+        };
+        Returns: string;
       };
       iniciar_conteo: {
         Args: {
@@ -3898,7 +4001,7 @@ export type Database = {
           p_cobertura?: number;
           p_entrega?: number;
         };
-        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number }[];
+        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number; factor: number }[];
       };
       tiene_rol: {
         Args: {

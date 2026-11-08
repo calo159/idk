@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Tags, Users, Warehouse } from "lucide-react";
+import { CalendarDays, Tags, Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
 import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -33,6 +33,15 @@ export default async function Pagina() {
             <span className="text-sm text-muted-foreground">
               Invita a tu equipo y define qué puede hacer cada uno
             </span>
+          </span>
+        </Link>
+      ) : null}
+      {puedeEscribir(ctx.rol, "bodegas") ? (
+        <Link href="/configuracion/temporadas" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <CalendarDays className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Temporadas</span>
+            <span className="text-sm text-muted-foreground">Navidad, Día de la Madre… para comprar a tiempo</span>
           </span>
         </Link>
       ) : null}
