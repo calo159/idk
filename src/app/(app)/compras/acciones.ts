@@ -10,6 +10,15 @@ import { type ResultadoAccion, erroresPorCampo, fallo, ok, zUuid } from "@/lib/v
 
 const numericoBd = (v: string) => v as unknown as number;
 
+/** Si el negocio activó los precios automáticos, los ajusta tras entrar mercancía nueva. Nunca bloquea la compra. */
+async function ajustarPreciosSiAplica(supabase: Awaited<ReturnType<typeof crearClienteServidor>>, org: string) {
+  try {
+    await supabase.rpc("actualizar_precios_automaticos", { p_org: org });
+  } catch {
+    /* la compra ya quedó registrada */
+  }
+}
+
 /** Crea la compra en borrador y, si se pide, la confirma (entra al inventario con costo promedio). */
 export async function crearCompra(
   entrada: unknown,
@@ -78,6 +87,7 @@ export async function crearCompra(
       if (errCxp) return fallo("La compra se confirmó, pero no se pudo crear la cuenta por pagar. Créala desde la compra.");
     }
   }
+  if (confirmar) await ajustarPreciosSiAplica(supabase, ctx.organizacionId);
   revalidatePath("/compras");
   revalidatePath("/inventario");
   return ok({ id: compra.id });
@@ -91,6 +101,7 @@ export async function confirmarCompra(compraId: string): Promise<ResultadoAccion
   const supabase = await crearClienteServidor();
   const { error } = await supabase.rpc("confirmar_compra", { p_compra_id: id.data });
   if (error) return fallo("No pudimos confirmar la compra");
+  await ajustarPreciosSiAplica(supabase, ctx.organizacionId);
   revalidatePath("/compras");
   revalidatePath(`/compras/${id.data}`);
   revalidatePath("/inventario");

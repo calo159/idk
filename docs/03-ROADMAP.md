@@ -51,7 +51,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.5 Pedidos de clientes por WhatsApp: extracción (reglas + IA de respaldo), emparejado con el catálogo (ambiguos para una persona), pedido pendiente, venta desde el POS y aviso al cliente con el total (migración 0024, flujo F6). _(Lógica y SQL probados; falta probar con n8n/WhatsApp reales.)_
 - [x] 3.6 Predicción de agotamiento y compra sugerida (ritmo mezclado 14/60 días, cobertura + entrega, proveedor más barato), órdenes de compra en borrador desde la app y aviso semanal (migración 0025, flujo F7). _(SQL y textos probados; flujo no probado contra n8n real. No crea la orden respondiendo SÍ por WhatsApp.)_
 - [x] 3.7 Calendario de temporadas (se repiten cada año, cruzan el año, por categoría o todo el negocio; factores típicos de Colombia) que ajusta la compra sugerida (migración 0026). _(SQL probado; pantalla sin ejecutar contra Supabase real.)_
-- [ ] 3.8 Precios automáticos y simulador.
+- [x] 3.8 Precios automáticos por margen objetivo (redondeo comercial, tope ±15 %, opt-in al confirmar compras, historial de precios) y simulador de utilidad con elasticidad (migración 0027). _(SQL y simulador probados; pantalla sin ejecutar contra Supabase real. El simulador solo cubre productos con margen objetivo.)_
 - [ ] 3.9 Promociones de plata dormida con imagen generada.
 - [ ] 3.10 Fidelización por celular, cumpleaños, clientes inactivos.
 - [ ] 3.11 Catálogo web público.

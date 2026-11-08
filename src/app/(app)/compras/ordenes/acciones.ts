@@ -70,6 +70,7 @@ export async function recibirOrden(entrada: unknown): Promise<ResultadoAccion<{ 
   });
   if (error || !data)
     return fallo(/más de lo pedido/.test(error?.message ?? "") ? "No puedes recibir más de lo pedido (máximo 10 % de tolerancia)" : "No pudimos registrar la recepción");
+  await supabase.rpc("actualizar_precios_automaticos", { p_org: ctx.organizacionId }).then(() => undefined, () => undefined);
   revalidatePath(`/compras/ordenes/${r.data.orden_id}`);
   revalidatePath("/compras");
   revalidatePath("/inventario");

@@ -1531,6 +1531,61 @@ export type Database = {
           },
         ];
       };
+      historial_precios: {
+        Row: {
+          id: number;
+          organizacion_id: string;
+          producto_id: string;
+          precio_anterior: number;
+          precio_nuevo: number;
+          motivo: string;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: never;
+          organizacion_id: string;
+          producto_id: string;
+          precio_anterior: number;
+          precio_nuevo: number;
+          motivo: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: never;
+          organizacion_id?: string;
+          producto_id?: string;
+          precio_anterior?: number;
+          precio_nuevo?: number;
+          motivo?: string;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "historial_precios_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "historial_precios_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "historial_precios_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invitaciones: {
         Row: {
           id: string;
@@ -2058,6 +2113,7 @@ export type Database = {
           creado_en: string;
           dias_credito: number;
           whatsapp_phone_number_id: string | null;
+          precios_automaticos: boolean;
         };
         Insert: {
           id?: string;
@@ -2072,6 +2128,7 @@ export type Database = {
           creado_en?: string;
           dias_credito?: number;
           whatsapp_phone_number_id?: string | null;
+          precios_automaticos?: boolean;
         };
         Update: {
           id?: string;
@@ -2086,6 +2143,7 @@ export type Database = {
           creado_en?: string;
           dias_credito?: number;
           whatsapp_phone_number_id?: string | null;
+          precios_automaticos?: boolean;
         };
         Relationships: [];
       };
@@ -3288,6 +3346,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      actualizar_precios_automaticos: {
+        Args: {
+          p_org: string;
+        };
+        Returns: number;
+      };
       ajustar_inventario: {
         Args: {
           p_org: string;
@@ -3342,6 +3406,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      aplicar_precios: {
+        Args: {
+          p_org: string;
+          p_items: Json;
+          p_motivo?: string;
+        };
+        Returns: number;
+      };
       asignar_lista_cliente: {
         Args: {
           p_cliente: string;
@@ -3390,6 +3462,12 @@ export type Database = {
           p_cliente?: string;
         };
         Returns: { cliente_id: string; nombre: string; telefono: string; acepta_mensajes: boolean; saldo: number; cupo: number; vencido: number; dias_mora: number; dias_deuda: number; ultimo_abono: string; puntaje: number; categoria: string }[];
+      };
+      calcular_precios_sugeridos: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { producto_id: string; producto: string; categoria: string; costo: number; precio_actual: number; margen_objetivo: number; margen_actual: number; precio_sugerido: number; cambio_pct: number; unidades_30d: number }[];
       };
       calcular_riesgo_turno: {
         Args: {
@@ -3475,6 +3553,13 @@ export type Database = {
           p_producto: string;
         };
         Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
+      };
+      configurar_precios_automaticos: {
+        Args: {
+          p_org: string;
+          p_activo: boolean;
+        };
+        Returns: undefined;
       };
       confirmar_compra: {
         Args: {
@@ -3696,6 +3781,12 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: { id: string; nombre: string; telefono_whatsapp: string }[];
       };
+      precios_sugeridos: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { producto_id: string; producto: string; categoria: string; costo: number; precio_actual: number; margen_objetivo: number; margen_actual: number; precio_sugerido: number; cambio_pct: number; unidades_30d: number }[];
+      };
       puntaje_cliente: {
         Args: {
           p_cliente: string;
@@ -3721,6 +3812,12 @@ export type Database = {
       recordatorios_pendientes: {
         Args: Record<PropertyKey, never>;
         Returns: { organizacion_id: string; organizacion: string; cliente_id: string; cliente: string; telefono: string; saldo: number; vencido: number; dias_mora: number; nivel: number }[];
+      };
+      redondeo_precio: {
+        Args: {
+          n: number;
+        };
+        Returns: number;
       };
       registrar_abono: {
         Args: {
