@@ -78,3 +78,24 @@ describe("permisos de interfaz", () => {
     expect(puede(null, "ventas.confirmar")).toBe(false);
   });
 });
+
+describe("zCodigoReferido y el registro", () => {
+  const base = { nombre: "Ana", correo: "ana@x.co", contrasena: "12345678", negocio: "Tienda", nicho: "general" };
+  it("acepta el código en minúsculas y con espacios, y lo normaliza", async () => {
+    const { esquemaRegistro } = await import("./auth");
+    expect(esquemaRegistro.parse({ ...base, referido: "  surt-ab3k9z " }).referido).toBe("SURT-AB3K9Z");
+  });
+  it("es opcional: vacío o ausente no estorba", async () => {
+    const { esquemaRegistro } = await import("./auth");
+    expect(esquemaRegistro.parse({ ...base, referido: "" }).referido).toBeUndefined();
+    expect(esquemaRegistro.parse(base).referido).toBeUndefined();
+  });
+  it("si lo escriben mal, avisa el formato (no lo ignora en silencio)", async () => {
+    const { esquemaRegistro } = await import("./auth");
+    for (const malo of ["SURT-123", "ABC", "SURT-AB3K9O", "SURT-AB3K9ZZ"]) {
+      const r = esquemaRegistro.safeParse({ ...base, referido: malo });
+      expect(r.success).toBe(false);
+      expect(!r.success && r.error.issues[0]?.message).toBe("El código tiene el formato SURT-XXXXXX");
+    }
+  });
+});

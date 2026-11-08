@@ -23,6 +23,7 @@ function Campo({
   estado,
   autoComplete,
   placeholder,
+  valorInicial,
 }: {
   nombre: string;
   etiqueta: string;
@@ -30,6 +31,7 @@ function Campo({
   estado: EstadoForm;
   autoComplete?: string;
   placeholder?: string;
+  valorInicial?: string;
 }) {
   const error = estado.campos?.[nombre];
   return (
@@ -41,6 +43,7 @@ function Campo({
         type={tipo}
         autoComplete={autoComplete}
         placeholder={placeholder}
+        defaultValue={valorInicial}
         aria-invalid={!!error}
         aria-describedby={error ? `${nombre}-error` : undefined}
         className="h-11"
@@ -124,7 +127,7 @@ export function FormLogin({ siguiente }: { siguiente?: string }) {
   );
 }
 
-export function FormRegistro() {
+export function FormRegistro({ referido }: { referido?: string }) {
   const [estado, accion, pendiente] = useActionState(registrarse, vacio);
   return (
     <form action={accion} className="space-y-4" noValidate>
@@ -144,6 +147,7 @@ export function FormRegistro() {
         autoComplete="new-password"
         estado={estado}
       />
+      <Campo nombre="referido" etiqueta="Código de referido (opcional)" placeholder="SURT-XXXXXX" valorInicial={referido} estado={estado} />
       <Mensajes estado={estado} />
       <Button type="submit" className="h-11 w-full" disabled={pendiente}>
         {pendiente ? "Creando…" : "Crear mi negocio"}
@@ -158,13 +162,14 @@ export function FormRegistro() {
   );
 }
 
-export function FormNegocio() {
+export function FormNegocio({ referido }: { referido?: string }) {
   const [estado, accion, pendiente] = useActionState(crearNegocio, vacio);
   return (
     <form action={accion} className="space-y-4" noValidate>
       <Campo nombre="nombre" etiqueta="Tu nombre" autoComplete="name" estado={estado} />
       <Campo nombre="negocio" etiqueta="Nombre del negocio" estado={estado} />
       <SelectorNicho estado={estado} />
+      <Campo nombre="referido" etiqueta="Código de referido (opcional)" placeholder="SURT-XXXXXX" valorInicial={referido} estado={estado} />
       <Mensajes estado={estado} />
       <Button type="submit" className="h-11 w-full" disabled={pendiente}>
         {pendiente ? "Creando…" : "Empezar"}

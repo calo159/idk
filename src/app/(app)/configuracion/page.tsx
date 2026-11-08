@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, CreditCard, FileText, Route, Store, Tags, Users, Warehouse } from "lucide-react";
+import { CalendarDays, CreditCard, FileText, Gift, Route, Store, Tags, Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
 import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -42,6 +42,15 @@ export default async function Pagina() {
           <span>
             <span className="block font-medium">Plan y pagos</span>
             <span className="text-sm text-muted-foreground">Tu plan, días restantes e historial de pagos</span>
+          </span>
+        </Link>
+      ) : null}
+      {ctx.rol === "dueno" || ctx.rol === "admin" ? (
+        <Link href="/referidos" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <Gift className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Referidos</span>
+            <span className="text-sm text-muted-foreground">Recomienda Surtix y gana meses gratis</span>
           </span>
         </Link>
       ) : null}

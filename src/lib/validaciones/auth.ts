@@ -11,18 +11,29 @@ export const esquemaLogin = z.object({
   contrasena: z.string().min(1, "La contraseña es obligatoria"),
 });
 
+/** Código de referido: opcional; si lo escriben debe tener el formato SURT-XXXXXX (sin letras confusas como O, I o L). */
+export const zCodigoReferido = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .refine((v) => v === "" || /^SURT-[A-HJ-NP-Z2-9]{6}$/.test(v), "El código tiene el formato SURT-XXXXXX")
+  .optional()
+  .transform((v) => v || undefined);
+
 export const esquemaRegistro = z.object({
   nombre: zTexto(2, 80, "Tu nombre"),
   correo: zCorreo,
   contrasena: zContrasena,
   negocio: zTexto(2, 80, "El nombre del negocio"),
   nicho: zNicho,
+  referido: zCodigoReferido,
 });
 
 export const esquemaNuevoNegocio = z.object({
   nombre: zTexto(2, 80, "Tu nombre"),
   negocio: zTexto(2, 80, "El nombre del negocio"),
   nicho: zNicho,
+  referido: zCodigoReferido,
 });
 
 export const esquemaRecuperar = z.object({ correo: zCorreo });

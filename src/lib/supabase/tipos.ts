@@ -2365,6 +2365,7 @@ export type Database = {
           catalogo_slug: string | null;
           catalogo_telefono: string | null;
           catalogo_mensaje: string | null;
+          codigo_referido: string | null;
         };
         Insert: {
           id?: string;
@@ -2388,6 +2389,7 @@ export type Database = {
           catalogo_slug?: string | null;
           catalogo_telefono?: string | null;
           catalogo_mensaje?: string | null;
+          codigo_referido?: string | null;
         };
         Update: {
           id?: string;
@@ -2411,6 +2413,7 @@ export type Database = {
           catalogo_slug?: string | null;
           catalogo_telefono?: string | null;
           catalogo_mensaje?: string | null;
+          codigo_referido?: string | null;
         };
         Relationships: [];
       };
@@ -3187,6 +3190,54 @@ export type Database = {
           {
             foreignKeyName: "recordatorios_cobro_organizacion_id_fkey";
             columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      referidos: {
+        Row: {
+          id: string;
+          referidor_org: string;
+          referido_org: string;
+          estado: string;
+          dias_referidor: number;
+          dias_referido: number;
+          creado_en: string;
+          convertido_en: string | null;
+        };
+        Insert: {
+          id?: string;
+          referidor_org: string;
+          referido_org: string;
+          estado?: string;
+          dias_referidor?: number;
+          dias_referido?: number;
+          creado_en?: string;
+          convertido_en?: string | null;
+        };
+        Update: {
+          id?: string;
+          referidor_org?: string;
+          referido_org?: string;
+          estado?: string;
+          dias_referidor?: number;
+          dias_referido?: number;
+          creado_en?: string;
+          convertido_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "referidos_referido_org_fkey";
+            columns: ["referido_org"];
+            isOneToOne: true;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "referidos_referidor_org_fkey";
+            columns: ["referidor_org"];
             isOneToOne: false;
             referencedRelation: "organizaciones";
             referencedColumns: ["id"];
@@ -4204,6 +4255,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      aplicar_codigo_referido: {
+        Args: {
+          p_org: string;
+          p_codigo: string;
+        };
+        Returns: string;
+      };
       aplicar_pago_suscripcion: {
         Args: {
           p_referencia: string;
@@ -4651,6 +4709,10 @@ export type Database = {
         };
         Returns: undefined;
       };
+      generar_codigo_referido: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
       guardar_config_facturacion: {
         Args: {
           p_org: string;
@@ -4761,6 +4823,12 @@ export type Database = {
       mis_organizaciones: {
         Args: Record<PropertyKey, never>;
         Returns: string[];
+      };
+      mis_referidos: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { negocio: string; estado: string; dias_ganados: number; creado_en: string; convertido_en: string }[];
       };
       org_por_numero_whatsapp: {
         Args: {

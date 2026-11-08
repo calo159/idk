@@ -188,7 +188,7 @@ beforeAll(async () => {
   B = await sembrar("Ferretería B", "b.co");
   const r = await db.query<{ tabla: string }>(`
     select c.relname as tabla from pg_class c join pg_namespace n on n.oid = c.relnamespace
-    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins') -- globales: precios y equipo de Surtix
+    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins', 'referidos') -- globales/entre dos negocios (referidos se prueba en referidos.db.test.ts)
     order by 1`);
   // Sin política de lectura a propósito: las del bot (solo service role) y la bitácora del soporte de Surtix (admin_acciones,
   // que se prueba en super-admin.db.test.ts: ni el dueño del negocio puede leerla).
