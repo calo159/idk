@@ -17,7 +17,15 @@ const n = (w: string) => normalizarTexto(w);
 
 /** Divide «2 cemento, 10 metros de cable y 1 martillo» en renglones con cantidad. Sin IA, sin costo. */
 export function extraerItemsReglas(textoCrudo: string): ItemPedido[] {
-  const texto = textoCrudo.replace(/\s+/g, " ").trim().slice(0, 1000);
+  // Los saltos de línea separan renglones (listas pegadas o enviadas desde el catálogo). Se descartan las líneas que son
+  // solo encabezado («Hola, quiero pedir:») o una nota entre paréntesis («(Total aproximado $ 86.000)»).
+  const texto = textoCrudo
+    .slice(0, 2000)
+    .split(/\r?\n/)
+    .map((l) => l.replace(/[ \t]+/g, " ").trim())
+    .filter((l) => l && !l.endsWith(":") && !/^\(.*\)$/.test(l))
+    .join("\n")
+    .slice(0, 1000);
   const trozos = texto.split(/(?<!\d),|,(?!\d)|[;\n]+|\s+y\s+(?=\d|un |una |dos |tres |cuatro |cinco |medio |media )/i).map((t) => t.trim()).filter(Boolean);
   const items: ItemPedido[] = [];
   for (const trozo of trozos) {

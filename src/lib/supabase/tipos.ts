@@ -2157,6 +2157,10 @@ export type Database = {
           pesos_por_punto: number;
           valor_punto: number;
           puntos_cumpleanos: number;
+          catalogo_activo: boolean;
+          catalogo_slug: string | null;
+          catalogo_telefono: string | null;
+          catalogo_mensaje: string | null;
         };
         Insert: {
           id?: string;
@@ -2176,6 +2180,10 @@ export type Database = {
           pesos_por_punto?: number;
           valor_punto?: number;
           puntos_cumpleanos?: number;
+          catalogo_activo?: boolean;
+          catalogo_slug?: string | null;
+          catalogo_telefono?: string | null;
+          catalogo_mensaje?: string | null;
         };
         Update: {
           id?: string;
@@ -2195,6 +2203,10 @@ export type Database = {
           pesos_por_punto?: number;
           valor_punto?: number;
           puntos_cumpleanos?: number;
+          catalogo_activo?: boolean;
+          catalogo_slug?: string | null;
+          catalogo_telefono?: string | null;
+          catalogo_mensaje?: string | null;
         };
         Relationships: [];
       };
@@ -2560,6 +2572,7 @@ export type Database = {
           maneja_lotes: boolean;
           maneja_seriales: boolean;
           garantia_dias: number | null;
+          en_catalogo: boolean;
         };
         Insert: {
           id?: string;
@@ -2582,6 +2595,7 @@ export type Database = {
           maneja_lotes?: boolean;
           maneja_seriales?: boolean;
           garantia_dias?: number | null;
+          en_catalogo?: boolean;
         };
         Update: {
           id?: string;
@@ -2604,6 +2618,7 @@ export type Database = {
           maneja_lotes?: boolean;
           maneja_seriales?: boolean;
           garantia_dias?: number | null;
+          en_catalogo?: boolean;
         };
         Relationships: [
           {
@@ -3764,6 +3779,18 @@ export type Database = {
         };
         Returns: { cliente_id: string; nombre: string; telefono: string; saldo: number; cupo: number; vencido: number; dias_mora: number; dias_deuda: number; ultimo_abono: string; puntaje: number; categoria: string }[];
       };
+      catalogo_productos: {
+        Args: {
+          p_slug: string;
+        };
+        Returns: { id: string; nombre: string; descripcion: string; categoria: string; unidad: string; precio: number; precio_antes: number; disponible: boolean }[];
+      };
+      catalogo_publico: {
+        Args: {
+          p_slug: string;
+        };
+        Returns: { nombre: string; telefono: string; mensaje: string }[];
+      };
       cerrar_conteo: {
         Args: {
           p_conteo: string;
@@ -3785,6 +3812,16 @@ export type Database = {
           p_producto: string;
         };
         Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
+      };
+      configurar_catalogo: {
+        Args: {
+          p_org: string;
+          p_activo: boolean;
+          p_slug: string;
+          p_telefono: string;
+          p_mensaje: string;
+        };
+        Returns: undefined;
       };
       configurar_fidelizacion: {
         Args: {
@@ -4068,6 +4105,14 @@ export type Database = {
           p_org: string;
         };
         Returns: { producto_id: string; precio: number; promocion: string }[];
+      };
+      publicar_en_catalogo: {
+        Args: {
+          p_org: string;
+          p_ids: string[];
+          p_publicar: boolean;
+        };
+        Returns: number;
       };
       puntaje_cliente: {
         Args: {

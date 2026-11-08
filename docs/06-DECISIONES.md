@@ -33,3 +33,12 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - Limitaciones conocidas: sin conexión no se pueden leer comprobantes con IA (el pago queda "sin verificar");
   el cupo del cliente y el stock se validan localmente con datos de la última carga y definitivamente al sincronizar.
 - El service worker solo guarda `/ventas/pos` y `/caja` (y estáticos). Al abrir `/login` se borra esa caché.
+
+## D-006 — Catálogo público: solo funciones SQL abiertas a `anon`, sin formulario de pedidos
+- La página `/catalogo/<dirección>` usa el rol `anon` y únicamente `catalogo_publico` y `catalogo_productos` (security definer): devuelven
+  nombre, descripción, categoría, unidad, precio, precio anterior y «disponible» (nunca costos, cantidades ni clientes). Las tablas siguen cerradas por RLS.
+- Los pedidos **no se guardan en la app**: se envían por WhatsApp al negocio, donde ya los lee el flujo F6. Un formulario público de escritura sería
+  una puerta abierta a spam sin ganar nada.
+- Fotos: el bucket de productos es privado; mostrarlas exige URLs firmadas generadas en el servidor. Queda para una mejora posterior.
+- Caché: la página declara `revalidate = 300`; en la compilación aparece como dinámica porque pasa por `proxy.ts`. Si el tráfico lo exige, se excluye `/catalogo` del matcher.
+

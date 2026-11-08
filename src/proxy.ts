@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { actualizarSesion } from "@/lib/supabase/sesion-proxy";
 
-const PUBLICAS = ["/login", "/registro", "/recuperar", "/invitacion"];
+const PUBLICAS = ["/login", "/registro", "/recuperar", "/invitacion", "/catalogo"];
 const esPublica = (ruta: string) => PUBLICAS.some((p) => ruta === p || ruta.startsWith(`${p}/`));
 
 /**
