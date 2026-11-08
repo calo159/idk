@@ -4,6 +4,7 @@ import { formatoCOP } from "@/lib/dinero";
 import { formatoFecha, haceCuanto } from "@/lib/fechas";
 import { ETIQUETA_ESTADO, estadoSeguro } from "@/lib/suscripcion";
 import { requerirSuperAdmin } from "@/server/admin";
+import { NuevoDistribuidor } from "./nuevo-distribuidor";
 
 export const metadata: Metadata = { title: "Panel Surtix", robots: { index: false, follow: false } };
 
@@ -46,6 +47,8 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
         {tarjeta("Vencidos", String(met.vencidos ?? 0))}
         {tarjeta("Suspendidos", String(met.suspendidos ?? 0))}
       </div>
+
+      <NuevoDistribuidor />
 
       <form role="search" className="flex gap-2">
         <input name="q" defaultValue={q} placeholder="Nombre del negocio o correo del dueño" aria-label="Buscar negocios" className="h-11 min-w-0 flex-1 rounded-lg border border-input bg-background px-3 text-sm" />

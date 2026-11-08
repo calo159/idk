@@ -13,6 +13,9 @@ export default async function Pagina() {
   // Si se registró con un código de referido, viene guardado con su cuenta.
   const { data } = await (await crearClienteServidor()).auth.getUser();
   const guardado = data.user?.user_metadata?.ref;
+  // Las personas de un distribuidor no tienen negocio propio: su casa es el portal del distribuidor.
+  const { data: distribuidores } = await (await crearClienteServidor()).rpc("mis_distribuidores");
+  if ((distribuidores ?? []).length > 0) redirect("/distribuidor");
   return (
     <div className="space-y-4">
       <h1 className="text-center text-xl font-semibold">Un último paso: tu negocio</h1>

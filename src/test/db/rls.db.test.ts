@@ -121,6 +121,12 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select guardar_config_facturacion($1,true,'pruebas','simulado','900123456','7','Prueba SAS','FE','1','2026-01-01',1,100,'2030-01-01',99999999)", [base.orgId]);
     await db.query("select solicitar_factura_electronica($1)", [ventaId]);
   });
+  {
+    const d = (await db.query<{ id: string }>("insert into distribuidores (nombre) values ($1) returning id", ["Dist " + correo])).rows[0]!.id;
+    const o = (await db.query<{ id: string }>("insert into ofertas_grupales (distribuidor_id, titulo, precio_referencia, cierra_en) values ($1,'Oferta',100,current_date + 5) returning id", [d])).rows[0]!.id;
+    await db.query("insert into ofertas_escalas (oferta_id, cantidad_desde, precio_unitario) values ($1,10,90)", [o]);
+    await db.query("insert into compromisos_grupales (oferta_id, organizacion_id, cantidad) values ($1,$2,5)", [o, base.orgId]);
+  }
   await db.query("update organizaciones set fidelizacion_activa=true where id=$1", [base.orgId]);
   await db.query("insert into puntos_movimientos (organizacion_id, cliente_id, puntos, motivo) values ($1,$2,5,'cumpleanos')", [base.orgId, clienteId]);
   await db.query("insert into contactos_fidelizacion (organizacion_id, cliente_id, tipo) values ($1,$2,'cumpleanos')", [base.orgId, clienteId]);
@@ -188,7 +194,8 @@ beforeAll(async () => {
   B = await sembrar("Ferretería B", "b.co");
   const r = await db.query<{ tabla: string }>(`
     select c.relname as tabla from pg_class c join pg_namespace n on n.oid = c.relnamespace
-    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins', 'referidos') -- globales/entre dos negocios (referidos se prueba en referidos.db.test.ts)
+    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins', 'referidos', 'distribuidores', 'distribuidor_usuarios', 'ofertas_grupales', 'ofertas_escalas')
+      -- globales o entre negocios: se prueban en referidos.db.test.ts y compras-grupales.db.test.ts
     order by 1`);
   // Sin política de lectura a propósito: las del bot (solo service role) y la bitácora del soporte de Surtix (admin_acciones,
   // que se prueba en super-admin.db.test.ts: ni el dueño del negocio puede leerla).

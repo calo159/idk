@@ -84,3 +84,12 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - La fuente son las fotos de `salud_historial`, que se guardan cuando el dueño abre la salud del negocio o el inicio. Un negocio que no entra a la app no aparece (y no distorsiona).
 - Pendiente: filtrar por ciudad cuando haya volumen, y tratar con asesoría legal el texto de consentimiento (Ley 1581 de 2012).
 
+## D-012 — Compras en grupo: lo único que cruza datos entre negocios
+- Es la primera función donde información de un negocio llega a otra parte (el distribuidor). Se limitó a lo imprescindible para entregar: nombre, ciudad, WhatsApp y cantidad,
+  y solo de los negocios que decidieron unirse a una oferta de ese distribuidor. Un negocio nunca ve a los demás participantes, solo el total y el precio.
+- Los distribuidores los da de alta el equipo de Surtix a mano (`admin_crear_distribuidor`); no hay registro libre, para que nadie se haga pasar por un distribuidor y recolecte contactos.
+- Todo ocurre por funciones `security definer` que verifican el rol; las tablas de ofertas y escalas son de solo lectura para el distribuidor y cerradas para los negocios.
+- El precio es el de la escala alcanzada al cierre y es igual para todos (no hay precios por negocio), lo que evita discriminación y malentendidos.
+- Surtix no cobra ni garantiza la entrega: la oferta es una coordinación. Se avisa por alerta al cerrar o cancelar. Pendiente: cierre automático al vencer la fecha (cron en n8n), comisión por intermediar
+  y calificación del distribuidor.
+

@@ -8,7 +8,7 @@ import { zCodigoReferido } from "@/lib/validaciones/auth";
 import { type ResultadoAccion, fallo, ok } from "@/lib/validaciones/comunes";
 
 /** Lo que la base de datos responde, dicho en cristiano. */
-export const MENSAJE_REFERIDO: Record<string, string> = {
+const MENSAJE_REFERIDO: Record<string, string> = {
   ya_usado: "Ya usaste un código de referido.",
   vencido: "Pasaron más de 30 días desde que creaste tu negocio, ya no se puede usar un código.",
   ya_pago: "Ya pagaste tu suscripción, ya no se puede usar un código.",

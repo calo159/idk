@@ -49,3 +49,21 @@ export async function pagoManualAdmin(entrada: unknown): Promise<ResultadoAccion
   if (!r.success) return fallo(r.error.issues[0]?.message ?? "Revisa los datos");
   return ejecutar((s) => s.rpc("admin_registrar_pago_manual", { p_org: r.data.org, p_plan: r.data.plan, p_meses: r.data.meses, p_monto: numericoBd(r.data.monto), p_motivo: r.data.motivo }), r.data.org);
 }
+
+const esquemaDistribuidor = z.object({
+  nombre: z.string().trim().min(2, "Escribe el nombre del distribuidor").max(120),
+  nit: z.string().trim().max(20),
+  telefono: z.string().trim().max(20),
+  correo: z.string().trim().toLowerCase().pipe(z.email("Escribe el correo de la persona que lo administrará")),
+});
+
+/** Da de alta a un distribuidor y a su primera persona (que ya debe tener cuenta). Solo el equipo de Surtix. */
+export async function crearDistribuidorAdmin(entrada: unknown): Promise<ResultadoAccion> {
+  const { supabase } = await requerirSuperAdmin();
+  const r = esquemaDistribuidor.safeParse(entrada);
+  if (!r.success) return fallo(r.error.issues[0]?.message ?? "Revisa los datos");
+  const { error } = await supabase.rpc("admin_crear_distribuidor", { p_nombre: r.data.nombre, p_nit: r.data.nit, p_telefono: r.data.telefono, p_correo: r.data.correo });
+  if (error) return fallo(/aún no tiene cuenta/.test(error.message) ? error.message : "No se pudo crear el distribuidor");
+  revalidatePath("/admin");
+  return ok(undefined);
+}

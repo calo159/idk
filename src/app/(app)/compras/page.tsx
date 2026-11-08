@@ -39,6 +39,7 @@ export default async function Pagina() {
         <Link href="/compras/ordenes" className="rounded-full border px-3 py-1.5 hover:bg-muted">Órdenes de compra</Link>
         <Link href="/compras/pagos" className="rounded-full border px-3 py-1.5 hover:bg-muted">Cuentas por pagar</Link>
         <Link href="/compras/sugerencias" className="rounded-full border px-3 py-1.5 hover:bg-muted">Sugerencias</Link>
+        <Link href="/compras/grupales" className="rounded-full border px-3 py-1.5 hover:bg-muted">Compras en grupo</Link>
         <Link href="/compras/comparador" className="rounded-full border px-3 py-1.5 hover:bg-muted">Comparar proveedores</Link>
         <Link href="/proveedores" className="rounded-full border px-3 py-1.5 hover:bg-muted">Proveedores</Link>
       </div>

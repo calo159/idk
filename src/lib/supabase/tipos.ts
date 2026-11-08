@@ -725,6 +725,58 @@ export type Database = {
           },
         ];
       };
+      compromisos_grupales: {
+        Row: {
+          id: string;
+          oferta_id: string;
+          organizacion_id: string;
+          cantidad: number;
+          orden_compra_id: string | null;
+          creado_en: string;
+          actualizado_en: string;
+        };
+        Insert: {
+          id?: string;
+          oferta_id: string;
+          organizacion_id: string;
+          cantidad: number;
+          orden_compra_id?: string | null;
+          creado_en?: string;
+          actualizado_en?: string;
+        };
+        Update: {
+          id?: string;
+          oferta_id?: string;
+          organizacion_id?: string;
+          cantidad?: number;
+          orden_compra_id?: string | null;
+          creado_en?: string;
+          actualizado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "compromisos_grupales_oferta_id_fkey";
+            columns: ["oferta_id"];
+            isOneToOne: false;
+            referencedRelation: "ofertas_grupales";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "compromisos_grupales_orden_compra_id_fkey";
+            columns: ["orden_compra_id"];
+            isOneToOne: false;
+            referencedRelation: "ordenes_compra";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "compromisos_grupales_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       config_comisiones: {
         Row: {
           id: string;
@@ -1472,6 +1524,74 @@ export type Database = {
           },
         ];
       };
+      distribuidor_usuarios: {
+        Row: {
+          distribuidor_id: string;
+          usuario_id: string;
+        };
+        Insert: {
+          distribuidor_id: string;
+          usuario_id: string;
+        };
+        Update: {
+          distribuidor_id?: string;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "distribuidor_usuarios_distribuidor_id_fkey";
+            columns: ["distribuidor_id"];
+            isOneToOne: false;
+            referencedRelation: "distribuidores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "distribuidor_usuarios_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      distribuidores: {
+        Row: {
+          id: string;
+          nombre: string;
+          nit: string | null;
+          telefono: string | null;
+          activo: boolean;
+          creado_por: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          nombre: string;
+          nit?: string | null;
+          telefono?: string | null;
+          activo?: boolean;
+          creado_por?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          nombre?: string;
+          nit?: string | null;
+          telefono?: string | null;
+          activo?: boolean;
+          creado_por?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "distribuidores_creado_por_fkey";
+            columns: ["creado_por"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       documentos_ia: {
         Row: {
           id: string;
@@ -2208,6 +2328,97 @@ export type Database = {
             columns: ["usuario_id"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ofertas_escalas: {
+        Row: {
+          id: string;
+          oferta_id: string;
+          cantidad_desde: number;
+          precio_unitario: number;
+        };
+        Insert: {
+          id?: string;
+          oferta_id: string;
+          cantidad_desde: number;
+          precio_unitario: number;
+        };
+        Update: {
+          id?: string;
+          oferta_id?: string;
+          cantidad_desde?: number;
+          precio_unitario?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ofertas_escalas_oferta_id_fkey";
+            columns: ["oferta_id"];
+            isOneToOne: false;
+            referencedRelation: "ofertas_grupales";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ofertas_grupales: {
+        Row: {
+          id: string;
+          distribuidor_id: string;
+          titulo: string;
+          descripcion: string | null;
+          unidad: string;
+          precio_referencia: number;
+          cierra_en: string;
+          entrega_estimada: string | null;
+          minimo_negocio: number;
+          maximo_negocio: number | null;
+          estado: string;
+          precio_final: number | null;
+          total_final: number | null;
+          cerrada_en: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          distribuidor_id: string;
+          titulo: string;
+          descripcion?: string | null;
+          unidad?: string;
+          precio_referencia: number;
+          cierra_en: string;
+          entrega_estimada?: string | null;
+          minimo_negocio?: number;
+          maximo_negocio?: number | null;
+          estado?: string;
+          precio_final?: number | null;
+          total_final?: number | null;
+          cerrada_en?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          distribuidor_id?: string;
+          titulo?: string;
+          descripcion?: string | null;
+          unidad?: string;
+          precio_referencia?: number;
+          cierra_en?: string;
+          entrega_estimada?: string | null;
+          minimo_negocio?: number;
+          maximo_negocio?: number | null;
+          estado?: string;
+          precio_final?: number | null;
+          total_final?: number | null;
+          cerrada_en?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ofertas_grupales_distribuidor_id_fkey";
+            columns: ["distribuidor_id"];
+            isOneToOne: false;
+            referencedRelation: "distribuidores";
             referencedColumns: ["id"];
           },
         ];
@@ -4160,6 +4371,13 @@ export type Database = {
         };
         Returns: number;
       };
+      admin_agregar_usuario_distribuidor: {
+        Args: {
+          p_distribuidor: string;
+          p_correo: string;
+        };
+        Returns: undefined;
+      };
       admin_cambiar_plan: {
         Args: {
           p_org: string;
@@ -4167,6 +4385,15 @@ export type Database = {
           p_motivo: string;
         };
         Returns: undefined;
+      };
+      admin_crear_distribuidor: {
+        Args: {
+          p_nombre: string;
+          p_nit: string;
+          p_telefono: string;
+          p_correo: string;
+        };
+        Returns: string;
       };
       admin_detalle_negocio: {
         Args: {
@@ -4400,6 +4627,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      cancelar_oferta_grupal: {
+        Args: {
+          p_oferta: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
       cancelar_separado: {
         Args: {
           p_separado: string;
@@ -4462,6 +4696,12 @@ export type Database = {
         };
         Returns: number;
       };
+      cerrar_oferta_grupal: {
+        Args: {
+          p_oferta: string;
+        };
+        Returns: string;
+      };
       cerrar_turno: {
         Args: {
           p_turno: string;
@@ -4476,6 +4716,20 @@ export type Database = {
           p_producto: string;
         };
         Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
+      };
+      comprometer_compra_grupal: {
+        Args: {
+          p_org: string;
+          p_oferta: string;
+          p_cantidad: number;
+        };
+        Returns: undefined;
+      };
+      compromisos_de_oferta: {
+        Args: {
+          p_oferta: string;
+        };
+        Returns: { negocio: string; ciudad: string; whatsapp: string; cantidad: number; total_a_pagar: number }[];
       };
       configurar_benchmark: {
         Args: {
@@ -4566,6 +4820,21 @@ export type Database = {
         };
         Returns: string;
       };
+      crear_oferta_grupal: {
+        Args: {
+          p_distribuidor: string;
+          p_titulo: string;
+          p_descripcion: string;
+          p_unidad: string;
+          p_precio_referencia: number;
+          p_cierra_en: string;
+          p_entrega: string;
+          p_minimo_negocio: number;
+          p_maximo_negocio: number;
+          p_escalas: Json;
+        };
+        Returns: string;
+      };
       crear_orden_compra: {
         Args: {
           p_org: string;
@@ -4574,6 +4843,15 @@ export type Database = {
           p_lineas: Json;
           p_fecha_esperada?: string;
           p_nota?: string;
+        };
+        Returns: string;
+      };
+      crear_orden_desde_oferta: {
+        Args: {
+          p_org: string;
+          p_oferta: string;
+          p_producto: string;
+          p_bodega: string;
         };
         Returns: string;
       };
@@ -4642,6 +4920,12 @@ export type Database = {
         };
         Returns: number;
       };
+      entregar_oferta_grupal: {
+        Args: {
+          p_oferta: string;
+        };
+        Returns: undefined;
+      };
       entregar_separado: {
         Args: {
           p_separado: string;
@@ -4649,6 +4933,12 @@ export type Database = {
           p_turno: string;
         };
         Returns: string;
+      };
+      es_de_distribuidor: {
+        Args: {
+          d: string;
+        };
+        Returns: boolean;
       };
       es_super_admin: {
         Args: Record<PropertyKey, never>;
@@ -4836,6 +5126,16 @@ export type Database = {
         };
         Returns: { plan: string; plan_nombre: string; estado: string; vigente_hasta: string; dias_restantes: number; precio_mensual: number; max_usuarios: number; max_bodegas: number; usuarios: number; bodegas: number; motivo_suspension: string }[];
       };
+      mis_compras_grupales: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { oferta_id: string; distribuidor: string; titulo: string; unidad: string; estado: string; cantidad: number; precio_final: number; total_a_pagar: number; entrega_estimada: string; orden_compra_id: string; cierra_en: string }[];
+      };
+      mis_distribuidores: {
+        Args: Record<PropertyKey, never>;
+        Returns: { id: string; nombre: string }[];
+      };
       mis_organizaciones: {
         Args: Record<PropertyKey, never>;
         Returns: string[];
@@ -4846,6 +5146,12 @@ export type Database = {
         };
         Returns: { negocio: string; estado: string; dias_ganados: number; creado_en: string; convertido_en: string }[];
       };
+      ofertas_abiertas: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { oferta_id: string; distribuidor: string; titulo: string; descripcion: string; unidad: string; precio_referencia: number; cierra_en: string; entrega_estimada: string; minimo_negocio: number; maximo_negocio: number; total_comprometido: number; negocios: number; precio_actual: number; escalas: Json; mi_cantidad: number }[];
+      };
       org_por_numero_whatsapp: {
         Args: {
           p_phone_number_id: string;
@@ -4855,6 +5161,13 @@ export type Database = {
       organizaciones_para_resumen: {
         Args: Record<PropertyKey, never>;
         Returns: { id: string; nombre: string; telefono_whatsapp: string }[];
+      };
+      precio_de_oferta: {
+        Args: {
+          p_oferta: string;
+          p_total: number;
+        };
+        Returns: number;
       };
       precios_sugeridos: {
         Args: {
@@ -5225,6 +5538,13 @@ export type Database = {
           p_fecha?: string;
         };
         Returns: { usuario_id: string; nombre: string; planificadas: number; visitadas: number; pedidos: number; cobros: number; sin_pedido: number; cerrados: number; ventas: number }[];
+      };
+      retirar_compromiso_grupal: {
+        Args: {
+          p_org: string;
+          p_oferta: string;
+        };
+        Returns: undefined;
       };
       riesgo_turno: {
         Args: {
