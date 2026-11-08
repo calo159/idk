@@ -198,6 +198,12 @@ export async function registrarVenta(
       }
     }
   }
+  // Una promoción vigente cuenta como precio de catálogo (solo si es más baja que el precio de referencia).
+  const { data: promos } = await supabase.rpc("promociones_vigentes", { p_org: ctx.organizacionId });
+  for (const x of promos ?? []) {
+    const r = productosRef.find((p) => p.id === x.producto_id);
+    if (r && dinero(x.precio).lt(dinero(r.precio_venta))) r.precio_venta = x.precio;
+  }
   await auditarPrecios(supabase, venta.id, d.lineas, productosRef, presentacionesRef);
 
   return ok({ ventaId: venta.id, numero: Number(numero), duplicada: false, vuelto: paraBd(pagos.vuelto), verificaciones });

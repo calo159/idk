@@ -52,6 +52,9 @@ export default async function Pagina({
             <Link href="/productos/precios" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
               Precios
             </Link>
+            <Link href="/productos/promociones" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
+              Promociones
+            </Link>
             <Link href="/productos/cuaderno" className={cn(buttonVariants({ variant: "outline" }), "h-10")}>
               Cuaderno
             </Link>

@@ -52,7 +52,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.6 Predicción de agotamiento y compra sugerida (ritmo mezclado 14/60 días, cobertura + entrega, proveedor más barato), órdenes de compra en borrador desde la app y aviso semanal (migración 0025, flujo F7). _(SQL y textos probados; flujo no probado contra n8n real. No crea la orden respondiendo SÍ por WhatsApp.)_
 - [x] 3.7 Calendario de temporadas (se repiten cada año, cruzan el año, por categoría o todo el negocio; factores típicos de Colombia) que ajusta la compra sugerida (migración 0026). _(SQL probado; pantalla sin ejecutar contra Supabase real.)_
 - [x] 3.8 Precios automáticos por margen objetivo (redondeo comercial, tope ±15 %, opt-in al confirmar compras, historial de precios) y simulador de utilidad con elasticidad (migración 0027). _(SQL y simulador probados; pantalla sin ejecutar contra Supabase real. El simulador solo cubre productos con margen objetivo.)_
-- [ ] 3.9 Promociones de plata dormida con imagen generada.
+- [x] 3.9 Promociones de plata dormida con imagen generada. (Sugerencias con descuento escalonado que nunca baja del costo; el POS cobra el precio promocional y no lo audita como cambio de precio; afiche 1080×1080 en canvas + texto para WhatsApp. Sin verificar visualmente en un navegador real.)
 - [ ] 3.10 Fidelización por celular, cumpleaños, clientes inactivos.
 - [ ] 3.11 Catálogo web público.
 - [ ] 3.12 Asistente en lenguaje natural dentro de la app.

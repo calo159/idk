@@ -111,6 +111,9 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select aplicar_precios($1,$2::jsonb)", [base.orgId, JSON.stringify([{ producto_id: productoId, precio: 26000 }])]);
   });
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select crear_promocion($1,'Liquidación',current_date,current_date + 7,$2::jsonb)", [base.orgId, JSON.stringify([{ producto_id: productoId, precio: 24000 }])]);
+  });
   // Orden de compra recibida a crédito, pago al proveedor y devolución (migración 0014)
   await comoUsuario(db, base.duenoId, async () => {
     const oc = (

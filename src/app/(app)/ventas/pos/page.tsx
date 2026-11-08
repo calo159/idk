@@ -71,11 +71,14 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
     (listas[x.lista_id] ??= {})[x.presentacion_id ? `p:${x.presentacion_id}` : `b:${x.producto_id}`] = Number(x.precio);
   }
 
+  const { data: promos } = await supabase.rpc("promociones_vigentes", { p_org: ctx.organizacionId });
+  const precioPromo = new Map((promos ?? []).map((x) => [x.producto_id, Number(x.precio)]));
+
   const catalogo: ProductoPOS[] = (productos ?? []).map((p) => ({
     id: p.id,
     nombre: p.nombre,
     unidad: p.unidad_base,
-    precio: Number(p.precio_venta),
+    precio: Math.min(Number(p.precio_venta), precioPromo.get(p.id) ?? Infinity),
     codigo: p.codigo_barras,
     sku: p.sku,
     controlaStock: p.maneja_inventario,

@@ -2578,6 +2578,103 @@ export type Database = {
           },
         ];
       };
+      promociones: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          nombre: string;
+          desde: string;
+          hasta: string;
+          activa: boolean;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          nombre: string;
+          desde: string;
+          hasta: string;
+          activa?: boolean;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          nombre?: string;
+          desde?: string;
+          hasta?: string;
+          activa?: boolean;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "promociones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "promociones_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      promociones_productos: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          promocion_id: string;
+          producto_id: string;
+          precio_normal: number;
+          precio_promocional: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          promocion_id: string;
+          producto_id: string;
+          precio_normal: number;
+          precio_promocional: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          promocion_id?: string;
+          producto_id?: string;
+          precio_normal?: number;
+          precio_promocional?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "promociones_productos_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "promociones_productos_producto_id_fkey";
+            columns: ["producto_id"];
+            isOneToOne: false;
+            referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "promociones_productos_promocion_id_fkey";
+            columns: ["promocion_id"];
+            isOneToOne: false;
+            referencedRelation: "promociones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       proveedores: {
         Row: {
           id: string;
@@ -3628,6 +3725,16 @@ export type Database = {
         };
         Returns: string;
       };
+      crear_promocion: {
+        Args: {
+          p_org: string;
+          p_nombre: string;
+          p_desde: string;
+          p_hasta: string;
+          p_items: Json;
+        };
+        Returns: string;
+      };
       crear_separado: {
         Args: {
           p_org: string;
@@ -3648,6 +3755,12 @@ export type Database = {
           p_combinaciones: Json;
         };
         Returns: number;
+      };
+      desactivar_promocion: {
+        Args: {
+          p_id: string;
+        };
+        Returns: undefined;
       };
       desde_funcion: {
         Args: Record<PropertyKey, never>;
@@ -3786,6 +3899,12 @@ export type Database = {
           p_org: string;
         };
         Returns: { producto_id: string; producto: string; categoria: string; costo: number; precio_actual: number; margen_objetivo: number; margen_actual: number; precio_sugerido: number; cambio_pct: number; unidades_30d: number }[];
+      };
+      promociones_vigentes: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { producto_id: string; precio: number; promocion: string }[];
       };
       puntaje_cliente: {
         Args: {
@@ -3991,6 +4110,13 @@ export type Database = {
         };
         Returns: { producto_id: string; nombre: string; cantidad: number; valor: number; ultima_venta: string; dias_sin_vender: number }[];
       };
+      reporte_plata_dormida_interno: {
+        Args: {
+          p_org: string;
+          p_dias: number;
+        };
+        Returns: { producto_id: string; nombre: string; cantidad: number; valor: number; ultima_venta: string; dias_sin_vender: number }[];
+      };
       reporte_rotacion: {
         Args: {
           p_org: string;
@@ -4099,6 +4225,13 @@ export type Database = {
           p_entrega?: number;
         };
         Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number; factor: number }[];
+      };
+      sugerir_promociones: {
+        Args: {
+          p_org: string;
+          p_dias?: number;
+        };
+        Returns: { producto_id: string; producto: string; cantidad: number; costo: number; precio_normal: number; dias_sin_vender: number; descuento_pct: number; precio_sugerido: number; valor_inmovilizado: number }[];
       };
       tiene_rol: {
         Args: {
