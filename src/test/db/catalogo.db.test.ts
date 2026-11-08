@@ -83,8 +83,10 @@ describe("configurar_catalogo", () => {
   });
 
   it("el rol anónimo no ve filas de las tablas ni puede configurar", async () => {
-    expect(await comoAnonimo(db, async () => (await db.query("select id from productos")).rows)).toEqual([]);
-    expect(await comoAnonimo(db, async () => (await db.query("select id from organizaciones")).rows)).toEqual([]);
+    // Sin sesión: o ninguna fila o «permission denied» (anon no puede ejecutar las funciones que usan las políticas). Nunca datos.
+    const filas = (tabla: string) => comoAnonimo(db, async () => (await db.query(`select id from ${tabla}`).then((r) => r.rows, (e: Error) => (/permission denied/i.test(e.message) ? [] : Promise.reject(e)))));
+    expect(await filas("productos")).toEqual([]);
+    expect(await filas("organizaciones")).toEqual([]);
     expect(await comoAnonimo(db, () => mensajeDeError(() => db.query("select * from configurar_catalogo(null,true,'x','1','')")))).toMatch(/permission denied|permiso/i);
   });
 });

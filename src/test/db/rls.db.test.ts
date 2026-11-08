@@ -284,7 +284,9 @@ describe("lectura: cada negocio solo ve lo suyo", () => {
     const fugas: string[] = [];
     await comoAnonimo(db, async () => {
       for (const t of [...tablasConOrg, "organizaciones"]) {
-        if ((await contar(`select count(*) as n from ${t}`)) > 0) fugas.push(t);
+        // Sin sesión, las políticas llaman funciones a las que `anon` ya no tiene acceso (0039): «permission denied» también es no ver nada.
+        const n = await contar(`select count(*) as n from ${t}`).catch((e: Error) => (/permission denied/i.test(e.message) ? 0 : Promise.reject(e)));
+        if (n > 0) fugas.push(t);
       }
     });
     expect(fugas).toEqual([]);
