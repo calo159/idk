@@ -42,3 +42,10 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - Fotos: el bucket de productos es privado; mostrarlas exige URLs firmadas generadas en el servidor. Queda para una mejora posterior.
 - Caché: la página declara `revalidate = 300`; en la compilación aparece como dinámica porque pasa por `proxy.ts`. Si el tráfico lo exige, se excluye `/catalogo` del matcher.
 
+## D-007 — Venta en ruta: autoventa con el POS y visitas aparte
+- El vendedor de ruta vende con el mismo POS (turno de caja propio, cola offline y `offline_id`); su venta queda con `origen = 'ruta'`.
+  No hay un «pedido de ruta» separado: así stock, costos, caja y comisiones funcionan igual que en el mostrador.
+- Las visitas (`visitas`) son un registro aparte: resultado, nota y ubicación (opcional) con la misma ventana de tiempo que las ventas offline (7 días).
+- Service worker: `/ventas/ruta` y el POS se guardan solo en su versión genérica (sin pedido ni cotización precargados). `?cliente=` lo lee el navegador.
+- Pendiente: abonos y pedidos de ruta sin internet, y mapa de la ruta.
+

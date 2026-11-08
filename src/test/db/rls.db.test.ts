@@ -107,6 +107,10 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_devolucion_cliente($1,$2::jsonb,'Prueba','nequi')", [ventaId, JSON.stringify([{ venta_detalle_id: det, cantidad: 1 }])]);
   });
   await db.query("insert into pedidos_whatsapp (organizacion_id, mensaje_id, telefono, texto) values ($1, $2, '3112223344', 'dos de cemento')", [base.orgId, "wamid." + correo]);
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select guardar_ruta($1,$2,1,$3::uuid[])", [base.orgId, base.duenoId, [clienteId]]);
+    await db.query("select registrar_visita($1,$2,'pedido','Prueba',11.5,-72.9,10,$3,null)", [base.orgId, clienteId, crypto.randomUUID()]);
+  });
   await db.query("update organizaciones set fidelizacion_activa=true where id=$1", [base.orgId]);
   await db.query("insert into puntos_movimientos (organizacion_id, cliente_id, puntos, motivo) values ($1,$2,5,'cumpleanos')", [base.orgId, clienteId]);
   await db.query("insert into contactos_fidelizacion (organizacion_id, cliente_id, tipo) values ($1,$2,'cumpleanos')", [base.orgId, clienteId]);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, Store, Tags, Users, Warehouse } from "lucide-react";
+import { CalendarDays, Route, Store, Tags, Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
 import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -42,6 +42,15 @@ export default async function Pagina() {
           <span>
             <span className="block font-medium">Catálogo web</span>
             <span className="text-sm text-muted-foreground">Un enlace con tus productos para que te pidan por WhatsApp</span>
+          </span>
+        </Link>
+      ) : null}
+      {ctx.rol === "dueno" || ctx.rol === "admin" ? (
+        <Link href="/configuracion/rutas" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <Route className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Rutas de venta</span>
+            <span className="text-sm text-muted-foreground">Qué clientes visita cada vendedor cada día</span>
           </span>
         </Link>
       ) : null}

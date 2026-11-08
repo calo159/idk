@@ -7,7 +7,7 @@
 const VERSION = "surtix-v1";
 const ESTATICOS = `${VERSION}-estaticos`;
 const PAGINAS = `${VERSION}-paginas`;
-const PAGINAS_OFFLINE = ["/ventas/pos", "/caja"];
+const PAGINAS_OFFLINE = ["/ventas/pos", "/caja", "/ventas/ruta"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(PAGINAS).then((c) => c.add("/offline.html")).then(() => self.skipWaiting()));
@@ -50,14 +50,17 @@ self.addEventListener("fetch", (e) => {
     e.respondWith(
       fetch(req)
         .then((resp) => {
-          // Solo respuestas reales (no redirecciones al login) se guardan.
-          if (resp.ok && !resp.redirected) {
+          // Solo respuestas reales (no redirecciones al login). Solo se guarda la página genérica: sin parámetros, o con
+          // «?cliente=» (que el navegador lee por su cuenta). Así un pedido o cotización precargados nunca reaparecen sin internet.
+          const generica = !url.search || (url.searchParams.size === 1 && url.searchParams.has("cliente"));
+          if (resp.ok && !resp.redirected && generica) {
             const copia = resp.clone();
-            caches.open(PAGINAS).then((c) => c.put(req, copia));
+            caches.open(PAGINAS).then((c) => c.put(url.origin + url.pathname, copia));
           }
           return resp;
         })
-        .catch(async () => (await caches.match(req)) || (await caches.match("/offline.html"))),
+        // «/ventas/pos?cliente=…» sin internet cae a la última copia del POS sin parámetros.
+        .catch(async () => (await caches.match(url.origin + url.pathname)) || (await caches.match("/offline.html"))),
     );
   }
 });

@@ -1,4 +1,5 @@
 import { cobrarVenta } from "@/app/(app)/ventas/pos/acciones";
+import { registrarVisita } from "@/app/(app)/ventas/ruta/acciones";
 import type { RespuestaEnvio } from "./cola";
 
 /**
@@ -9,6 +10,16 @@ import type { RespuestaEnvio } from "./cola";
 export async function enviarVentaOffline(payload: Record<string, unknown>): Promise<RespuestaEnvio> {
   try {
     const r = await cobrarVenta(payload);
+    return r.ok ? { tipo: "ok" } : { tipo: "rechazada", mensaje: r.error };
+  } catch {
+    return { tipo: "sin_conexion" };
+  }
+}
+
+/** Igual que las ventas, pero para visitas de ruta. */
+export async function enviarVisitaOffline(payload: Record<string, unknown>): Promise<RespuestaEnvio> {
+  try {
+    const r = await registrarVisita(payload);
     return r.ok ? { tipo: "ok" } : { tipo: "rechazada", mensaje: r.error };
   } catch {
     return { tipo: "sin_conexion" };

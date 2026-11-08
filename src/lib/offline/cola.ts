@@ -20,11 +20,23 @@ export interface VentaEnCola {
   ultimoError: string | null;
 }
 
+/** Visita de un vendedor de ruta hecha sin internet (se envía con `registrar_visita`, idempotente por offline_id). */
+export interface VisitaEnCola {
+  offlineId: string;
+  payload: Record<string, unknown>;
+  estado: EstadoCola;
+  intentos: number;
+  creadoEn: number;
+  ultimoError: string | null;
+}
+
 class BdSurtix extends Dexie {
   ventas!: EntityTable<VentaEnCola, "offlineId">;
+  visitas!: EntityTable<VisitaEnCola, "offlineId">;
   constructor(nombre = "surtix-offline") {
     super(nombre);
     this.version(1).stores({ ventas: "offlineId, estado, creadoEn" });
+    this.version(2).stores({ ventas: "offlineId, estado, creadoEn", visitas: "offlineId, estado, creadoEn" });
   }
 }
 

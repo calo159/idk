@@ -11,6 +11,7 @@ export interface ClienteForm {
   nombre: string;
   documento: string | null;
   telefono: string | null;
+  direccion?: string | null;
   fecha_nacimiento: string | null;
   cupo_credito: number;
   acepta_mensajes: boolean;
@@ -47,6 +48,7 @@ export function FormCliente({ cliente, puedeCupo }: { cliente?: ClienteForm; pue
         {campo("telefono", "Celular / WhatsApp", cliente?.telefono, { modo: "tel" })}
         {campo("documento", "Cédula / NIT", cliente?.documento, { modo: "numeric" })}
       </div>
+      {campo("direccion", "Dirección / referencia (para las rutas de venta)", cliente?.direccion)}
       <div className="grid grid-cols-2 gap-3">
         {campo("fecha_nacimiento", "Cumpleaños", cliente?.fecha_nacimiento, { tipo: "date" })}
         {campo("cupo_credito", "Cupo de fiado ($)", cliente?.cupo_credito ?? 0, {

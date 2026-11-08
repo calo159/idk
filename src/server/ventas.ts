@@ -117,7 +117,7 @@ export async function registrarVenta(
       offline_id: d.offline_id,
       ...(d.creado_en ? { creado_en: d.creado_en } : {}),
       descuento: numericoBd(paraBd(d.descuento)),
-      origen: "pos",
+      origen: ctx.rol === "ruta" ? "ruta" : "pos",
     })
     .select("id")
     .single();

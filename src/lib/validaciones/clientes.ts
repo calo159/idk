@@ -11,6 +11,12 @@ export const esquemaCliente = z.object({
     .transform((v) => (v === "" ? undefined : v))
     .pipe(zDocumentoCO.optional()),
   telefono: zCelularOpcional,
+  direccion: z
+    .string()
+    .trim()
+    .max(200, "La dirección debe tener máximo 200 caracteres")
+    .transform((v) => (v === "" ? undefined : v))
+    .optional(),
   fecha_nacimiento: z
     .string()
     .trim()

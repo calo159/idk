@@ -426,6 +426,7 @@ export type Database = {
           activo: boolean;
           creado_en: string;
           lista_precios_id: string | null;
+          direccion: string | null;
         };
         Insert: {
           id?: string;
@@ -440,6 +441,7 @@ export type Database = {
           activo?: boolean;
           creado_en?: string;
           lista_precios_id?: string | null;
+          direccion?: string | null;
         };
         Update: {
           id?: string;
@@ -454,6 +456,7 @@ export type Database = {
           activo?: boolean;
           creado_en?: string;
           lista_precios_id?: string | null;
+          direccion?: string | null;
         };
         Relationships: [
           {
@@ -2883,6 +2886,55 @@ export type Database = {
           },
         ];
       };
+      ruta_clientes: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          usuario_id: string;
+          cliente_id: string;
+          dia_semana: number;
+          orden: number;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          usuario_id: string;
+          cliente_id: string;
+          dia_semana: number;
+          orden: number;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          usuario_id?: string;
+          cliente_id?: string;
+          dia_semana?: number;
+          orden?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ruta_clientes_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ruta_clientes_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ruta_clientes_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       separados: {
         Row: {
           id: string;
@@ -3522,6 +3574,73 @@ export type Database = {
           },
         ];
       };
+      visitas: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          usuario_id: string;
+          cliente_id: string;
+          resultado: string;
+          nota: string | null;
+          lat: number | null;
+          lng: number | null;
+          precision_m: number | null;
+          offline_id: string;
+          visitado_en: string;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          usuario_id: string;
+          cliente_id: string;
+          resultado: string;
+          nota?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          precision_m?: number | null;
+          offline_id: string;
+          visitado_en?: string;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          usuario_id?: string;
+          cliente_id?: string;
+          resultado?: string;
+          nota?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          precision_m?: number | null;
+          offline_id?: string;
+          visitado_en?: string;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "visitas_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "visitas_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "visitas_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       v_plata_dormida: {
@@ -4027,6 +4146,15 @@ export type Database = {
         };
         Returns: undefined;
       };
+      guardar_ruta: {
+        Args: {
+          p_org: string;
+          p_usuario: string;
+          p_dia: number;
+          p_clientes: string[];
+        };
+        Returns: number;
+      };
       guardar_temporada: {
         Args: {
           p_org: string;
@@ -4305,6 +4433,20 @@ export type Database = {
         };
         Returns: number;
       };
+      registrar_visita: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_resultado: string;
+          p_nota: string;
+          p_lat: number;
+          p_lng: number;
+          p_precision: number;
+          p_offline_id: string;
+          p_visitado_en?: string;
+        };
+        Returns: string;
+      };
       reporte_abc: {
         Args: {
           p_org: string;
@@ -4410,6 +4552,13 @@ export type Database = {
         };
         Returns: Json;
       };
+      resumen_rutas: {
+        Args: {
+          p_org: string;
+          p_fecha?: string;
+        };
+        Returns: { usuario_id: string; nombre: string; planificadas: number; visitadas: number; pedidos: number; cobros: number; sin_pedido: number; cerrados: number; ventas: number }[];
+      };
       riesgo_turno: {
         Args: {
           p_turno: string;
@@ -4421,6 +4570,13 @@ export type Database = {
           tabla: string;
         };
         Returns: Database["public"]["Enums"]["rol_miembro"][];
+      };
+      ruta_del_dia: {
+        Args: {
+          p_org: string;
+          p_fecha?: string;
+        };
+        Returns: { cliente_id: string; nombre: string; telefono: string; direccion: string; saldo: number; vencido: number; dias_mora: number; orden: number; visitado: boolean; resultado: string; ultima_visita: string; ultima_compra: string }[];
       };
       saldo_puntos: {
         Args: {
@@ -4506,6 +4662,13 @@ export type Database = {
           p_pago?: string;
         };
         Returns: Database["public"]["Enums"]["estado_verificacion"];
+      };
+      visitas_del_dia: {
+        Args: {
+          p_org: string;
+          p_fecha?: string;
+        };
+        Returns: { id: string; usuario: string; cliente: string; resultado: string; nota: string; lat: number; lng: number; precision_m: number; visitado_en: string }[];
       };
     };
     Enums: {

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { EscanerCodigo } from "@/components/escaner-codigo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,7 +103,9 @@ export function PuntoDeVenta({
   const [pagos, setPagos] = useState<Record<Metodo, string>>({
     efectivo: "", nequi: "", daviplata: "", transferencia: "", tarjeta: "", credito: "",
   });
-  const [clienteId, setClienteId] = useState(cotizacionInicial?.clienteId ?? "");
+  // «Vender» desde la ruta abre el POS con ?cliente=…: se lee en el navegador para que la página guardada sin internet sirva igual.
+  const clienteUrl = useSearchParams().get("cliente");
+  const [clienteId, setClienteId] = useState(cotizacionInicial?.clienteId ?? (clientes.some((c) => c.id === clienteUrl) ? clienteUrl! : ""));
   const [descuento, setDescuento] = useState("");
   const [canjeTxt, setCanjeTxt] = useState("");
   const [errorCobro, setErrorCobro] = useState<string | null>(null);

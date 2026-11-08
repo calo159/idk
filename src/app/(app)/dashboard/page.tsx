@@ -43,6 +43,7 @@ export default async function Pagina() {
         <h1 className="text-xl font-semibold">Hola, {ctx.nombre.split(" ")[0]}</h1>
         <p className="text-sm text-muted-foreground">{formatoDiaLargo(new Date())}</p>
         <div className="grid grid-cols-2 gap-3">
+          {ctx.rol === "ruta" ? <Tarjeta titulo="Mi ruta de hoy" valor="Clientes por visitar" href="/ventas/ruta" /> : null}
           <Tarjeta titulo="Vender" valor="Abrir POS" href="/ventas/pos" />
           <Tarjeta titulo="Mi caja" valor="Abrir / cerrar" href="/caja" />
           <Tarjeta titulo="Mi avance del mes" valor="Meta y comisión" href="/reportes/comisiones" />
