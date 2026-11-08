@@ -184,10 +184,11 @@ beforeAll(async () => {
   B = await sembrar("Ferretería B", "b.co");
   const r = await db.query<{ tabla: string }>(`
     select c.relname as tabla from pg_class c join pg_namespace n on n.oid = c.relnamespace
-    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes') -- planes: catálogo global de precios
+    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins') -- globales: precios y equipo de Surtix
     order by 1`);
-  // Las tablas internas del bot no tienen política de lectura a propósito (solo el service role las usa).
-  tablasConOrg = r.rows.map((x) => x.tabla).filter((t) => !t.startsWith("bot_"));
+  // Sin política de lectura a propósito: las del bot (solo service role) y la bitácora del soporte de Surtix (admin_acciones,
+  // que se prueba en super-admin.db.test.ts: ni el dueño del negocio puede leerla).
+  tablasConOrg = r.rows.map((x) => x.tabla).filter((t) => !t.startsWith("bot_") && t !== "admin_acciones");
 });
 
 afterAll(async () => {

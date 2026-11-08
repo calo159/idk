@@ -29,7 +29,7 @@ describe("migraciones", () => {
     const r = await db.query<{ tabla: string }>(`
       select c.relname as tabla
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
-      where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes') -- planes: catálogo de precios global
+      where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes', 'super_admins') -- globales: precios y equipo de Surtix
         and not exists (select 1 from pg_attribute a
                          where a.attrelid = c.oid and a.attname = 'organizacion_id' and not a.attisdropped)
     `);

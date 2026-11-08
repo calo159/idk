@@ -139,6 +139,51 @@ export type Database = {
           },
         ];
       };
+      admin_acciones: {
+        Row: {
+          id: string;
+          usuario_id: string;
+          organizacion_id: string;
+          accion: string;
+          motivo: string;
+          detalle: Json;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          usuario_id: string;
+          organizacion_id: string;
+          accion: string;
+          motivo: string;
+          detalle?: Json;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          usuario_id?: string;
+          organizacion_id?: string;
+          accion?: string;
+          motivo?: string;
+          detalle?: Json;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "admin_acciones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "admin_acciones_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ajustes_cartera: {
         Row: {
           id: string;
@@ -3294,6 +3339,29 @@ export type Database = {
           },
         ];
       };
+      super_admins: {
+        Row: {
+          usuario_id: string;
+          creado_en: string;
+        };
+        Insert: {
+          usuario_id: string;
+          creado_en?: string;
+        };
+        Update: {
+          usuario_id?: string;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "super_admins_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       suscripciones: {
         Row: {
           organizacion_id: string;
@@ -3879,6 +3947,57 @@ export type Database = {
         };
         Returns: number;
       };
+      admin_cambiar_plan: {
+        Args: {
+          p_org: string;
+          p_plan: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
+      admin_detalle_negocio: {
+        Args: {
+          p_org: string;
+        };
+        Returns: Json;
+      };
+      admin_extender_suscripcion: {
+        Args: {
+          p_org: string;
+          p_dias: number;
+          p_motivo: string;
+        };
+        Returns: string;
+      };
+      admin_listar_negocios: {
+        Args: {
+          p_buscar?: string;
+          p_limite?: number;
+        };
+        Returns: { id: string; nombre: string; nicho: string; ciudad: string; creado_en: string; plan: string; estado: string; vigente_hasta: string; usuarios: number; ventas_30d: number; ultima_venta: string; dueno: string; correo_dueno: string }[];
+      };
+      admin_metricas: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
+      admin_registrar_pago_manual: {
+        Args: {
+          p_org: string;
+          p_plan: string;
+          p_meses: number;
+          p_monto: number;
+          p_motivo: string;
+        };
+        Returns: string;
+      };
+      admin_suspender: {
+        Args: {
+          p_org: string;
+          p_suspender: boolean;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
       ajustar_inventario: {
         Args: {
           p_org: string;
@@ -4291,11 +4410,19 @@ export type Database = {
         };
         Returns: string;
       };
+      es_super_admin: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
       estado_de_suscripcion: {
         Args: {
           s: unknown;
         };
         Returns: string;
+      };
+      exigir_super_admin: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       factor_temporada: {
         Args: {
@@ -4434,6 +4561,12 @@ export type Database = {
         };
         Returns: { plan: string; plan_nombre: string; estado: string; vigente_hasta: string; dias_restantes: number; precio_mensual: number; max_usuarios: number; max_bodegas: number; usuarios: number; bodegas: number; motivo_suspension: string }[];
       };
+      mi_suscripcion_interna: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { plan: string; plan_nombre: string; estado: string; vigente_hasta: string; dias_restantes: number; precio_mensual: number; max_usuarios: number; max_bodegas: number; usuarios: number; bodegas: number; motivo_suspension: string }[];
+      };
       mis_organizaciones: {
         Args: Record<PropertyKey, never>;
         Returns: string[];
@@ -4508,6 +4641,15 @@ export type Database = {
           p_turno?: string;
         };
         Returns: string;
+      };
+      registrar_accion_admin: {
+        Args: {
+          p_org: string;
+          p_accion: string;
+          p_motivo: string;
+          p_detalle: Json;
+        };
+        Returns: undefined;
       };
       registrar_cambio_precio: {
         Args: {

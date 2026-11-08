@@ -61,7 +61,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 
 ## Fase 4 — Negocio y escala
 - [x] 4.1 Planes y cobro de suscripción con Wompi: 3 planes con límites de usuarios y bodegas (los hace cumplir la base de datos), prueba gratis de 14 días, gracia de 5 días, pago por 1/3/6/12 meses, webhook firmado e idempotente, bloqueo solo de las pantallas (nunca se borran datos) y pantalla «Plan y pagos» (migración 0033). _(SQL, firmas y webhook probados; NO probado contra el sandbox de Wompi: hacen falta las llaves WOMPI_* y un comercio de prueba. Los precios de los planes son provisionales y se editan en la tabla `planes`. Mercado Pago no se implementó.)_
-- [ ] 4.2 Panel de super-admin (clientes, uso, soporte).
+- [x] 4.2 Panel de super-admin en /admin (migración 0034): lista y búsqueda de negocios con plan, estado y uso, métricas globales (negocios, prueba, pagando, ingreso mensual aprox.), detalle de soporte y acciones —cambiar plan, regalar días, suspender/reactivar, registrar pago manual— que exigen un motivo y quedan en una bitácora. Sin suplantar usuarios y sin ver datos comerciales del negocio. _(SQL y guardas probados; pantallas sin ejecutar contra Supabase real. Alta de un super-admin: ver D-009 en docs/06-DECISIONES.md.)_
 - [ ] 4.3 Facturación electrónica DIAN vía proveedor externo.
 - [ ] 4.4 Programa de referidos.
 - [ ] 4.5 Benchmark anónimo por nicho.

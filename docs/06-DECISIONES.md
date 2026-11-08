@@ -58,3 +58,12 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - Los límites de plan (usuarios, bodegas) son triggers de base de datos: ninguna pantalla puede saltárselos.
 - Pendiente para producción: llaves de Wompi, URL del webhook en su panel, definir precios reales, factura al suscriptor.
 
+## D-009 — Super-admin: solo por SQL, sin suplantar y con bitácora
+- El equipo de Surtix se da de alta únicamente desde la consola de la base de datos (SQL editor de Supabase), nunca desde la app:
+  `insert into super_admins (usuario_id) values ('<uuid de auth.users>');` (para quitar: `delete from super_admins where usuario_id = '<uuid>';`).
+- La tabla `super_admins` y la bitácora `admin_acciones` no tienen políticas de RLS: ni la API ni el dueño de un negocio las leen o escriben.
+- Todas las funciones `admin_*` vuelven a verificar `es_super_admin()` dentro de la base de datos; el 404 de `/admin` es solo cortesía.
+- El panel muestra conteos y estado, no ventas, clientes, precios ni deudas. **No hay «entrar como el cliente»**: si un caso de soporte lo necesita,
+  se hace con una sesión compartida por el propio cliente.
+- Toda acción de soporte (plan, días, suspensión, pago manual) exige un motivo de mínimo 3 letras y queda con quién la hizo y cuándo.
+
