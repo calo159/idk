@@ -11,6 +11,11 @@ export const esquemaCliente = z.object({
     .transform((v) => (v === "" ? undefined : v))
     .pipe(zDocumentoCO.optional()),
   telefono: zCelularOpcional,
+  tipo_documento: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v : "CC"))
+    .pipe(z.enum(["CC", "NIT", "CE", "PA", "TI"], { message: "Elige el tipo de documento" })),
   direccion: z
     .string()
     .trim()

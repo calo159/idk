@@ -118,3 +118,11 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
   Si dos ventas sin internet gastan los mismos puntos, la segunda no se bloquea: el dueño recibe la alerta `canje_sin_saldo`.
 - App: Clientes → Fidelización (configurar, lista del día con enlace de WhatsApp y «Ya escribí»).
 - `GET/POST /api/webhooks/fidelizacion` + `n8n/F8-fidelizacion.json` (lunes a sábado 9 a. m., mismo horario respetuoso que la cobranza).
+
+### F9 — Facturas electrónicas (marco, sin proveedor real)
+- `POST /api/webhooks/facturacion` (solo token, sin cuerpo) envía a su proveedor las facturas electrónicas pendientes, hasta 20 por llamada.
+  La base de datos reserva cada factura (`skip locked`) para que dos llamadas no envíen la misma; un envío a medias se recupera a los 10 minutos.
+- Reintentos: una falla transitoria vuelve a la cola hasta 5 veces y luego avisa al dueño; un rechazo avisa de inmediato y se corrige desde la venta
+  («Corregir y reintentar» conserva el mismo número). Una factura aceptada no se vuelve a tocar.
+- Flujo: `n8n/F9-facturacion-electronica.json` (cada 5 minutos). Hoy solo existe el proveedor `simulado`.
+

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, CreditCard, Route, Store, Tags, Users, Warehouse } from "lucide-react";
+import { CalendarDays, CreditCard, FileText, Route, Store, Tags, Users, Warehouse } from "lucide-react";
 import { requerirContexto } from "@/lib/auth/contexto";
 import { etiquetaRol, puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -42,6 +42,15 @@ export default async function Pagina() {
           <span>
             <span className="block font-medium">Plan y pagos</span>
             <span className="text-sm text-muted-foreground">Tu plan, días restantes e historial de pagos</span>
+          </span>
+        </Link>
+      ) : null}
+      {ctx.rol === "dueno" || ctx.rol === "admin" ? (
+        <Link href="/configuracion/facturacion" className="flex min-h-16 items-center gap-3 rounded-xl border p-4 hover:bg-muted">
+          <FileText className="size-6 text-primary" aria-hidden />
+          <span>
+            <span className="block font-medium">Facturación electrónica</span>
+            <span className="text-sm text-muted-foreground">Datos fiscales, resolución DIAN y numeración (en pruebas)</span>
           </span>
         </Link>
       ) : null}

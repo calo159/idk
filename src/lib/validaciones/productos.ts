@@ -73,6 +73,12 @@ export const esquemaProducto = z.object({
     .pipe(porcentajeTexto.optional()),
   stock_minimo: desdeTexto(zCantidadNoNegativa, 0),
   maneja_inventario: z.boolean(),
+  /** IVA incluido en el precio de venta (para la factura electrónica). */
+  iva_pct: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v : "0"))
+    .pipe(z.enum(["0", "5", "19"], { message: "Elige el IVA del producto" })),
 });
 export type DatosProducto = z.infer<typeof esquemaProducto>;
 

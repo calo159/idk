@@ -67,3 +67,12 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
   se hace con una sesión compartida por el propio cliente.
 - Toda acción de soporte (plan, días, suspensión, pago manual) exige un motivo de mínimo 3 letras y queda con quién la hizo y cuándo.
 
+## D-010 — Facturación electrónica: marco propio + proveedor tecnológico, sin inventar el contrato
+- La factura electrónica en Colombia la valida la DIAN a través de un proveedor tecnológico autorizado. Surtix **no** firma ni transmite XML UBL.
+- Se construyó lo que es independiente del proveedor y se puede probar: datos fiscales, resolución y numeración (nunca retrocede, conserva el número al reintentar),
+  IVA, el documento (`construir_documento_factura`, única fuente de verdad), la cola y los estados.
+- No se escribió un adaptador «a ojo» para Factus/Alegra/Siigo: sin su documentación y credenciales sería código inventado que parecería funcionar.
+  El contrato es la interfaz `ProveedorFE`; el simulado sirve para practicar y está bloqueado en producción por la base de datos.
+- Supuestos a validar con un contador: precios con IVA incluido, tope de consumidor final = 5 UVT (valor configurable, actualizar cada año), IVA solo 0/5/19 %
+  (sin impoconsumo ni retenciones), y nota crédito pendiente.
+

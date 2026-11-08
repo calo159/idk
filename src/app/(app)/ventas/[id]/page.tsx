@@ -11,6 +11,7 @@ import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { zUuid } from "@/lib/validaciones/comunes";
 import { DevolverVenta } from "./devolver";
 import { FormAnularVenta } from "./anular";
+import { FacturaElectronica } from "./factura";
 
 export const metadata: Metadata = { title: "Venta" };
 
@@ -26,7 +27,7 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
   const { id } = await params;
   if (!zUuid.safeParse(id).success) notFound();
   const supabase = await crearClienteServidor();
-  const [{ data: venta }, { data: lineas }, { data: pagos }] = await Promise.all([
+  const [{ data: venta }, { data: lineas }, { data: pagos }, { data: factura }, { data: cfgFe }] = await Promise.all([
     supabase
       .from("ventas")
       .select("id, numero, estado, total, descuento, costo_total, creado_en, motivo_anulacion, anulada_en, cliente_id, clientes(nombre)")
@@ -38,6 +39,8 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
       .select("id, cantidad, precio_unitario, subtotal, productos(nombre), presentaciones(nombre), devoluciones_cliente_detalle(cantidad)")
       .eq("venta_id", id),
     supabase.from("pagos_venta").select("id, metodo, monto, verificacion").eq("venta_id", id),
+    supabase.from("facturas_electronicas").select("id, estado, prefijo, numero, ambiente, cufe, error, pdf_url").eq("venta_id", id).maybeSingle(),
+    supabase.from("config_facturacion").select("activa").eq("organizacion_id", ctx.organizacionId).maybeSingle(),
   ]);
   if (!venta) notFound();
   const verUtilidad = ctx.rol === "dueno" || ctx.rol === "admin" || ctx.rol === "contador";
@@ -108,6 +111,13 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
         </ul>
       </div>
 
+      {venta.estado === "confirmado" && (factura || cfgFe?.activa) ? (
+        <FacturaElectronica
+          ventaId={venta.id}
+          puedeFacturar={puede(ctx.rol, "ventas.confirmar")}
+          factura={factura ? { id: factura.id, estado: factura.estado, numeroCompleto: `${factura.prefijo}${factura.numero}`, ambiente: factura.ambiente, cufe: factura.cufe, error: factura.error, pdfUrl: factura.pdf_url } : null}
+        />
+      ) : null}
       {venta.estado === "confirmado" && puede(ctx.rol, "ventas.confirmar") ? (
         <DevolverVenta
           ventaId={venta.id}

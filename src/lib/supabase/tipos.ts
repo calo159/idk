@@ -472,6 +472,7 @@ export type Database = {
           creado_en: string;
           lista_precios_id: string | null;
           direccion: string | null;
+          tipo_documento: string;
         };
         Insert: {
           id?: string;
@@ -487,6 +488,7 @@ export type Database = {
           creado_en?: string;
           lista_precios_id?: string | null;
           direccion?: string | null;
+          tipo_documento?: string;
         };
         Update: {
           id?: string;
@@ -502,6 +504,7 @@ export type Database = {
           creado_en?: string;
           lista_precios_id?: string | null;
           direccion?: string | null;
+          tipo_documento?: string;
         };
         Relationships: [
           {
@@ -760,6 +763,71 @@ export type Database = {
             columns: ["usuario_id"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      config_facturacion: {
+        Row: {
+          organizacion_id: string;
+          activa: boolean;
+          ambiente: string;
+          proveedor: string;
+          nit: string | null;
+          dv: string | null;
+          razon_social: string | null;
+          prefijo: string | null;
+          resolucion_numero: string | null;
+          resolucion_fecha: string | null;
+          rango_desde: number | null;
+          rango_hasta: number | null;
+          vigencia_hasta: string | null;
+          siguiente_numero: number | null;
+          consumidor_final_hasta: number;
+          actualizado_en: string;
+        };
+        Insert: {
+          organizacion_id: string;
+          activa?: boolean;
+          ambiente?: string;
+          proveedor?: string;
+          nit?: string | null;
+          dv?: string | null;
+          razon_social?: string | null;
+          prefijo?: string | null;
+          resolucion_numero?: string | null;
+          resolucion_fecha?: string | null;
+          rango_desde?: number | null;
+          rango_hasta?: number | null;
+          vigencia_hasta?: string | null;
+          siguiente_numero?: number | null;
+          consumidor_final_hasta?: number;
+          actualizado_en?: string;
+        };
+        Update: {
+          organizacion_id?: string;
+          activa?: boolean;
+          ambiente?: string;
+          proveedor?: string;
+          nit?: string | null;
+          dv?: string | null;
+          razon_social?: string | null;
+          prefijo?: string | null;
+          resolucion_numero?: string | null;
+          resolucion_fecha?: string | null;
+          rango_desde?: number | null;
+          rango_hasta?: number | null;
+          vigencia_hasta?: string | null;
+          siguiente_numero?: number | null;
+          consumidor_final_hasta?: number;
+          actualizado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "config_facturacion_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: true;
+            referencedRelation: "organizaciones";
             referencedColumns: ["id"];
           },
         ];
@@ -1544,6 +1612,94 @@ export type Database = {
             columns: ["producto_id"];
             isOneToOne: false;
             referencedRelation: "productos";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      facturas_electronicas: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          venta_id: string;
+          numero: number;
+          prefijo: string;
+          estado: string;
+          ambiente: string;
+          proveedor: string;
+          documento: Json;
+          cufe: string | null;
+          pdf_url: string | null;
+          xml_url: string | null;
+          respuesta: Json | null;
+          error: string | null;
+          intentos: number;
+          creado_por: string | null;
+          creado_en: string;
+          enviado_en: string | null;
+          aceptado_en: string | null;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          venta_id: string;
+          numero: number;
+          prefijo: string;
+          estado?: string;
+          ambiente: string;
+          proveedor: string;
+          documento: Json;
+          cufe?: string | null;
+          pdf_url?: string | null;
+          xml_url?: string | null;
+          respuesta?: Json | null;
+          error?: string | null;
+          intentos?: number;
+          creado_por?: string | null;
+          creado_en?: string;
+          enviado_en?: string | null;
+          aceptado_en?: string | null;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          venta_id?: string;
+          numero?: number;
+          prefijo?: string;
+          estado?: string;
+          ambiente?: string;
+          proveedor?: string;
+          documento?: Json;
+          cufe?: string | null;
+          pdf_url?: string | null;
+          xml_url?: string | null;
+          respuesta?: Json | null;
+          error?: string | null;
+          intentos?: number;
+          creado_por?: string | null;
+          creado_en?: string;
+          enviado_en?: string | null;
+          aceptado_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "facturas_electronicas_creado_por_fkey";
+            columns: ["creado_por"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "facturas_electronicas_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "facturas_electronicas_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: true;
+            referencedRelation: "ventas";
             referencedColumns: ["id"];
           },
         ];
@@ -2724,6 +2880,7 @@ export type Database = {
           maneja_seriales: boolean;
           garantia_dias: number | null;
           en_catalogo: boolean;
+          iva_pct: number;
         };
         Insert: {
           id?: string;
@@ -2747,6 +2904,7 @@ export type Database = {
           maneja_seriales?: boolean;
           garantia_dias?: number | null;
           en_catalogo?: boolean;
+          iva_pct?: number;
         };
         Update: {
           id?: string;
@@ -2770,6 +2928,7 @@ export type Database = {
           maneja_seriales?: boolean;
           garantia_dias?: number | null;
           en_catalogo?: boolean;
+          iva_pct?: number;
         };
         Relationships: [
           {
@@ -4290,6 +4449,13 @@ export type Database = {
         };
         Returns: number;
       };
+      construir_documento_factura: {
+        Args: {
+          p_venta: string;
+          p_numero: number;
+        };
+        Returns: Json;
+      };
       consultar_serial: {
         Args: {
           p_org: string;
@@ -4433,6 +4599,12 @@ export type Database = {
         };
         Returns: number;
       };
+      facturas_pendientes_envio: {
+        Args: {
+          p_limite?: number;
+        };
+        Returns: { id: string; organizacion_id: string; proveedor: string; ambiente: string; documento: Json; intentos: number }[];
+      };
       fidelizacion_para_n8n: {
         Args: Record<PropertyKey, never>;
         Returns: { organizacion_id: string; organizacion: string; cliente_id: string; cliente: string; telefono: string; tipo: string; dato: number; puntos: number; puntos_bono: number; valor_punto: number }[];
@@ -4476,6 +4648,25 @@ export type Database = {
           p_id: number;
           p_ok: boolean;
           p_error?: string;
+        };
+        Returns: undefined;
+      };
+      guardar_config_facturacion: {
+        Args: {
+          p_org: string;
+          p_activa: boolean;
+          p_ambiente: string;
+          p_proveedor: string;
+          p_nit: string;
+          p_dv: string;
+          p_razon_social: string;
+          p_prefijo: string;
+          p_resolucion_numero: string;
+          p_resolucion_fecha: string;
+          p_rango_desde: number;
+          p_rango_hasta: number;
+          p_vigencia_hasta: string;
+          p_consumidor_final_hasta: number;
         };
         Returns: undefined;
       };
@@ -4815,6 +5006,12 @@ export type Database = {
         };
         Returns: string;
       };
+      reintentar_factura_electronica: {
+        Args: {
+          p_factura: string;
+        };
+        Returns: undefined;
+      };
       reporte_abc: {
         Args: {
           p_org: string;
@@ -4912,6 +5109,18 @@ export type Database = {
         };
         Returns: undefined;
       };
+      resultado_factura_electronica: {
+        Args: {
+          p_id: string;
+          p_estado: string;
+          p_cufe: string;
+          p_pdf: string;
+          p_xml: string;
+          p_respuesta: Json;
+          p_error: string;
+        };
+        Returns: string;
+      };
       resumen_periodo: {
         Args: {
           p_org: string;
@@ -4970,6 +5179,12 @@ export type Database = {
           doc: string;
         };
         Returns: number;
+      };
+      solicitar_factura_electronica: {
+        Args: {
+          p_venta: string;
+        };
+        Returns: string;
       };
       stock_reservado: {
         Args: {

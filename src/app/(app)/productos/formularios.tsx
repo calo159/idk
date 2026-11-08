@@ -26,6 +26,7 @@ export interface ProductoForm {
   margen_objetivo: number | null;
   stock_minimo: number;
   maneja_inventario: boolean;
+  iva_pct?: number;
 }
 
 function Campo({
@@ -161,6 +162,13 @@ export function FormProducto({
           capture="environment"
           className="h-11"
         />
+      </Campo>
+      <Campo id="iva_pct" etiqueta="IVA incluido en el precio (para facturar)" error={e.iva_pct}>
+        <select id="iva_pct" name="iva_pct" defaultValue={String(producto?.iva_pct ?? 0)} className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm">
+          <option value="0">0 % (excluido / exento)</option>
+          <option value="5">5 %</option>
+          <option value="19">19 %</option>
+        </select>
       </Campo>
       <label className="flex items-center gap-2 text-sm">
         <input

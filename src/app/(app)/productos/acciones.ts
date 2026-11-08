@@ -41,6 +41,7 @@ const CAMPOS_PRODUCTO = [
   "precio_venta",
   "margen_objetivo",
   "stock_minimo",
+  "iva_pct",
 ];
 
 /** Crea (sin `id`) o edita (con `id`) un producto. Sube la foto si viene una. */
@@ -87,6 +88,7 @@ export async function guardarProducto(
     margen_objetivo: r.data.margen_objetivo === undefined ? null : numericoBd(paraBd(r.data.margen_objetivo)),
     stock_minimo: numericoBd(cantidadParaBd(r.data.stock_minimo)),
     maneja_inventario: r.data.maneja_inventario,
+    iva_pct: Number(r.data.iva_pct),
     ...(fotoUrl ? { foto_url: fotoUrl } : {}),
   };
 

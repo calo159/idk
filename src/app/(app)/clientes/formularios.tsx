@@ -12,6 +12,7 @@ export interface ClienteForm {
   documento: string | null;
   telefono: string | null;
   direccion?: string | null;
+  tipo_documento?: string | null;
   fecha_nacimiento: string | null;
   cupo_credito: number;
   acepta_mensajes: boolean;
@@ -46,7 +47,16 @@ export function FormCliente({ cliente, puedeCupo }: { cliente?: ClienteForm; pue
       {campo("nombre", "Nombre", cliente?.nombre)}
       <div className="grid grid-cols-2 gap-3">
         {campo("telefono", "Celular / WhatsApp", cliente?.telefono, { modo: "tel" })}
-        {campo("documento", "Cédula / NIT", cliente?.documento, { modo: "numeric" })}
+        <div className="space-y-1.5">
+          <Label htmlFor="documento">Documento</Label>
+          <div className="flex gap-2">
+            <select name="tipo_documento" aria-label="Tipo de documento" defaultValue={cliente?.tipo_documento ?? "CC"} className="h-11 rounded-lg border border-input bg-background px-2 text-sm">
+              {["CC", "NIT", "CE", "PA", "TI"].map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <Input id="documento" name="documento" inputMode="numeric" defaultValue={cliente?.documento ?? ""} className="h-11 min-w-0 flex-1" />
+          </div>
+          {e.documento ? <p className="text-xs text-destructive">{e.documento}</p> : null}
+        </div>
       </div>
       {campo("direccion", "Dirección / referencia (para las rutas de venta)", cliente?.direccion)}
       <div className="grid grid-cols-2 gap-3">
