@@ -1991,6 +1991,7 @@ export type Database = {
           umbral_ajuste_alerta: number;
           plan: string;
           creado_en: string;
+          dias_credito: number;
         };
         Insert: {
           id?: string;
@@ -2003,6 +2004,7 @@ export type Database = {
           umbral_ajuste_alerta?: number;
           plan?: string;
           creado_en?: string;
+          dias_credito?: number;
         };
         Update: {
           id?: string;
@@ -2015,6 +2017,7 @@ export type Database = {
           umbral_ajuste_alerta?: number;
           plan?: string;
           creado_en?: string;
+          dias_credito?: number;
         };
         Relationships: [];
       };
@@ -2413,6 +2416,48 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "proveedores_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      recordatorios_cobro: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string;
+          nivel: number;
+          saldo: number;
+          enviado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id: string;
+          nivel: number;
+          saldo: number;
+          enviado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string;
+          nivel?: number;
+          saldo?: number;
+          enviado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "recordatorios_cobro_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "recordatorios_cobro_organizacion_id_fkey";
             columns: ["organizacion_id"];
             isOneToOne: false;
             referencedRelation: "organizaciones";
@@ -3112,6 +3157,13 @@ export type Database = {
         };
         Returns: { usuario_id: string; nombre: string; ventas: number; ventas_netas: number; utilidad_neta: number; meta: number; cumplimiento: number; base: string; porcentaje: number; comision: number }[];
       };
+      calcular_cartera: {
+        Args: {
+          p_org: string;
+          p_cliente?: string;
+        };
+        Returns: { cliente_id: string; nombre: string; telefono: string; acepta_mensajes: boolean; saldo: number; cupo: number; vencido: number; dias_mora: number; dias_deuda: number; ultimo_abono: string; puntaje: number; categoria: string }[];
+      };
       calcular_riesgo_turno: {
         Args: {
           p_turno: string;
@@ -3154,6 +3206,12 @@ export type Database = {
           p_lineas: Json;
         };
         Returns: number;
+      };
+      cartera_clientes: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { cliente_id: string; nombre: string; telefono: string; saldo: number; cupo: number; vencido: number; dias_mora: number; dias_deuda: number; ultimo_abono: string; puntaje: number; categoria: string }[];
       };
       cerrar_conteo: {
         Args: {
@@ -3358,6 +3416,12 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: { id: string; nombre: string; telefono_whatsapp: string }[];
       };
+      puntaje_cliente: {
+        Args: {
+          p_cliente: string;
+        };
+        Returns: { puntaje: number; categoria: string; saldo: number; vencido: number; dias_mora: number }[];
+      };
       recibir_orden_compra: {
         Args: {
           p_orden: string;
@@ -3373,6 +3437,10 @@ export type Database = {
           p_limite?: number;
         };
         Returns: { id: number; organizacion_id: string; organizacion: string; telefono_whatsapp: string; tipo: string; payload: Json; intentos: number; creado_en: string }[];
+      };
+      recordatorios_pendientes: {
+        Args: Record<PropertyKey, never>;
+        Returns: { organizacion_id: string; organizacion: string; cliente_id: string; cliente: string; telefono: string; saldo: number; vencido: number; dias_mora: number; nivel: number }[];
       };
       registrar_abono: {
         Args: {
@@ -3477,6 +3545,14 @@ export type Database = {
           p_referencia?: string;
         };
         Returns: string;
+      };
+      registrar_recordatorio: {
+        Args: {
+          p_cliente: string;
+          p_nivel: number;
+          p_saldo: number;
+        };
+        Returns: undefined;
       };
       registrar_seriales: {
         Args: {

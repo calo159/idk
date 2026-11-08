@@ -32,6 +32,8 @@ export default async function Pagina({
   if (t) consulta = consulta.or(`nombre.ilike.%${t}%,telefono.ilike.%${t}%,documento.ilike.%${t}%`);
   if (deuda) consulta = consulta.gt("saldo", 0);
   const { data: clientes } = await consulta;
+  const { data: cartera } = await supabase.rpc("cartera_clientes", { p_org: ctx.organizacionId });
+  const categoria = new Map((cartera ?? []).map((c) => [c.cliente_id, c.categoria]));
   const porCobrar = sumar(...(clientes ?? []).map((c) => c.saldo));
 
   return (
@@ -78,6 +80,7 @@ export default async function Pagina({
                       {c.telefono ? formatoCelular(c.telefono) : "Sin celular"}
                     </p>
                   </div>
+                  {categoria.get(c.id) === "malo" ? <Badge variant="destructive">No fiar más</Badge> : null}
                   {estado === "excedido" ? <Badge variant="destructive">Excede cupo</Badge> : null}
                   {estado === "cerca_del_cupo" ? <Badge variant="secondary">Cerca del cupo</Badge> : null}
                   <span className="text-sm font-medium tabular-nums">

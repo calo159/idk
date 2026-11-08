@@ -7,6 +7,7 @@ import { formatoFechaHora } from "@/lib/fechas";
 import { puede, puedeEscribir } from "@/lib/permisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { cupoDisponible } from "@/lib/validaciones/clientes";
+import { ETIQUETA_CATEGORIA } from "@/lib/cobranza";
 import { zUuid } from "@/lib/validaciones/comunes";
 import { FormAbono, FormCliente } from "../formularios";
 import { SelectorLista } from "../selector-lista";
@@ -18,6 +19,7 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
   const { id } = await params;
   if (!zUuid.safeParse(id).success) notFound();
   const supabase = await crearClienteServidor();
+  const { data: puntaje } = await supabase.rpc("puntaje_cliente", { p_cliente: id });
   const { data: listas } = await supabase.from("listas_precios").select("id, nombre").eq("organizacion_id", ctx.organizacionId).eq("activa", true).order("nombre");
   const [{ data: cliente }, { data: abonos }, { data: fiados }] = await Promise.all([
     supabase.from("clientes").select("*").eq("id", id).eq("organizacion_id", ctx.organizacionId).maybeSingle(),
@@ -55,6 +57,18 @@ export default async function Pagina({ params }: { params: Promise<{ id: string 
           </p>
         </div>
       </div>
+
+      {puntaje?.[0] && Number(cliente.saldo) > 0 ? (
+        <div className={`rounded-xl border p-4 text-sm ${puntaje[0].categoria === "malo" ? "border-destructive/60 bg-destructive/5" : ""}`}>
+          <p className="font-medium">
+            Puntaje de pago: {puntaje[0].puntaje}/100 · {ETIQUETA_CATEGORIA[puntaje[0].categoria] ?? puntaje[0].categoria}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {Number(puntaje[0].vencido) > 0 ? `${formatoCOP(puntaje[0].vencido)} vencido, ${puntaje[0].dias_mora} día(s) de mora.` : "Sin deuda vencida."}
+            {puntaje[0].categoria === "malo" ? " Conviene no fiarle más hasta que se ponga al día." : ""}
+          </p>
+        </div>
+      ) : null}
 
       {(ctx.rol === "dueno" || ctx.rol === "admin") && (listas ?? []).length > 0 ? (
         <SelectorLista clienteId={cliente.id} actual={cliente.lista_precios_id} listas={listas ?? []} />

@@ -76,3 +76,10 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
 - `GET /api/webhooks/resumen?tipo=dia|semana` devuelve por negocio `{destino, mensaje, archivo_pdf}`. La semana es la anterior completa (lun–dom).
 - `GET /api/webhooks/resumen?tipo=semana&pdf=1&organizacion=…` devuelve el PDF de una página.
 - Flujos: `n8n/F2-resumen-diario.json` (8:00 p. m.) y `n8n/F3-reporte-semanal-pdf.json` (lunes 7:00 a. m.).
+
+### F4 — Cobranza ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0022`: deuda vencida por antigüedad (los abonos pagan lo más viejo primero), puntaje de pago 0–100 (bueno ≥ 70,
+  regular 40–69, malo < 40) y recordatorios en 3 niveles (1, 7 y 15 días de mora; `organizaciones.dias_credito`, 30 por defecto).
+- `GET /api/webhooks/cobranza` solo responde de lunes a sábado entre 8 a. m. y 7 p. m. (Bogotá) y respeta a quien no acepta mensajes.
+  `POST` (token + firma HMAC) confirma el envío para no repetirlo. Flujo: `n8n/F4-cobranza.json` (10:00 a. m.).
+- En la app: puntaje en la ficha del cliente, insignia "No fiar más" en la lista y, en el POS, fiar a un mal pagador exige autorización del dueño/admin.

@@ -79,6 +79,15 @@ export async function registrarVenta(
     if (!cli) return fallo("Cliente no encontrado");
     const dentro = puedeFiar(cli.cupo_credito, cli.saldo, aCredito);
     const puedeAutorizar = ctx.rol === "dueno" || ctx.rol === "admin";
+    // Un cliente con mal historial de pago solo recibe fiado con autorización del dueño o un administrador.
+    const { data: pun } = await supabase.rpc("puntaje_cliente", { p_cliente: d.cliente_id });
+    if (pun?.[0]?.categoria === "malo" && !(d.autorizar_exceso_cupo && puedeAutorizar))
+      return fallo(
+        puedeAutorizar
+          ? "Este cliente tiene mal historial de pago (deuda vencida). Puedes autorizar el fiado bajo tu responsabilidad."
+          : "Este cliente tiene mal historial de pago. Pide autorización al dueño o administrador para fiarle.",
+        { cupo: "excedido" },
+      );
     if (!dentro && !(d.autorizar_exceso_cupo && puedeAutorizar))
       return fallo(
         puedeAutorizar
