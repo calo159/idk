@@ -311,6 +311,71 @@ export type Database = {
           },
         ];
       };
+      bot_mensajes: {
+        Row: {
+          mensaje_id: string;
+          organizacion_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          mensaje_id: string;
+          organizacion_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          mensaje_id?: string;
+          organizacion_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bot_mensajes_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bot_pendientes: {
+        Row: {
+          telefono: string;
+          organizacion_id: string;
+          usuario_id: string;
+          accion: Json;
+          expira_en: string;
+        };
+        Insert: {
+          telefono: string;
+          organizacion_id: string;
+          usuario_id: string;
+          accion: Json;
+          expira_en?: string;
+        };
+        Update: {
+          telefono?: string;
+          organizacion_id?: string;
+          usuario_id?: string;
+          accion?: Json;
+          expira_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bot_pendientes_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bot_pendientes_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       categorias: {
         Row: {
           id: string;
@@ -3150,6 +3215,34 @@ export type Database = {
         };
         Returns: undefined;
       };
+      bot_guardar_pendiente: {
+        Args: {
+          p_telefono: string;
+          p_org: string;
+          p_usuario: string;
+          p_accion: Json;
+        };
+        Returns: undefined;
+      };
+      bot_registrar_mensaje: {
+        Args: {
+          p_mensaje: string;
+          p_org: string;
+        };
+        Returns: boolean;
+      };
+      bot_resolver: {
+        Args: {
+          p_telefono: string;
+        };
+        Returns: { organizacion_id: string; organizacion: string; usuario_id: string; nombre: string; rol: Database["public"]["Enums"]["rol_miembro"] }[];
+      };
+      bot_tomar_pendiente: {
+        Args: {
+          p_telefono: string;
+        };
+        Returns: { organizacion_id: string; usuario_id: string; accion: Json }[];
+      };
       calcular_avance_mes: {
         Args: {
           p_org: string;
@@ -3513,6 +3606,17 @@ export type Database = {
           p_soporte?: string;
           p_fecha?: string;
           p_turno?: string;
+        };
+        Returns: string;
+      };
+      registrar_gasto_bot: {
+        Args: {
+          p_org: string;
+          p_usuario: string;
+          p_categoria: string;
+          p_descripcion: string;
+          p_monto: number;
+          p_metodo: Database["public"]["Enums"]["metodo_pago"];
         };
         Returns: string;
       };

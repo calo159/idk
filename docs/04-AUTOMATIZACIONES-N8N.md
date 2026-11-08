@@ -83,3 +83,12 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
 - `GET /api/webhooks/cobranza` solo responde de lunes a sábado entre 8 a. m. y 7 p. m. (Bogotá) y respeta a quien no acepta mensajes.
   `POST` (token + firma HMAC) confirma el envío para no repetirlo. Flujo: `n8n/F4-cobranza.json` (10:00 a. m.).
 - En la app: puntaje en la ficha del cliente, insignia "No fiar más" en la lista y, en el POS, fiar a un mal pagador exige autorización del dueño/admin.
+
+### F5 — Bot del dueño por WhatsApp ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0023`: `bot_resolver` (solo dueño/admin por `miembros.telefono` o el WhatsApp de alertas), `bot_registrar_mensaje`
+  (idempotencia por ID de mensaje), `bot_guardar_pendiente`/`bot_tomar_pendiente` (confirmaciones que vencen a los 10 min) y `registrar_gasto_bot`.
+- `POST /api/webhooks/whatsapp-dueno` (token + firma HMAC): `{telefono, texto, mensaje_id}` → `{respuesta, destino}`.
+  Un número no autorizado recibe `respuesta: null` (el bot no revela que existe).
+- Interpretación: reglas primero (ventas, stock, deudas, gastos con "45 mil", "1,5 millones"…) y la IA (Claude, tool use) solo si las reglas no entienden.
+  La IA no puede confirmar ni cancelar: eso solo lo hacen las palabras exactas del dueño. **Todo gasto pide SÍ/NO antes de guardarse.**
+- Pendiente: el nodo de transcripción de audio (elegir proveedor) y la verificación GET del webhook de Meta.

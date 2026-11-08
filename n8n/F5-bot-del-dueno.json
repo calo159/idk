@@ -1,0 +1,336 @@
+{
+  "name": "F5 - Bot del dueño por WhatsApp (Surtix)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-dueno",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "n1",
+      "name": "Webhook de Meta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-dueno"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrae el primer mensaje entrante del formato de WhatsApp Cloud API.\nconst cambio = $json.body?.entry?.[0]?.changes?.[0]?.value;\nconst m = cambio?.messages?.[0];\nif (!m) return []; // notificaciones de estado (entregado/leído): se ignoran\nreturn [{ json: { telefono: m.from, mensaje_id: m.id, tipo: m.type, texto: m.text?.body ?? '', audio_id: m.audio?.id ?? null } }];"
+      },
+      "id": "n2",
+      "name": "Leer mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.tipo }}",
+              "operation": "equal",
+              "value2": "audio"
+            }
+          ]
+        }
+      },
+      "id": "n3",
+      "name": "¿Es un audio?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v20.0/{{ $json.audio_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        }
+      },
+      "id": "n4",
+      "name": "Obtener URL del audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "n5",
+      "name": "Descargar audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// PENDIENTE DE CONFIGURAR: transcribir el audio con el proveedor que elijas (Whisper, Google Speech, etc.).\n// Debe devolver { texto: '<transcripción>' }. Mientras tanto se responde pidiendo escribir el mensaje.\nconst base = $('Leer mensaje').item.json;\nreturn { json: { ...base, texto: '' } };"
+      },
+      "id": "n6",
+      "name": "Transcribir audio (configurar proveedor)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst base = $json.texto !== undefined ? $json : $('Leer mensaje').item.json;\nconst cuerpo = JSON.stringify({ telefono: base.telefono, mensaje_id: base.mensaje_id, texto: base.texto || '' });\nconst fecha = String(Date.now());\nconst firma = crypto.createHmac('sha256', $env.N8N_WEBHOOK_SECRET).update(`${fecha}.${cuerpo}`).digest('hex');\nreturn { json: { cuerpo, fecha, firma } };"
+      },
+      "id": "n7",
+      "name": "Firmar petición",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/whatsapp-dueno",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}"
+            },
+            {
+              "name": "x-surtix-fecha",
+              "value": "={{ $json.fecha }}"
+            },
+            {
+              "name": "x-surtix-firma",
+              "value": "={{ $json.firma }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.cuerpo }}"
+      },
+      "id": "n8",
+      "name": "Preguntar a Surtix",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.respuesta !== null && $json.respuesta !== undefined }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "n9",
+      "name": "¿Hay respuesta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.destino, type: 'text', text: { body: $json.respuesta } }) }}"
+      },
+      "id": "n10",
+      "name": "Responder por WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2180,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook de Meta": {
+      "main": [
+        [
+          {
+            "node": "Leer mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer mensaje": {
+      "main": [
+        [
+          {
+            "node": "¿Es un audio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es un audio?": {
+      "main": [
+        [
+          {
+            "node": "Obtener URL del audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Firmar petición",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener URL del audio": {
+      "main": [
+        [
+          {
+            "node": "Descargar audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribir audio (configurar proveedor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribir audio (configurar proveedor)": {
+      "main": [
+        [
+          {
+            "node": "Firmar petición",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firmar petición": {
+      "main": [
+        [
+          {
+            "node": "Preguntar a Surtix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preguntar a Surtix": {
+      "main": [
+        [
+          {
+            "node": "¿Hay respuesta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay respuesta?": {
+      "main": [
+        [
+          {
+            "node": "Responder por WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota"
+  },
+  "pinData": {},
+  "meta": {
+    "nota": "Falta: verificación GET del webhook de Meta (hub.challenge) y elegir proveedor de transcripción de audio. Sin probar contra n8n/WhatsApp reales."
+  }
+}

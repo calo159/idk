@@ -47,7 +47,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.1 n8n: outbox con reclamo seguro, API de eventos con token + firma HMAC anti-repetición, flujo F1 de alertas al dueño por WhatsApp (migración 0020). _(Rutas y SQL probados; el flujo JSON no se probó contra n8n ni WhatsApp reales.)_
 - [x] 3.2 Resumen diario (8 p. m.) y reporte semanal en PDF por WhatsApp (migración 0021, flujos F2 y F3). _(SQL, textos y PDF probados; los flujos no se probaron contra n8n ni WhatsApp.)_
 - [x] 3.3 Cobranza: deuda vencida por antigüedad, puntaje de pago, recordatorios de 3 niveles por WhatsApp y bloqueo de fiado a malos pagadores sin autorización (migración 0022, flujo F4). _(SQL y textos probados; flujo no probado contra n8n real.)_
-- [ ] 3.4 Bot de WhatsApp del dueño (consultas y registro de gastos por texto/audio).
+- [x] 3.4 Bot de WhatsApp del dueño: consultas (ventas, stock, deudas) y registro de gastos con confirmación SÍ/NO, solo números de dueño/admin, idempotente por mensaje (migración 0023, flujo F5). _(Lógica y SQL probados; falta transcripción de audio y probar con WhatsApp/n8n reales.)_
 - [ ] 3.5 Pedidos de clientes por WhatsApp → venta en borrador.
 - [ ] 3.6 Predicción de agotamiento y orden de compra sugerida.
 - [ ] 3.7 Calendario de temporadas.
