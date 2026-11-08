@@ -81,6 +81,7 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     await db.query("select registrar_gasto($1,'Transporte','Flete',1000,'efectivo',null,null,$2)", [base.orgId, turno]);
     await db.query("select registrar_movimiento_caja($1,'ingreso',500,'Cambio de la casa')", [turno]);
   });
+  await db.query("insert into recordatorios_cobro (organizacion_id, cliente_id, nivel, saldo) values ($1,$2,1,1000)", [base.orgId, clienteId]);
   // Lista de precios, lote y serial (migración 0019)
   await comoUsuario(db, base.duenoId, async () => {
     const lista = (await db.query<{ id: string }>("select crear_lista_precios($1,'Mayorista') id", [base.orgId])).rows[0]!.id;
