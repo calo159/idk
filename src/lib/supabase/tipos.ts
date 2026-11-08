@@ -3354,6 +3354,10 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string[];
       };
+      organizaciones_para_resumen: {
+        Args: Record<PropertyKey, never>;
+        Returns: { id: string; nombre: string; telefono_whatsapp: string }[];
+      };
       recibir_orden_compra: {
         Args: {
           p_orden: string;
@@ -3560,6 +3564,14 @@ export type Database = {
           p_hasta: string;
         };
         Returns: undefined;
+      };
+      resumen_periodo: {
+        Args: {
+          p_org: string;
+          p_desde: string;
+          p_hasta: string;
+        };
+        Returns: Json;
       };
       riesgo_turno: {
         Args: {

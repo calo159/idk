@@ -70,3 +70,9 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
   `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TOKEN`.
 - El dueño configura su WhatsApp en Configuración. Sin número, los eventos se confirman sin enviarse.
 - Nota: los mensajes iniciados por el negocio fuera de la ventana de 24 h requieren plantilla aprobada por Meta (`n8n/plantillas.md`).
+
+### F2 y F3 — Resumen diario y reporte semanal ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0021`: `resumen_periodo(org, desde, hasta)` (jsonb, neto de devoluciones) y `organizaciones_para_resumen()`, solo `service_role`.
+- `GET /api/webhooks/resumen?tipo=dia|semana` devuelve por negocio `{destino, mensaje, archivo_pdf}`. La semana es la anterior completa (lun–dom).
+- `GET /api/webhooks/resumen?tipo=semana&pdf=1&organizacion=…` devuelve el PDF de una página.
+- Flujos: `n8n/F2-resumen-diario.json` (8:00 p. m.) y `n8n/F3-reporte-semanal-pdf.json` (lunes 7:00 a. m.).
