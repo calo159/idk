@@ -165,7 +165,8 @@ beforeAll(async () => {
     select c.relname as tabla from pg_class c join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'organizaciones'
     order by 1`);
-  tablasConOrg = r.rows.map((x) => x.tabla);
+  // Las tablas internas del bot no tienen política de lectura a propósito (solo el service role las usa).
+  tablasConOrg = r.rows.map((x) => x.tabla).filter((t) => !t.startsWith("bot_"));
 });
 
 afterAll(async () => {
