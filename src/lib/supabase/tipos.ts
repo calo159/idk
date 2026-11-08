@@ -2271,6 +2271,76 @@ export type Database = {
           },
         ];
       };
+      pagos_suscripcion: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          plan: string;
+          meses: number;
+          monto: number;
+          estado: string;
+          proveedor: string;
+          referencia: string;
+          transaccion_id: string | null;
+          respuesta: Json | null;
+          creado_por: string | null;
+          creado_en: string;
+          aprobado_en: string | null;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          plan: string;
+          meses: number;
+          monto: number;
+          estado?: string;
+          proveedor?: string;
+          referencia: string;
+          transaccion_id?: string | null;
+          respuesta?: Json | null;
+          creado_por?: string | null;
+          creado_en?: string;
+          aprobado_en?: string | null;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          plan?: string;
+          meses?: number;
+          monto?: number;
+          estado?: string;
+          proveedor?: string;
+          referencia?: string;
+          transaccion_id?: string | null;
+          respuesta?: Json | null;
+          creado_por?: string | null;
+          creado_en?: string;
+          aprobado_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pagos_suscripcion_creado_por_fkey";
+            columns: ["creado_por"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pagos_suscripcion_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pagos_suscripcion_plan_fkey";
+            columns: ["plan"];
+            isOneToOne: false;
+            referencedRelation: "planes";
+            referencedColumns: ["codigo"];
+          },
+        ];
+      };
       pagos_venta: {
         Row: {
           id: string;
@@ -2392,6 +2462,39 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      planes: {
+        Row: {
+          codigo: string;
+          nombre: string;
+          descripcion: string | null;
+          precio_mensual: number;
+          max_usuarios: number | null;
+          max_bodegas: number | null;
+          orden: number;
+          activo: boolean;
+        };
+        Insert: {
+          codigo: string;
+          nombre: string;
+          descripcion?: string | null;
+          precio_mensual: number;
+          max_usuarios?: number | null;
+          max_bodegas?: number | null;
+          orden?: number;
+          activo?: boolean;
+        };
+        Update: {
+          codigo?: string;
+          nombre?: string;
+          descripcion?: string | null;
+          precio_mensual?: number;
+          max_usuarios?: number | null;
+          max_bodegas?: number | null;
+          orden?: number;
+          activo?: boolean;
+        };
+        Relationships: [];
       };
       precios_lista: {
         Row: {
@@ -3191,6 +3294,54 @@ export type Database = {
           },
         ];
       };
+      suscripciones: {
+        Row: {
+          organizacion_id: string;
+          plan: string;
+          prueba_hasta: string | null;
+          periodo_hasta: string | null;
+          suspendida: boolean;
+          motivo_suspension: string | null;
+          creado_en: string;
+          actualizado_en: string;
+        };
+        Insert: {
+          organizacion_id: string;
+          plan: string;
+          prueba_hasta?: string | null;
+          periodo_hasta?: string | null;
+          suspendida?: boolean;
+          motivo_suspension?: string | null;
+          creado_en?: string;
+          actualizado_en?: string;
+        };
+        Update: {
+          organizacion_id?: string;
+          plan?: string;
+          prueba_hasta?: string | null;
+          periodo_hasta?: string | null;
+          suspendida?: boolean;
+          motivo_suspension?: string | null;
+          creado_en?: string;
+          actualizado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "suscripciones_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: true;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "suscripciones_plan_fkey";
+            columns: ["plan"];
+            isOneToOne: false;
+            referencedRelation: "planes";
+            referencedColumns: ["codigo"];
+          },
+        ];
+      };
       temporadas: {
         Row: {
           id: string;
@@ -3775,6 +3926,16 @@ export type Database = {
         };
         Returns: undefined;
       };
+      aplicar_pago_suscripcion: {
+        Args: {
+          p_referencia: string;
+          p_transaccion_id: string;
+          p_estado: string;
+          p_monto: number;
+          p_respuesta: Json;
+        };
+        Returns: string;
+      };
       aplicar_plantilla_nicho: {
         Args: {
           p_org: string;
@@ -4130,6 +4291,12 @@ export type Database = {
         };
         Returns: string;
       };
+      estado_de_suscripcion: {
+        Args: {
+          s: unknown;
+        };
+        Returns: string;
+      };
       factor_temporada: {
         Args: {
           p_org: string;
@@ -4217,6 +4384,14 @@ export type Database = {
         };
         Returns: string;
       };
+      iniciar_pago_suscripcion: {
+        Args: {
+          p_org: string;
+          p_plan: string;
+          p_meses?: number;
+        };
+        Returns: { referencia: string; monto: number; plan_nombre: string }[];
+      };
       lotes_con_saldo: {
         Args: {
           p_org: string;
@@ -4252,6 +4427,12 @@ export type Database = {
           p_mes: string;
         };
         Returns: { usuario_id: string; nombre: string; ventas: number; ventas_netas: number; utilidad_neta: number; meta: number; cumplimiento: number; base: string; porcentaje: number; comision: number }[];
+      };
+      mi_suscripcion: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { plan: string; plan_nombre: string; estado: string; vigente_hasta: string; dias_restantes: number; precio_mensual: number; max_usuarios: number; max_bodegas: number; usuarios: number; bodegas: number; motivo_suspension: string }[];
       };
       mis_organizaciones: {
         Args: Record<PropertyKey, never>;

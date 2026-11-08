@@ -38,6 +38,8 @@ beforeAll(async () => {
   vendedor = await agregarMiembro(db, n.orgId, "vend@r.co", "vendedor");
   bodeguero = await agregarMiembro(db, n.orgId, "bod@r.co", "bodeguero");
   contador = await agregarMiembro(db, n.orgId, "cont@r.co", "contador");
+  // Estas pruebas invitan a varias personas: con el plan sin tope de usuarios, el límite no estorba (se prueba en suscripcion.db.test.ts).
+  await db.query("update suscripciones set plan = 'crecimiento' where organizacion_id = $1", [n.orgId]);
 });
 
 afterAll(async () => {

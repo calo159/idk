@@ -49,3 +49,12 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - Service worker: `/ventas/ruta` y el POS se guardan solo en su versión genérica (sin pedido ni cotización precargados). `?cliente=` lo lee el navegador.
 - Pendiente: abonos y pedidos de ruta sin internet, y mapa de la ruta.
 
+## D-008 — Suscripciones: estado calculado, Wompi y bloqueo suave
+- El estado (prueba / activa / gracia / vencida / suspendida) **no se guarda**: lo calcula `estado_de_suscripcion` a partir de `prueba_hasta`, `periodo_hasta` y `suspendida`. Así no hay un cron que pueda fallar.
+- Un pago aprobado extiende desde donde termina lo que ya tenía (prueba o pago anterior): pagar temprano no hace perder días.
+- `aplicar_pago_suscripcion` es idempotente por referencia y exige que el monto aprobado coincida con el esperado; si no, el pago queda «en revisión» y no activa nada.
+- Si falla la consulta de la suscripción, la app **no bloquea** (falla abierta): un error nuestro no puede dejar a un negocio sin caja.
+- Vencida o suspendida bloquea solo las pantallas del grupo `(app)`; `/suscripcion` está fuera para poder pagar. Los datos no se tocan.
+- Los límites de plan (usuarios, bodegas) son triggers de base de datos: ninguna pantalla puede saltárselos.
+- Pendiente para producción: llaves de Wompi, URL del webhook en su panel, definir precios reales, factura al suscriptor.
+

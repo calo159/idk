@@ -114,6 +114,9 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
   await comoUsuario(db, base.duenoId, async () => {
     await db.query("select metricas_salud($1)", [base.orgId]);
   });
+  await comoUsuario(db, base.duenoId, async () => {
+    await db.query("select * from iniciar_pago_suscripcion($1,'negocio',1)", [base.orgId]);
+  });
   await db.query("update organizaciones set fidelizacion_activa=true where id=$1", [base.orgId]);
   await db.query("insert into puntos_movimientos (organizacion_id, cliente_id, puntos, motivo) values ($1,$2,5,'cumpleanos')", [base.orgId, clienteId]);
   await db.query("insert into contactos_fidelizacion (organizacion_id, cliente_id, tipo) values ($1,$2,'cumpleanos')", [base.orgId, clienteId]);
@@ -181,7 +184,7 @@ beforeAll(async () => {
   B = await sembrar("Ferretería B", "b.co");
   const r = await db.query<{ tabla: string }>(`
     select c.relname as tabla from pg_class c join pg_namespace n on n.oid = c.relnamespace
-    where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'organizaciones'
+    where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes') -- planes: catálogo global de precios
     order by 1`);
   // Las tablas internas del bot no tienen política de lectura a propósito (solo el service role las usa).
   tablasConOrg = r.rows.map((x) => x.tabla).filter((t) => !t.startsWith("bot_"));

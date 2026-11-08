@@ -25,11 +25,11 @@ describe("migraciones", () => {
     expect(r.rows.map((x) => x.tabla)).toEqual([]);
   });
 
-  it("toda tabla de negocio (salvo organizaciones) tiene organizacion_id", async () => {
+  it("toda tabla de negocio (salvo organizaciones y catálogos globales) tiene organizacion_id", async () => {
     const r = await db.query<{ tabla: string }>(`
       select c.relname as tabla
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
-      where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'organizaciones'
+      where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('organizaciones', 'planes') -- planes: catálogo de precios global
         and not exists (select 1 from pg_attribute a
                          where a.attrelid = c.oid and a.attname = 'organizacion_id' and not a.attisdropped)
     `);

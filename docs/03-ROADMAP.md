@@ -60,7 +60,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.14 Puntaje de salud del negocio (0–100): margen 30 %, rotación 25 %, cartera 25 %, pérdidas 20 % de los últimos 30 días, con consejo y enlace por componente, tendencia frente a hace un mes (foto diaria) y tarjeta en el Inicio (migración 0032). _(Medidas y puntaje probados; las metas —30 % de margen, 30 días de inventario, etc.— son un punto de partida a validar con negocios reales. Pantalla sin ejecutar contra Supabase real.)_
 
 ## Fase 4 — Negocio y escala
-- [ ] 4.1 Planes y cobro de suscripción (Wompi o Mercado Pago), periodo de prueba.
+- [x] 4.1 Planes y cobro de suscripción con Wompi: 3 planes con límites de usuarios y bodegas (los hace cumplir la base de datos), prueba gratis de 14 días, gracia de 5 días, pago por 1/3/6/12 meses, webhook firmado e idempotente, bloqueo solo de las pantallas (nunca se borran datos) y pantalla «Plan y pagos» (migración 0033). _(SQL, firmas y webhook probados; NO probado contra el sandbox de Wompi: hacen falta las llaves WOMPI_* y un comercio de prueba. Los precios de los planes son provisionales y se editan en la tabla `planes`. Mercado Pago no se implementó.)_
 - [ ] 4.2 Panel de super-admin (clientes, uso, soporte).
 - [ ] 4.3 Facturación electrónica DIAN vía proveedor externo.
 - [ ] 4.4 Programa de referidos.

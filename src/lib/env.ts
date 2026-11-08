@@ -37,6 +37,10 @@ const esquemaServidor = z.object({
   ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-5-5"),
   N8N_WEBHOOK_SECRET: z.string().min(16).optional(),
   SURTIX_API_TOKEN: z.string().min(16).optional(),
+  // Cobro de suscripciones con Wompi (llaves del panel de Wompi; las de prueba empiezan por pub_test_ / test_).
+  WOMPI_PUBLIC_KEY: z.string().min(1).optional(),
+  WOMPI_INTEGRITY_SECRET: z.string().min(1).optional(),
+  WOMPI_EVENTS_SECRET: z.string().min(1).optional(),
 });
 
 export type EntornoServidor = z.infer<typeof esquemaServidor>;
@@ -48,6 +52,9 @@ export function entornoServidor(): EntornoServidor {
     ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || undefined,
     N8N_WEBHOOK_SECRET: process.env.N8N_WEBHOOK_SECRET || undefined,
     SURTIX_API_TOKEN: process.env.SURTIX_API_TOKEN || undefined,
+    WOMPI_PUBLIC_KEY: process.env.WOMPI_PUBLIC_KEY || undefined,
+    WOMPI_INTEGRITY_SECRET: process.env.WOMPI_INTEGRITY_SECRET || undefined,
+    WOMPI_EVENTS_SECRET: process.env.WOMPI_EVENTS_SECRET || undefined,
   });
 }
 
