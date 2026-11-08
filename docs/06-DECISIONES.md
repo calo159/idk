@@ -76,3 +76,11 @@ Registro corto de decisiones que no están en `02-ARQUITECTURA.md`. Una entrada 
 - Supuestos a validar con un contador: precios con IVA incluido, tope de consumidor final = 5 UVT (valor configurable, actualizar cada año), IVA solo 0/5/19 %
   (sin impoconsumo ni retenciones), y nota crédito pendiente.
 
+## D-011 — Benchmark: consentimiento primero y agregados mínimos
+- Participar es voluntario y recíproco: solo ve la comparación quien comparte sus propias cifras, y dejar de compartir lo saca del grupo al instante.
+- Se comparten razones (porcentajes/promedios), nunca pesos totales: con razones no se puede deducir el tamaño de un negocio.
+- Mínimo 6 negocios en el grupo (sin contar al que consulta) y solo percentiles; la función no devuelve ids ni nombres. Con grupos pequeños los percentiles se acercan a valores individuales,
+  por eso el umbral es conservador; subirlo (p. ej. a 10) es cambiar un número en la migración.
+- La fuente son las fotos de `salud_historial`, que se guardan cuando el dueño abre la salud del negocio o el inicio. Un negocio que no entra a la app no aparece (y no distorsiona).
+- Pendiente: filtrar por ciudad cuando haya volumen, y tratar con asesoría legal el texto de consentimiento (Ley 1581 de 2012).
+

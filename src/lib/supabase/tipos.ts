@@ -2366,6 +2366,7 @@ export type Database = {
           catalogo_telefono: string | null;
           catalogo_mensaje: string | null;
           codigo_referido: string | null;
+          compartir_benchmark: boolean;
         };
         Insert: {
           id?: string;
@@ -2390,6 +2391,7 @@ export type Database = {
           catalogo_telefono?: string | null;
           catalogo_mensaje?: string | null;
           codigo_referido?: string | null;
+          compartir_benchmark?: boolean;
         };
         Update: {
           id?: string;
@@ -2414,6 +2416,7 @@ export type Database = {
           catalogo_telefono?: string | null;
           catalogo_mensaje?: string | null;
           codigo_referido?: string | null;
+          compartir_benchmark?: boolean;
         };
         Relationships: [];
       };
@@ -4294,6 +4297,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      benchmark_nicho: {
+        Args: {
+          p_org: string;
+        };
+        Returns: Json;
+      };
       bot_guardar_pendiente: {
         Args: {
           p_telefono: string;
@@ -4467,6 +4476,13 @@ export type Database = {
           p_producto: string;
         };
         Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
+      };
+      configurar_benchmark: {
+        Args: {
+          p_org: string;
+          p_compartir: boolean;
+        };
+        Returns: undefined;
       };
       configurar_catalogo: {
         Args: {
@@ -4865,6 +4881,12 @@ export type Database = {
           p_cliente: string;
         };
         Returns: { puntaje: number; categoria: string; saldo: number; vencido: number; dias_mora: number }[];
+      };
+      razones_de_metricas: {
+        Args: {
+          m: Json;
+        };
+        Returns: Json;
       };
       recibir_orden_compra: {
         Args: {
