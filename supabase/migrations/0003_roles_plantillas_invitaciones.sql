@@ -207,7 +207,7 @@ create table invitaciones (
   correo text not null,
   rol rol_miembro not null check (rol <> 'dueno'),
   nombre text,
-  token text not null unique default encode(gen_random_bytes(24), 'hex'),
+  token text not null unique default replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', ''),
   creado_por uuid references auth.users(id),
   expira_en timestamptz not null default now() + interval '7 days',
   aceptada_en timestamptz,
