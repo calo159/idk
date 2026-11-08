@@ -7,6 +7,8 @@ import { formatoDiaLargo, haceCuanto, hoyBogota, sumarDias } from "@/lib/fechas"
 import { estadoStock } from "@/lib/inventario";
 import { variacionPorcentual } from "@/lib/reportes";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
+import { ETIQUETA_NIVEL } from "@/lib/salud";
+import { cargarSalud } from "@/server/salud";
 import { ListaAlertas } from "./alertas";
 
 export const metadata: Metadata = { title: "Inicio" };
@@ -79,6 +81,7 @@ export default async function Pagina() {
         .limit(8),
     ]);
 
+  const salud = await cargarSalud(supabase, ctx.organizacionId);
   const serie = dias ?? [];
   const delDia = serie.find((d) => d.dia === hoy);
   const ayer = serie.find((d) => d.dia === sumarDias(hoy, -1));
@@ -114,6 +117,15 @@ export default async function Pagina() {
           href="/inventario?filtro=bajo"
         />
       </div>
+
+      {salud && salud.salud.puntaje !== null ? (
+        <Tarjeta
+          titulo="Salud del negocio"
+          valor={`${salud.salud.puntaje}/100 · ${ETIQUETA_NIVEL[salud.salud.nivel!]}`}
+          nota={salud.cambio === null || salud.cambio === 0 ? "Margen, rotación, cartera y pérdidas" : `${salud.cambio > 0 ? "▲" : "▼"} ${Math.abs(salud.cambio)} punto(s) en el último mes`}
+          href="/reportes/salud"
+        />
+      ) : null}
 
       <Link href="/asistente" className="flex items-center gap-3 rounded-xl border p-4 hover:bg-muted/50">
         <span className="text-2xl" aria-hidden>💬</span>

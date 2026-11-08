@@ -2935,6 +2935,38 @@ export type Database = {
           },
         ];
       };
+      salud_historial: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          fecha: string;
+          metricas: Json;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          fecha: string;
+          metricas: Json;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          fecha?: string;
+          metricas?: Json;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "salud_historial_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       separados: {
         Row: {
           id: string;
@@ -3814,6 +3846,13 @@ export type Database = {
         };
         Returns: { cliente_id: string; nombre: string; telefono: string; tipo: string; dato: number; puntos: number }[];
       };
+      calcular_metricas_salud: {
+        Args: {
+          p_org: string;
+          p_hasta: string;
+        };
+        Returns: Json;
+      };
       calcular_precios_sugeridos: {
         Args: {
           p_org: string;
@@ -4200,6 +4239,12 @@ export type Database = {
           p_estado: Database["public"]["Enums"]["estado_verificacion"];
         };
         Returns: undefined;
+      };
+      metricas_salud: {
+        Args: {
+          p_org: string;
+        };
+        Returns: Json;
       };
       mi_avance_mes: {
         Args: {
