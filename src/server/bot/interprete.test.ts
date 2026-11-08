@@ -31,6 +31,8 @@ describe("interpretarReglas", () => {
   it("stock", () => {
     expect(interpretarReglas("stock de cemento gris")).toEqual({ tipo: "stock", producto: "cemento gris" });
     expect(interpretarReglas("cuántos martillos hay")).toEqual({ tipo: "stock", producto: "martillos" });
+    expect(interpretarReglas("¿Cuántas quedan de cemento?")).toEqual({ tipo: "stock", producto: "cemento" });
+    expect(interpretarReglas("cuántos hay de martillo")).toEqual({ tipo: "stock", producto: "martillo" });
   });
   it("gastos: monto, categoría, método y descripción", () => {
     expect(interpretarReglas("gasté 45 mil en flete de cemento")).toMatchObject({ tipo: "gasto", monto: 45000, categoria: "Transporte y fletes", metodo: "efectivo" });

@@ -114,6 +114,14 @@ export default async function Pagina() {
         />
       </div>
 
+      <Link href="/asistente" className="flex items-center gap-3 rounded-xl border p-4 hover:bg-muted/50">
+        <span className="text-2xl" aria-hidden>💬</span>
+        <span>
+          <span className="block font-medium">Pregúntale a tu negocio</span>
+          <span className="text-sm text-muted-foreground">«¿Cuál fue mi producto más rentable este mes?»</span>
+        </span>
+      </Link>
+
       <div className="rounded-xl border p-4">
         <GraficoBarras
           titulo="Ventas de los últimos 7 días"

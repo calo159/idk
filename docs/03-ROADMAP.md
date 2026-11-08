@@ -55,7 +55,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.9 Promociones de plata dormida con imagen generada. (Sugerencias con descuento escalonado que nunca baja del costo; el POS cobra el precio promocional y no lo audita como cambio de precio; afiche 1080×1080 en canvas + texto para WhatsApp. Sin verificar visualmente en un navegador real.)
 - [x] 3.10 Fidelización por celular (puntos, canje en el POS), cumpleaños con puntos de regalo y clientes inactivos (migración 0029, flujo F8). _(SQL, rutas y textos probados; canje en el POS y pantalla sin ejecutar contra Supabase real; flujo no probado contra n8n/WhatsApp reales.)_
 - [x] 3.11 Catálogo web público (/catalogo/<dirección>): productos y precios con ofertas vigentes, disponibilidad sin cantidades, el cliente arma su lista y la envía por WhatsApp (lo entiende el flujo F6); el dueño lo activa, elige la dirección y oculta productos (migración 0030). _(SQL, textos y lector de pedidos probados; páginas sin ejecutar contra Supabase real. Sin fotos ni cantidades decimales todavía.)_
-- [ ] 3.12 Asistente en lenguaje natural dentro de la app.
+- [x] 3.12 Asistente en lenguaje natural dentro de la app (/asistente, `POST /api/ia/consulta`): Claude con tool use sobre 7 consultas de solo lectura que corren con la sesión del usuario (RLS y roles), tope de vueltas y de tamaño, límite de 20 preguntas/10 min por usuario y respaldo por reglas sin clave de IA. _(Lógica probada con modelo simulado; falta probar con ANTHROPIC_API_KEY real. Solo dueño, admin y contador.)_
 - [ ] 3.13 App de venta en ruta.
 - [ ] 3.14 Puntaje de salud del negocio.
 

@@ -93,7 +93,7 @@ export function interpretarReglas(textoCrudo: string): Intencion {
   if (debe?.[debe.length - 1]) return { tipo: "deuda", cliente: debe[debe.length - 1]!.trim().slice(0, 80) };
 
   // Stock: "cuánto cemento hay", "stock de martillo", "inventario de alambre"
-  const stock = /(?:stock|inventario|existencias?) (?:de |del |de la )?(.+)$/.exec(t) ?? /cuant[oa]s? (.+?) (?:hay|me quedan|quedan|tengo|tenemos)$/.exec(t);
+  const stock = /(?:stock|inventario|existencias?) (?:de |del |de la )?(.+)$/.exec(t) ?? /cuant[oa]s? (.+?) (?:hay|me quedan|quedan|tengo|tenemos)$/.exec(t) ?? /cuant[oa]s? (?:hay|me quedan|quedan|tengo|tenemos) (?:de |del |de la )(.+)$/.exec(t);
   if (stock?.[1] && stock[1].length >= 2) return { tipo: "stock", producto: stock[1].trim().slice(0, 80) };
 
   return { tipo: "no_entendido" };
