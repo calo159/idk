@@ -101,3 +101,10 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
 - Panel: Ventas → Pedidos WhatsApp → «Preparar venta» abre el POS con el carrito lleno (precios actuales y lista del cliente). Al cobrar, el pedido
   pasa a confirmado y el cliente recibe el total (`pedido.confirmado` por F1). «Rechazar» avisa con el motivo.
 - Flujo: `n8n/F6-pedidos-clientes.json`. Pendiente: verificación GET del webhook de Meta.
+
+### F7 — Reposición sugerida ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0025`: ritmo de venta = 60 % últimos 14 días + 40 % últimos 60; días restantes = stock / ritmo; compra sugerida para cubrir
+  `cobertura + entrega` días y siempre hasta el stock mínimo. Proveedor sugerido = el del último precio más barato. Crítico = se acaba antes de que llegue el pedido.
+- App: Compras → Sugerencias (elige productos/proveedor/cantidad y crea **una orden de compra en borrador por proveedor**; no mueve inventario).
+- `GET /api/webhooks/reposicion` + `n8n/F7-reposicion-sugerida.json` (lunes 7:00 a. m.) avisan al dueño.
+- **Diferencia con el diseño original:** el pedido al proveedor por WhatsApp y el «responde SÍ para crear la orden» no están: la orden se crea en la app.

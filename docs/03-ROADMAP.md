@@ -49,7 +49,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 3.3 Cobranza: deuda vencida por antigüedad, puntaje de pago, recordatorios de 3 niveles por WhatsApp y bloqueo de fiado a malos pagadores sin autorización (migración 0022, flujo F4). _(SQL y textos probados; flujo no probado contra n8n real.)_
 - [x] 3.4 Bot de WhatsApp del dueño: consultas (ventas, stock, deudas) y registro de gastos con confirmación SÍ/NO, solo números de dueño/admin, idempotente por mensaje (migración 0023, flujo F5). _(Lógica y SQL probados; falta transcripción de audio y probar con WhatsApp/n8n reales.)_
 - [x] 3.5 Pedidos de clientes por WhatsApp: extracción (reglas + IA de respaldo), emparejado con el catálogo (ambiguos para una persona), pedido pendiente, venta desde el POS y aviso al cliente con el total (migración 0024, flujo F6). _(Lógica y SQL probados; falta probar con n8n/WhatsApp reales.)_
-- [ ] 3.6 Predicción de agotamiento y orden de compra sugerida.
+- [x] 3.6 Predicción de agotamiento y compra sugerida (ritmo mezclado 14/60 días, cobertura + entrega, proveedor más barato), órdenes de compra en borrador desde la app y aviso semanal (migración 0025, flujo F7). _(SQL y textos probados; flujo no probado contra n8n real. No crea la orden respondiendo SÍ por WhatsApp.)_
 - [ ] 3.7 Calendario de temporadas.
 - [ ] 3.8 Precios automáticos y simulador.
 - [ ] 3.9 Promociones de plata dormida con imagen generada.

@@ -3333,6 +3333,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      calcular_sugerencia: {
+        Args: {
+          p_org: string;
+          p_cobertura?: number;
+          p_entrega?: number;
+        };
+        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number }[];
+      };
       cambiar_estado_cotizacion: {
         Args: {
           p_cot: string;
@@ -3832,6 +3840,10 @@ export type Database = {
         };
         Returns: undefined;
       };
+      reposicion_para_resumen: {
+        Args: Record<PropertyKey, never>;
+        Returns: { organizacion_id: string; organizacion: string; telefono_whatsapp: string; criticos: number; total: number; valor: number; top: Json }[];
+      };
       resolver_pedido_whatsapp: {
         Args: {
           p_pedido: string;
@@ -3879,6 +3891,14 @@ export type Database = {
           p_org: string;
         };
         Returns: { producto_id: string; bodega_id: string; reservado: number }[];
+      };
+      sugerencia_compras: {
+        Args: {
+          p_org: string;
+          p_cobertura?: number;
+          p_entrega?: number;
+        };
+        Returns: { producto_id: string; producto: string; unidad: string; stock: number; stock_minimo: number; venta_diaria: number; dias_restantes: number; sugerida: number; urgencia: string; proveedor_id: string; proveedor: string; costo_estimado: number; valor_estimado: number }[];
       };
       tiene_rol: {
         Args: {

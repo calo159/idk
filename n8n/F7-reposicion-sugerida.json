@@ -1,0 +1,130 @@
+{
+  "name": "F7 - Reposición sugerida semanal (Surtix)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Lunes 7 a. m.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/reposicion",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}"
+            }
+          ]
+        }
+      },
+      "id": "n2",
+      "name": "Pedir sugerencias",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "sugerencias",
+        "options": {}
+      },
+      "id": "n3",
+      "name": "Un ítem por negocio",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.destino, type: 'text', text: { body: $json.mensaje } }) }}"
+      },
+      "id": "n4",
+      "name": "Enviar al dueño",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Lunes 7 a. m.": {
+      "main": [
+        [
+          {
+            "node": "Pedir sugerencias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir sugerencias": {
+      "main": [
+        [
+          {
+            "node": "Un ítem por negocio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Un ítem por negocio": {
+      "main": [
+        [
+          {
+            "node": "Enviar al dueño",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota"
+  },
+  "pinData": {},
+  "meta": {
+    "nota": "Las órdenes de compra se crean desde la app (Compras → Sugerencias). Crearlas respondiendo SÍ por WhatsApp queda para más adelante. Sin probar contra n8n/WhatsApp reales."
+  }
+}
