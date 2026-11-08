@@ -24,6 +24,8 @@ export const esquemaVenta = z.object({
   bodega_id: zUuid,
   cliente_id: zUuid.nullish().transform((v) => v ?? null),
   descuento: zMonto.default(0),
+  /** Puntos de fidelización canjeados en esta venta (su valor ya va dentro de `descuento`). */
+  puntos_canje: z.number().int().min(0).max(1_000_000).default(0),
   lineas: z.array(esquemaLineaVenta).min(1, "Agrega al menos un producto").max(200),
   pagos: z.array(esquemaPagoVenta).min(1, "Registra el pago").max(10),
   /**

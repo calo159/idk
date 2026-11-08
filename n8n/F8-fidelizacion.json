@@ -1,0 +1,204 @@
+{
+  "name": "F8 - Fidelización (Surtix)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-6"
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Lunes a sábado 9 a. m.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/fidelizacion",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}"
+            }
+          ]
+        }
+      },
+      "id": "n2",
+      "name": "Pedir contactos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "contactos",
+        "options": {}
+      },
+      "id": "n3",
+      "name": "Un ítem por contacto",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.destino, type: 'text', text: { body: $json.mensaje } }) }}"
+      },
+      "id": "n4",
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst r = $('Un ítem por contacto').item.json;\nconst cuerpo = JSON.stringify({ cliente_id: r.cliente_id, tipo: r.tipo });\nconst fecha = String(Date.now());\nconst firma = crypto.createHmac('sha256', $env.N8N_WEBHOOK_SECRET).update(`${fecha}.${cuerpo}`).digest('hex');\nreturn { json: { cuerpo, fecha, firma } };"
+      },
+      "id": "n5",
+      "name": "Firmar confirmación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/fidelizacion",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}"
+            },
+            {
+              "name": "x-surtix-fecha",
+              "value": "={{ $json.fecha }}"
+            },
+            {
+              "name": "x-surtix-firma",
+              "value": "={{ $json.firma }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.cuerpo }}"
+      },
+      "id": "n6",
+      "name": "Confirmar a Surtix",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Lunes a sábado 9 a. m.": {
+      "main": [
+        [
+          {
+            "node": "Pedir contactos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir contactos": {
+      "main": [
+        [
+          {
+            "node": "Un ítem por contacto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Un ítem por contacto": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Firmar confirmación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firmar confirmación": {
+      "main": [
+        [
+          {
+            "node": "Confirmar a Surtix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota"
+  },
+  "pinData": {},
+  "meta": {
+    "nota": "Saluda cumpleaños y reactiva clientes inactivos. Solo confirma a Surtix si WhatsApp aceptó el mensaje; la confirmación entrega el bono de cumpleaños. Fuera de las 24 h de conversación WhatsApp exige plantilla aprobada (ver plantillas.md). Sin probar contra n8n real."
+  }
+}

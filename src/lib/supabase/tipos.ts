@@ -742,6 +742,45 @@ export type Database = {
           },
         ];
       };
+      contactos_fidelizacion: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string;
+          tipo: string;
+          enviado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id: string;
+          tipo: string;
+          enviado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string;
+          tipo?: string;
+          enviado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "contactos_fidelizacion_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contactos_fidelizacion_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       conteos: {
         Row: {
           id: string;
@@ -2114,6 +2153,10 @@ export type Database = {
           dias_credito: number;
           whatsapp_phone_number_id: string | null;
           precios_automaticos: boolean;
+          fidelizacion_activa: boolean;
+          pesos_por_punto: number;
+          valor_punto: number;
+          puntos_cumpleanos: number;
         };
         Insert: {
           id?: string;
@@ -2129,6 +2172,10 @@ export type Database = {
           dias_credito?: number;
           whatsapp_phone_number_id?: string | null;
           precios_automaticos?: boolean;
+          fidelizacion_activa?: boolean;
+          pesos_por_punto?: number;
+          valor_punto?: number;
+          puntos_cumpleanos?: number;
         };
         Update: {
           id?: string;
@@ -2144,6 +2191,10 @@ export type Database = {
           dias_credito?: number;
           whatsapp_phone_number_id?: string | null;
           precios_automaticos?: boolean;
+          fidelizacion_activa?: boolean;
+          pesos_por_punto?: number;
+          valor_punto?: number;
+          puntos_cumpleanos?: number;
         };
         Relationships: [];
       };
@@ -2709,6 +2760,68 @@ export type Database = {
             columns: ["organizacion_id"];
             isOneToOne: false;
             referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      puntos_movimientos: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          cliente_id: string;
+          puntos: number;
+          motivo: string;
+          venta_id: string | null;
+          usuario_id: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          cliente_id: string;
+          puntos: number;
+          motivo: string;
+          venta_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          cliente_id?: string;
+          puntos?: number;
+          motivo?: string;
+          venta_id?: string | null;
+          usuario_id?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "puntos_movimientos_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "puntos_movimientos_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "puntos_movimientos_usuario_id_fkey";
+            columns: ["usuario_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "puntos_movimientos_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
             referencedColumns: ["id"];
           },
         ];
@@ -3560,6 +3673,13 @@ export type Database = {
         };
         Returns: { cliente_id: string; nombre: string; telefono: string; acepta_mensajes: boolean; saldo: number; cupo: number; vencido: number; dias_mora: number; dias_deuda: number; ultimo_abono: string; puntaje: number; categoria: string }[];
       };
+      calcular_contactos_fidelizacion: {
+        Args: {
+          p_org: string;
+          p_dias_inactivo?: number;
+        };
+        Returns: { cliente_id: string; nombre: string; telefono: string; tipo: string; dato: number; puntos: number }[];
+      };
       calcular_precios_sugeridos: {
         Args: {
           p_org: string;
@@ -3609,6 +3729,21 @@ export type Database = {
         };
         Returns: undefined;
       };
+      canjear_puntos: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_puntos: number;
+        };
+        Returns: number;
+      };
+      canjear_puntos_venta: {
+        Args: {
+          p_venta: string;
+          p_puntos: number;
+        };
+        Returns: boolean;
+      };
       cargar_inventario_inicial: {
         Args: {
           p_org: string;
@@ -3650,6 +3785,16 @@ export type Database = {
           p_producto: string;
         };
         Returns: { proveedor_id: string; proveedor: string; ultimo_costo: number; fecha: string; compras: number; costo_minimo: number; costo_maximo: number; diferencia_vs_mejor: number; pct_vs_mejor: number }[];
+      };
+      configurar_fidelizacion: {
+        Args: {
+          p_org: string;
+          p_activa: boolean;
+          p_pesos_por_punto: number;
+          p_valor_punto: number;
+          p_puntos_cumple: number;
+        };
+        Returns: undefined;
       };
       configurar_precios_automaticos: {
         Args: {
@@ -3799,6 +3944,16 @@ export type Database = {
         };
         Returns: number;
       };
+      fidelizacion_para_n8n: {
+        Args: Record<PropertyKey, never>;
+        Returns: { organizacion_id: string; organizacion: string; cliente_id: string; cliente: string; telefono: string; tipo: string; dato: number; puntos: number; puntos_bono: number; valor_punto: number }[];
+      };
+      fidelizacion_pendiente: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { cliente_id: string; nombre: string; telefono: string; tipo: string; dato: number; puntos: number }[];
+      };
       fijar_comision: {
         Args: {
           p_org: string;
@@ -3865,6 +4020,14 @@ export type Database = {
           p_bodega?: string;
         };
         Returns: { lote_id: string; producto_id: string; producto: string; bodega_id: string; codigo: string; vence: string; cantidad_recibida: number; saldo: number; dias_para_vencer: number }[];
+      };
+      marcar_contacto_fidelizacion: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_tipo: string;
+        };
+        Returns: undefined;
       };
       marcar_verificacion_pago: {
         Args: {
@@ -3951,6 +4114,21 @@ export type Database = {
         Args: {
           p_venta: string;
           p_cambios: Json;
+        };
+        Returns: undefined;
+      };
+      registrar_contacto_fidelizacion: {
+        Args: {
+          p_cliente: string;
+          p_tipo: string;
+        };
+        Returns: undefined;
+      };
+      registrar_contacto_fidelizacion_interno: {
+        Args: {
+          p_org: string;
+          p_cliente: string;
+          p_tipo: string;
         };
         Returns: undefined;
       };
@@ -4198,6 +4376,18 @@ export type Database = {
           tabla: string;
         };
         Returns: Database["public"]["Enums"]["rol_miembro"][];
+      };
+      saldo_puntos: {
+        Args: {
+          p_cliente: string;
+        };
+        Returns: number;
+      };
+      saldos_puntos: {
+        Args: {
+          p_org: string;
+        };
+        Returns: { cliente_id: string; puntos: number }[];
       };
       signo_movimiento: {
         Args: {

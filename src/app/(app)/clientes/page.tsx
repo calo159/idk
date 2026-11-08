@@ -40,6 +40,9 @@ export default async function Pagina({
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Clientes</h1>
+        <Link href="/clientes/fidelizacion" className={cn(buttonVariants({ variant: "outline" }), "ml-auto h-10")}>
+          Fidelización
+        </Link>
         {puedeEscribir(ctx.rol, "clientes") ? (
           <Link href="/clientes/nuevo" className={cn(buttonVariants(), "h-10")}>
             <Plus className="size-4" aria-hidden /> Nuevo

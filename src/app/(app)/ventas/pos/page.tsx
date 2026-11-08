@@ -137,6 +137,12 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
     }
   }
 
+  // Fidelización: puntos de cada cliente y cuánto vale cada punto (0 si el negocio no la usa).
+  const { data: org } = await supabase.from("organizaciones").select("fidelizacion_activa, valor_punto").eq("id", ctx.organizacionId).single();
+  const valorPunto = org?.fidelizacion_activa ? Number(org.valor_punto) : 0;
+  const { data: saldosPuntos } = valorPunto > 0 ? await supabase.rpc("saldos_puntos", { p_org: ctx.organizacionId }) : { data: [] };
+  const puntos = new Map((saldosPuntos ?? []).map((x) => [x.cliente_id, x.puntos]));
+
   return (
     <PuntoDeVenta
       pedidoId={pedidoId}
@@ -150,7 +156,9 @@ export default async function Pagina({ searchParams }: { searchParams: Promise<{
         cupo: Number(c.cupo_credito),
         saldo: Number(c.saldo),
         listaId: c.lista_precios_id,
+        puntos: puntos.get(c.id) ?? 0,
       }))}
+      valorPunto={valorPunto}
       listasPrecios={listas}
       puedeAutorizarExceso={ctx.rol === "dueno" || ctx.rol === "admin"}
     />

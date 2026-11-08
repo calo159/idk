@@ -31,6 +31,8 @@ export interface ClientePOS {
   cupo: number;
   saldo: number;
   listaId?: string | null;
+  /** Puntos de fidelización disponibles. */
+  puntos?: number;
 }
 
 type Metodo = "efectivo" | "nequi" | "daviplata" | "transferencia" | "tarjeta" | "credito";
@@ -69,7 +71,10 @@ export function PuntoDeVenta({
   cotizacionInicial = null,
   pedidoId = null,
   listasPrecios = {},
+  valorPunto = 0,
 }: {
+  /** Pesos que vale cada punto (0 = fidelización apagada). */
+  valorPunto?: number;
   listasPrecios?: Record<string, Record<string, number>>;
   pedidoId?: string | null;
   cotizacionInicial?: {
@@ -99,6 +104,7 @@ export function PuntoDeVenta({
   });
   const [clienteId, setClienteId] = useState(cotizacionInicial?.clienteId ?? "");
   const [descuento, setDescuento] = useState("");
+  const [canjeTxt, setCanjeTxt] = useState("");
   const [errorCobro, setErrorCobro] = useState<string | null>(null);
   const [excesoPendiente, setExcesoPendiente] = useState(false);
   const [recibo, setRecibo] = useState<Recibo | null>(null);
@@ -111,10 +117,15 @@ export function PuntoDeVenta({
   const campoBusqueda = useRef<HTMLInputElement>(null);
 
   const dto = leerNumeroCO(descuento)?.toNumber() ?? 0;
-  const total = totalVenta(carrito.map((l) => ({ cantidad: l.cantidad, precio_unitario: l.precio, descuento: l.descuento })), dto);
+  const lineasTotal = carrito.map((l) => ({ cantidad: l.cantidad, precio_unitario: l.precio, descuento: l.descuento }));
+  const cliente = clientes.find((c) => c.id === clienteId) ?? null;
+  // Canje de puntos: no más de los que tiene ni de lo que falta por pagar.
+  const maxCanje = valorPunto > 0 && cliente ? Math.max(0, Math.min(cliente.puntos ?? 0, Math.floor(totalVenta(lineasTotal, dto).toNumber() / valorPunto))) : 0;
+  const puntosCanje = Math.min(Math.max(Math.floor(leerNumeroCO(canjeTxt)?.toNumber() ?? 0), 0), maxCanje);
+  const dtoTotal = dto + puntosCanje * valorPunto;
+  const total = totalVenta(lineasTotal, dtoTotal);
   const sugeridos = useMemo(() => buscarPorNombre(catalogo, busqueda), [catalogo, busqueda]);
   const consumo = useMemo(() => consumoPorProducto(carrito), [carrito]);
-  const cliente = clientes.find((c) => c.id === clienteId) ?? null;
 
   const montos = METODOS.map((m) => ({ metodo: m.valor, monto: leerNumeroCO(pagos[m.valor])?.toNumber() ?? 0 }));
   const resumen = resumirPagos(total, montos);
@@ -195,6 +206,7 @@ export function PuntoDeVenta({
     setPagos({ efectivo: "", nequi: "", daviplata: "", transferencia: "", tarjeta: "", credito: "" });
     setClienteId("");
     setDescuento("");
+    setCanjeTxt("");
     setCobrando(false);
     setErrorCobro(null);
     setExcesoPendiente(false);
@@ -208,7 +220,8 @@ export function PuntoDeVenta({
       offline_id: ventaOfflineId.current,
       bodega_id: bodegaId,
       cliente_id: clienteId || null,
-      descuento: dto,
+      descuento: dtoTotal,
+      puntos_canje: puntosCanje,
       autorizar_exceso_cupo: autorizar,
       cotizacion_id: cotizacionInicial?.id || null,
       pedido_id: pedidoId,
@@ -478,6 +491,14 @@ export function PuntoDeVenta({
                 </option>
               ))}
             </select>
+            {cliente && valorPunto > 0 && (cliente.puntos ?? 0) > 0 ? (
+              <div className="flex items-center gap-2 pt-1 text-sm">
+                <span className="flex-1 text-muted-foreground">⭐ Tiene {cliente.puntos} puntos (= {formatoCOP((cliente.puntos ?? 0) * valorPunto)})</span>
+                <Input aria-label="Puntos a canjear" inputMode="numeric" placeholder="Canjear" className="h-9 w-24 text-right" value={canjeTxt} onChange={(e) => setCanjeTxt(e.target.value)} />
+                <button type="button" className="text-xs underline" onClick={() => setCanjeTxt(String(maxCanje))}>Todos</button>
+              </div>
+            ) : null}
+            {puntosCanje > 0 ? <p className="text-xs text-primary">Se descuentan {formatoCOP(puntosCanje * valorPunto)} por {puntosCanje} puntos.</p> : null}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

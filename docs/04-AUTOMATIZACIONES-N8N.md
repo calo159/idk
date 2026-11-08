@@ -108,3 +108,13 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
 - App: Compras → Sugerencias (elige productos/proveedor/cantidad y crea **una orden de compra en borrador por proveedor**; no mueve inventario).
 - `GET /api/webhooks/reposicion` + `n8n/F7-reposicion-sugerida.json` (lunes 7:00 a. m.) avisan al dueño.
 - **Diferencia con el diseño original:** el pedido al proveedor por WhatsApp y el «responde SÍ para crear la orden» no están: la orden se crea en la app.
+
+### F8 — Fidelización ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0029`: puntos por celular (libro de movimientos: 1 punto por cada `pesos_por_punto`, hacia abajo; se revierten al anular la venta),
+  canje (`valor_punto` pesos por punto) y listas de cumpleaños de hoy y clientes inactivos (2+ compras y 30 a 365 días sin comprar). Apagada por defecto.
+- El saludo de cumpleaños regala puntos de bono (queda en el libro), no un descuento que alguien deba recordar. Cada contacto se registra para no repetirlo
+  (cumpleaños: una vez al año; inactivos: cada 60 días).
+- POS: al elegir un cliente con puntos aparece «Canjear»; el valor entra en el descuento de la venta y el canje se registra al confirmarla.
+  Si dos ventas sin internet gastan los mismos puntos, la segunda no se bloquea: el dueño recibe la alerta `canje_sin_saldo`.
+- App: Clientes → Fidelización (configurar, lista del día con enlace de WhatsApp y «Ya escribí»).
+- `GET/POST /api/webhooks/fidelizacion` + `n8n/F8-fidelizacion.json` (lunes a sábado 9 a. m., mismo horario respetuoso que la cobranza).

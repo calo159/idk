@@ -198,6 +198,9 @@ export async function registrarVenta(
       }
     }
   }
+  // Canje de puntos: se descuentan después de confirmar. Si no alcanzan (p. ej. dos ventas sin internet) la venta
+  // ya está hecha: el servidor avisa al dueño con una alerta.
+  if (d.puntos_canje > 0 && d.cliente_id) await supabase.rpc("canjear_puntos_venta", { p_venta: venta.id, p_puntos: d.puntos_canje });
   // Una promoción vigente cuenta como precio de catálogo (solo si es más baja que el precio de referencia).
   const { data: promos } = await supabase.rpc("promociones_vigentes", { p_org: ctx.organizacionId });
   for (const x of promos ?? []) {
