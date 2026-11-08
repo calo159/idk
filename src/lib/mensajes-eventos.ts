@@ -29,6 +29,14 @@ export function mensajeDeEvento(tipo: string, payload: Payload, negocio: string)
       return `🟡 ${cabecera}\nUn producto llegó a su stock mínimo. Revisa Inventario → Por reponer.`;
     case "stock.negativo":
       return `🟠 ${cabecera}\nHay un producto con stock negativo: se vendió más de lo que había registrado. Revisa Inventario.`;
+    case "pedido.nuevo": {
+      const sin = num(payload.sin_emparejar) || 0;
+      return `🛒 ${cabecera}\nLlegó un pedido por WhatsApp (${num(payload.productos) || 0} producto(s)${sin ? `, ${sin} por confirmar` : ""}). Revísalo en Ventas → Pedidos.`;
+    }
+    case "pedido.confirmado":
+      return `Tu pedido en *${negocio}* está listo ✅\nTotal: *${formatoCOP(num(payload.total) || 0)}* (venta #${texto(payload.numero)}). ¡Gracias por tu compra!`;
+    case "pedido.rechazado":
+      return `Hola, de *${negocio}*. No pudimos atender tu pedido: ${texto(payload.motivo)}. Escríbenos si quieres ajustarlo.`;
     case "compra.anulada":
       return null;
     default:

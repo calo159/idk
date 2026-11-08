@@ -2057,6 +2057,7 @@ export type Database = {
           plan: string;
           creado_en: string;
           dias_credito: number;
+          whatsapp_phone_number_id: string | null;
         };
         Insert: {
           id?: string;
@@ -2070,6 +2071,7 @@ export type Database = {
           plan?: string;
           creado_en?: string;
           dias_credito?: number;
+          whatsapp_phone_number_id?: string | null;
         };
         Update: {
           id?: string;
@@ -2083,6 +2085,7 @@ export type Database = {
           plan?: string;
           creado_en?: string;
           dias_credito?: number;
+          whatsapp_phone_number_id?: string | null;
         };
         Relationships: [];
       };
@@ -2192,6 +2195,73 @@ export type Database = {
           },
           {
             foreignKeyName: "pagos_venta_venta_id_fkey";
+            columns: ["venta_id"];
+            isOneToOne: false;
+            referencedRelation: "ventas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      pedidos_whatsapp: {
+        Row: {
+          id: string;
+          organizacion_id: string;
+          mensaje_id: string;
+          telefono: string;
+          cliente_id: string | null;
+          texto: string;
+          lineas: Json;
+          no_encontrados: Json;
+          estado: string;
+          venta_id: string | null;
+          motivo: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          id?: string;
+          organizacion_id: string;
+          mensaje_id: string;
+          telefono: string;
+          cliente_id?: string | null;
+          texto: string;
+          lineas?: Json;
+          no_encontrados?: Json;
+          estado?: string;
+          venta_id?: string | null;
+          motivo?: string | null;
+          creado_en?: string;
+        };
+        Update: {
+          id?: string;
+          organizacion_id?: string;
+          mensaje_id?: string;
+          telefono?: string;
+          cliente_id?: string | null;
+          texto?: string;
+          lineas?: Json;
+          no_encontrados?: Json;
+          estado?: string;
+          venta_id?: string | null;
+          motivo?: string | null;
+          creado_en?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_whatsapp_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pedidos_whatsapp_organizacion_id_fkey";
+            columns: ["organizacion_id"];
+            isOneToOne: false;
+            referencedRelation: "organizaciones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pedidos_whatsapp_venta_id_fkey";
             columns: ["venta_id"];
             isOneToOne: false;
             referencedRelation: "ventas";
@@ -3505,6 +3575,12 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string[];
       };
+      org_por_numero_whatsapp: {
+        Args: {
+          p_phone_number_id: string;
+        };
+        Returns: { organizacion_id: string; organizacion: string }[];
+      };
       organizaciones_para_resumen: {
         Args: Record<PropertyKey, never>;
         Returns: { id: string; nombre: string; telefono_whatsapp: string }[];
@@ -3650,6 +3726,17 @@ export type Database = {
         };
         Returns: string;
       };
+      registrar_pedido_whatsapp: {
+        Args: {
+          p_org: string;
+          p_mensaje_id: string;
+          p_telefono: string;
+          p_texto: string;
+          p_lineas: Json;
+          p_no_encontrados: Json;
+        };
+        Returns: { pedido_id: string; nuevo: boolean; cliente_id: string }[];
+      };
       registrar_recordatorio: {
         Args: {
           p_cliente: string;
@@ -3742,6 +3829,15 @@ export type Database = {
           p_org: string;
           p_desde: string;
           p_hasta: string;
+        };
+        Returns: undefined;
+      };
+      resolver_pedido_whatsapp: {
+        Args: {
+          p_pedido: string;
+          p_estado: string;
+          p_venta?: string;
+          p_motivo?: string;
         };
         Returns: undefined;
       };

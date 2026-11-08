@@ -39,6 +39,8 @@ export const esquemaVenta = z.object({
       const ahora = Date.now();
       return t <= ahora + 5 * 60_000 && t >= ahora - 7 * 86_400_000;
     }, "La fecha de la venta no es válida"),
+  /** Pedido de WhatsApp del que viene esta venta (se marca confirmado y se avisa al cliente). */
+  pedido_id: zUuid.nullish().transform((v) => v ?? null),
   /** Cotización de la que viene esta venta (se marca como vendida). */
   cotizacion_id: zUuid.nullish().transform((v) => v ?? null),
   /** Un administrador autoriza vender por encima del cupo. */

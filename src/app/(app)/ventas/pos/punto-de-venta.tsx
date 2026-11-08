@@ -67,9 +67,11 @@ export function PuntoDeVenta({
   clientes,
   puedeAutorizarExceso,
   cotizacionInicial = null,
+  pedidoId = null,
   listasPrecios = {},
 }: {
   listasPrecios?: Record<string, Record<string, number>>;
+  pedidoId?: string | null;
   cotizacionInicial?: {
     id: string;
     clienteId: string | null;
@@ -208,7 +210,8 @@ export function PuntoDeVenta({
       cliente_id: clienteId || null,
       descuento: dto,
       autorizar_exceso_cupo: autorizar,
-      cotizacion_id: cotizacionInicial?.id ?? null,
+      cotizacion_id: cotizacionInicial?.id || null,
+      pedido_id: pedidoId,
       lineas: carrito.map((l) => ({
         producto_id: l.productoId,
         presentacion_id: l.presentacionId,

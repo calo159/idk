@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Configuración" };
 export default async function Pagina() {
   const ctx = await requerirContexto();
   const supabase = await crearClienteServidor();
-  const { data: org } = await supabase.from("organizaciones").select("telefono_whatsapp").eq("id", ctx.organizacionId).maybeSingle();
+  const { data: org } = await supabase.from("organizaciones").select("telefono_whatsapp, whatsapp_phone_number_id").eq("id", ctx.organizacionId).maybeSingle();
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <h1 className="text-xl font-semibold">Configuración</h1>
@@ -21,7 +21,7 @@ export default async function Pagina() {
           {ctx.nombre} · {etiquetaRol(ctx.rol)} · {ctx.correo}
         </p>
       </div>
-      {ctx.rol === "dueno" || ctx.rol === "admin" ? <FormWhatsApp actual={org?.telefono_whatsapp ?? null} /> : null}
+      {ctx.rol === "dueno" || ctx.rol === "admin" ? <FormWhatsApp actual={org?.telefono_whatsapp ?? null} numeroId={org?.whatsapp_phone_number_id ?? null} /> : null}
       {puede(ctx.rol, "usuarios.gestionar") ? (
         <Link
           href="/configuracion/usuarios"

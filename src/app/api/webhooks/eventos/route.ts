@@ -23,8 +23,11 @@ export async function GET(req: Request) {
   if (error) return NextResponse.json({ error: "No se pudieron leer los eventos" }, { status: 500 });
 
   const eventos = (data ?? []).map((e) => {
-    const destino = destinoWhatsApp(e.telefono_whatsapp);
-    const mensaje = destino ? mensajeDeEvento(e.tipo, (e.payload ?? {}) as Record<string, unknown>, e.organizacion) : null;
+    const payload = (e.payload ?? {}) as Record<string, unknown>;
+    // Los avisos de pedido confirmado/rechazado van al cliente que hizo el pedido, no al dueño.
+    const paraCliente = (e.tipo === "pedido.confirmado" || e.tipo === "pedido.rechazado") && typeof payload.telefono_cliente === "string";
+    const destino = destinoWhatsApp(paraCliente ? (payload.telefono_cliente as string) : e.telefono_whatsapp);
+    const mensaje = destino ? mensajeDeEvento(e.tipo, payload, e.organizacion) : null;
     return {
       id: e.id,
       organizacion_id: e.organizacion_id,

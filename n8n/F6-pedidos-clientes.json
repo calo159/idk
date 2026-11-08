@@ -1,0 +1,175 @@
+{
+  "name": "F6 - Pedidos de clientes por WhatsApp (Surtix)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-pedidos",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "n1",
+      "name": "Webhook de Meta (clientes)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-pedidos"
+    },
+    {
+      "parameters": {
+        "jsCode": "const v = $json.body?.entry?.[0]?.changes?.[0]?.value;\nconst m = v?.messages?.[0];\nif (!m || m.type !== 'text') return []; // solo texto; audios/imagenes se atienden a mano\nconst cuerpo = JSON.stringify({ phone_number_id: v.metadata.phone_number_id, telefono: m.from, texto: m.text.body, mensaje_id: m.id });\nconst crypto = require('crypto');\nconst fecha = String(Date.now());\nconst firma = crypto.createHmac('sha256', $env.N8N_WEBHOOK_SECRET).update(`${fecha}.${cuerpo}`).digest('hex');\nreturn [{ json: { cuerpo, fecha, firma } }];"
+      },
+      "id": "n2",
+      "name": "Leer y firmar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/pedido",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}"
+            },
+            {
+              "name": "x-surtix-fecha",
+              "value": "={{ $json.fecha }}"
+            },
+            {
+              "name": "x-surtix-firma",
+              "value": "={{ $json.firma }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.cuerpo }}"
+      },
+      "id": "n3",
+      "name": "Enviar pedido a Surtix",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.respuesta !== null && $json.respuesta !== undefined }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "n4",
+      "name": "¿Hay respuesta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.destino, type: 'text', text: { body: $json.respuesta } }) }}"
+      },
+      "id": "n5",
+      "name": "Responder al cliente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook de Meta (clientes)": {
+      "main": [
+        [
+          {
+            "node": "Leer y firmar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer y firmar": {
+      "main": [
+        [
+          {
+            "node": "Enviar pedido a Surtix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar pedido a Surtix": {
+      "main": [
+        [
+          {
+            "node": "¿Hay respuesta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay respuesta?": {
+      "main": [
+        [
+          {
+            "node": "Responder al cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota"
+  },
+  "pinData": {},
+  "meta": {
+    "nota": "El aviso al cliente cuando el negocio confirma/rechaza el pedido lo envía F1 (eventos pedido.confirmado / pedido.rechazado). Falta la verificación GET del webhook de Meta. Sin probar contra n8n/WhatsApp reales."
+  }
+}

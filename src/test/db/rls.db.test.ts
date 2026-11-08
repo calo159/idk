@@ -106,6 +106,7 @@ async function sembrar(nombre: string, correo: string): Promise<Negocio> {
     const det = (await db.query<{ id: string }>("select id from ventas_detalle where venta_id=$1 limit 1", [ventaId])).rows[0]!.id;
     await db.query("select registrar_devolucion_cliente($1,$2::jsonb,'Prueba','nequi')", [ventaId, JSON.stringify([{ venta_detalle_id: det, cantidad: 1 }])]);
   });
+  await db.query("insert into pedidos_whatsapp (organizacion_id, mensaje_id, telefono, texto) values ($1, $2, '3112223344', 'dos de cemento')", [base.orgId, "wamid." + correo]);
   // Orden de compra recibida a crédito, pago al proveedor y devolución (migración 0014)
   await comoUsuario(db, base.duenoId, async () => {
     const oc = (

@@ -92,3 +92,12 @@ Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. M
 - Interpretación: reglas primero (ventas, stock, deudas, gastos con "45 mil", "1,5 millones"…) y la IA (Claude, tool use) solo si las reglas no entienden.
   La IA no puede confirmar ni cancelar: eso solo lo hacen las palabras exactas del dueño. **Todo gasto pide SÍ/NO antes de guardarse.**
 - Pendiente: el nodo de transcripción de audio (elegir proveedor) y la verificación GET del webhook de Meta.
+
+### F6 — Pedidos de clientes por WhatsApp ✅ (sin probar contra n8n/WhatsApp reales)
+- Migración `0024`: `pedidos_whatsapp` (pendiente → confirmado / rechazado). El negocio se identifica por `organizaciones.whatsapp_phone_number_id`
+  (Configuración). Un pedido **no es una venta**: no toca inventario, caja ni cartera hasta que una persona lo vende desde el POS.
+- `POST /api/webhooks/pedido` (token + firma HMAC): extrae renglones con reglas («2 cemento, 10 metros de cable»; la IA solo si las reglas no sacan nada),
+  los empareja con el catálogo (ambiguos y desconocidos quedan "por confirmar" con candidatos) y responde al cliente sin prometer precios.
+- Panel: Ventas → Pedidos WhatsApp → «Preparar venta» abre el POS con el carrito lleno (precios actuales y lista del cliente). Al cobrar, el pedido
+  pasa a confirmado y el cliente recibe el total (`pedido.confirmado` por F1). «Rechazar» avisa con el motivo.
+- Flujo: `n8n/F6-pedidos-clientes.json`. Pendiente: verificación GET del webhook de Meta.
