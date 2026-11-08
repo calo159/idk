@@ -44,7 +44,7 @@ Marca `[x]` al terminar. Cada tarea debe quedar con tests de su lógica crítica
 - [x] 2.12 Foto del cuaderno → productos con existencias y deudas de clientes (migración 0018; la IA propone, la persona revisa; probado con modelo simulado). _(Falta probar con ANTHROPIC_API_KEY real y cuadernos reales.)_
 
 ## Fase 3 — Automatización e inteligencia
-- [ ] 3.1 n8n: outbox, webhooks firmados, flujo de alertas al dueño por WhatsApp.
+- [x] 3.1 n8n: outbox con reclamo seguro, API de eventos con token + firma HMAC anti-repetición, flujo F1 de alertas al dueño por WhatsApp (migración 0020). _(Rutas y SQL probados; el flujo JSON no se probó contra n8n ni WhatsApp reales.)_
 - [ ] 3.2 Resumen diario y reporte semanal en PDF por WhatsApp.
 - [ ] 3.3 Recordatorios de cobro y puntaje de pago.
 - [ ] 3.4 Bot de WhatsApp del dueño (consultas y registro de gastos por texto/audio).

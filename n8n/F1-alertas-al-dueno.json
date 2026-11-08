@@ -1,0 +1,90 @@
+{
+  "name": "F1 - Alertas al dueño (Surtix)",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [{ "field": "minutes", "minutesInterval": 1 }] } },
+      "id": "n1", "name": "Cada minuto", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/eventos?limite=50",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Authorization", "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}" }] },
+        "options": { "timeout": 20000 }
+      },
+      "id": "n2", "name": "Pedir eventos a Surtix", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [420, 300]
+    },
+    {
+      "parameters": { "fieldToSplitOut": "eventos", "options": {} },
+      "id": "n3", "name": "Un ítem por evento", "type": "n8n-nodes-base.splitOut", "typeVersion": 1, "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "conditions": { "boolean": [{ "value1": "={{ $json.omitir }}", "value2": false }] }
+      },
+      "id": "n4", "name": "¿Hay algo que enviar?", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Authorization", "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.destino, type: 'text', text: { preview_url: false, body: $json.mensaje } }) }}",
+        "options": { "timeout": 20000 }
+      },
+      "id": "n5", "name": "Enviar WhatsApp", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1080, 220],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Firma el cuerpo con HMAC-SHA256: \"{fecha}.{cuerpo}\" (ver docs/04-AUTOMATIZACIONES-N8N.md).\nconst crypto = require('crypto');\nconst evento = $('Un ítem por evento').item.json;\nconst falla = $input.item.json.error !== undefined;\nconst cuerpo = JSON.stringify(falla ? { ok: false, error: String($input.item.json.error?.message ?? 'Falló el envío').slice(0, 400) } : { ok: true });\nconst fecha = String(Date.now());\nconst firma = crypto.createHmac('sha256', $env.N8N_WEBHOOK_SECRET).update(`${fecha}.${cuerpo}`).digest('hex');\nreturn { json: { id: evento.id, cuerpo, fecha, firma } };"
+      },
+      "id": "n6", "name": "Armar confirmación firmada", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1300, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SURTIX_URL }}/api/webhooks/eventos/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.SURTIX_API_TOKEN }}" },
+            { "name": "x-surtix-fecha", "value": "={{ $json.fecha }}" },
+            { "name": "x-surtix-firma", "value": "={{ $json.firma }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.cuerpo }}"
+      },
+      "id": "n7", "name": "Confirmar a Surtix", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1520, 300]
+    }
+  ],
+  "connections": {
+    "Cada minuto": { "main": [[{ "node": "Pedir eventos a Surtix", "type": "main", "index": 0 }]] },
+    "Pedir eventos a Surtix": { "main": [[{ "node": "Un ítem por evento", "type": "main", "index": 0 }]] },
+    "Un ítem por evento": { "main": [[{ "node": "¿Hay algo que enviar?", "type": "main", "index": 0 }]] },
+    "¿Hay algo que enviar?": {
+      "main": [
+        [{ "node": "Enviar WhatsApp", "type": "main", "index": 0 }],
+        [{ "node": "Armar confirmación firmada", "type": "main", "index": 0 }]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [{ "node": "Armar confirmación firmada", "type": "main", "index": 0 }],
+        [{ "node": "Armar confirmación firmada", "type": "main", "index": 0 }]
+      ]
+    },
+    "Armar confirmación firmada": { "main": [[{ "node": "Confirmar a Surtix", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "timezone": "America/Bogota" },
+  "pinData": {},
+  "meta": { "nota": "Variables de entorno de n8n: SURTIX_URL, SURTIX_API_TOKEN, N8N_WEBHOOK_SECRET, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_TOKEN. Sin probar contra n8n real." }
+}

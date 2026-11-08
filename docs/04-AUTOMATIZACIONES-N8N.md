@@ -57,3 +57,16 @@ Semanal: export de datos por organización a almacenamiento externo.
 ## Plantillas de WhatsApp
 
 Los mensajes iniciados por el negocio requieren plantillas aprobadas por Meta. Mantener la lista en `n8n/plantillas.md`.
+
+## Implementación (estado real)
+
+### F1 — Alertas al dueño ✅ (sin probar contra un n8n real)
+- Migración `0020`: cada alerta nueva emite `alerta.creada`; `reclamar_eventos` entrega eventos a un solo consumidor
+  (arrendamiento de 2 min, 5 intentos), descarta `stock.bajo` repetidos del día y `comprobante.sospechoso` (ya cubierto por su alerta).
+- `GET /api/webhooks/eventos` (Bearer `SURTIX_API_TOKEN`) devuelve el mensaje ya armado y el destino (`573…`).
+- `POST /api/webhooks/eventos/{id}` confirma `{ok:true}` o `{ok:false,error}`. Exige Bearer **y** firma HMAC:
+  `x-surtix-firma = HMAC_SHA256(secreto, "{x-surtix-fecha}.{cuerpo}")`, fecha en milisegundos, tolerancia ±5 min.
+- Flujo exportado: `n8n/F1-alertas-al-dueno.json`. Variables de n8n: `SURTIX_URL`, `SURTIX_API_TOKEN`, `N8N_WEBHOOK_SECRET`,
+  `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TOKEN`.
+- El dueño configura su WhatsApp en Configuración. Sin número, los eventos se confirman sin enviarse.
+- Nota: los mensajes iniciados por el negocio fuera de la ventana de 24 h requieren plantilla aprobada por Meta (`n8n/plantillas.md`).

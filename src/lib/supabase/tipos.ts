@@ -1312,6 +1312,8 @@ export type Database = {
           intentos: number;
           procesado_en: string | null;
           creado_en: string;
+          error: string | null;
+          bloqueado_hasta: string | null;
         };
         Insert: {
           id?: never;
@@ -1321,6 +1323,8 @@ export type Database = {
           intentos?: number;
           procesado_en?: string | null;
           creado_en?: string;
+          error?: string | null;
+          bloqueado_hasta?: string | null;
         };
         Update: {
           id?: never;
@@ -1330,6 +1334,8 @@ export type Database = {
           intentos?: number;
           procesado_en?: string | null;
           creado_en?: string;
+          error?: string | null;
+          bloqueado_hasta?: string | null;
         };
         Relationships: [
           {
@@ -3305,6 +3311,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      finalizar_evento: {
+        Args: {
+          p_id: number;
+          p_ok: boolean;
+          p_error?: string;
+        };
+        Returns: undefined;
+      };
       iniciar_conteo: {
         Args: {
           p_org: string;
@@ -3349,6 +3363,12 @@ export type Database = {
           p_dias_credito?: number;
         };
         Returns: string;
+      };
+      reclamar_eventos: {
+        Args: {
+          p_limite?: number;
+        };
+        Returns: { id: number; organizacion_id: string; organizacion: string; telefono_whatsapp: string; tipo: string; payload: Json; intentos: number; creado_en: string }[];
       };
       registrar_abono: {
         Args: {
