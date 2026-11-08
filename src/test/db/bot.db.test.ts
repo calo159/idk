@@ -88,6 +88,14 @@ describe("registrar_gasto_bot", () => {
     expect(await f(admin, 1_000_000_000)).toMatch(/monto no es válido/);
     expect(await f(admin, 100, "credito")).toMatch(/crédito/);
   });
+  it("las tablas internas del bot no se pueden leer desde la app (ni por el dueño)", async () => {
+    await db.query("insert into bot_mensajes (mensaje_id, organizacion_id) values ('visible?', $1)", [orgId]);
+    const filas = await comoUsuario(db, dueno, async () => [
+      ...(await db.query("select * from bot_mensajes")).rows,
+      ...(await db.query("select * from bot_pendientes")).rows,
+    ]);
+    expect(filas).toEqual([]);
+  });
   it("un usuario autenticado no puede llamar ninguna función del bot", async () => {
     for (const s of ["select * from bot_resolver('3001112233')", "select bot_registrar_mensaje('x', gen_random_uuid())", "select registrar_gasto_bot(gen_random_uuid(), gen_random_uuid(), 'a','b',1,'efectivo')"]) {
       expect(await comoUsuario(db, dueno, () => mensajeDeError(() => db.query(s))), s).toMatch(/permission denied/);
